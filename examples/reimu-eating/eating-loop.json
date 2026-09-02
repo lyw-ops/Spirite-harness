@@ -25,7 +25,7 @@
   "tracks": [
     {
       "track_id": "breathing",
-      "target": "body",
+      "target": "sprite",
       "motion": "translate_y",
       "amplitude": 1.5,
       "unit": "px",
@@ -55,7 +55,7 @@
     },
     {
       "track_id": "sway",
-      "target": "body",
+      "target": "sprite",
       "motion": "translate_x",
       "amplitude": 0.5,
       "unit": "px",

@@ -1,20 +1,22 @@
 """Deterministic expansion of an Animation Plan into a frame plan.
 
 The frame plan is pure math over the declared motion tracks: per frame, each
-track is sampled into a concrete transform value and translate tracks are
-aggregated into a whole-sprite pixel offset. No pixels are synthesized here;
-renderers (milestone 2+) consume the frame plan.
+track is sampled into a concrete transform value, and translate tracks that
+target the reserved ``"sprite"`` label are aggregated into a whole-sprite pixel
+offset. Tracks targeting semantic parts (``head``, ``hand_right``, …) are
+expanded per frame but never move the aggregate offset. No pixels are
+synthesized here; renderers (milestone 2+) consume the frame plan.
 """
 
 from __future__ import annotations
 
 import hashlib
-import json
 from typing import Any
 
 from . import __version__
 from .curves import sample_track_value
-from .plan import AnimationPlan, resolved_anchor
+from .jsonio import dumps_strict
+from .plan import SPRITE_TARGET, AnimationPlan, resolved_anchor
 
 
 FRAME_PLAN_VERSION = 1
@@ -28,14 +30,22 @@ def _round(value: float) -> float:
 
 
 def sample_offsets(plan: AnimationPlan) -> list[tuple[float, float]]:
-    """Aggregate whole-sprite pixel offset (x right, y down) per frame."""
+    """Aggregate whole-sprite pixel offset (x right, y down) per frame.
+
+    Only translate tracks targeting :data:`~sprite_harness.plan.SPRITE_TARGET`
+    contribute; target-local motion (a hand, a head) never shifts the
+    whole-sprite bounding-box expectation.
+    """
 
     offsets: list[tuple[float, float]] = []
     for index in range(plan.frame_count):
         dx = 0.0
         dy = 0.0
         for track in plan.tracks:
-            if track.motion not in ("translate_x", "translate_y"):
+            if track.target != SPRITE_TARGET or track.motion not in (
+                "translate_x",
+                "translate_y",
+            ):
                 continue
             value = sample_track_value(
                 track.curve,
@@ -54,11 +64,18 @@ def sample_offsets(plan: AnimationPlan) -> list[tuple[float, float]]:
     return offsets
 
 
-def normalize_plan(plan: AnimationPlan, *, canvas: tuple[int, int] | None = None) -> dict[str, Any]:
+def normalize_plan(
+    plan: AnimationPlan,
+    *,
+    canvas: tuple[int, int] | None = None,
+    source: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Canonical fully-defaulted plan document, suitable for ``plan.json``.
 
     ``canvas`` supplies dimensions inherited from the source image when the
-    plan itself declares none.
+    plan itself declares none. ``source`` replaces the plan's own source block
+    (build creation passes the build-relative path plus the inspected identity
+    so the written ``plan.json`` resolves and digest-binds the source).
     """
 
     width, height = (
@@ -108,8 +125,17 @@ def normalize_plan(plan: AnimationPlan, *, canvas: tuple[int, int] | None = None
             for event in plan.events
         ],
     }
-    if plan.source_image is not None:
-        document["source"] = {"image": plan.source_image}
+    if source is not None:
+        document["source"] = dict(source)
+    elif plan.source_image is not None:
+        source_block: dict[str, Any] = {"image": plan.source_image}
+        if plan.source_sha256 is not None:
+            source_block["sha256"] = plan.source_sha256
+        if plan.source_width is not None:
+            source_block["width"] = plan.source_width
+        if plan.source_height is not None:
+            source_block["height"] = plan.source_height
+        document["source"] = source_block
     if plan.seed is not None:
         document["seed"] = plan.seed
     constraints: dict[str, Any] = {}
@@ -125,21 +151,42 @@ def normalize_plan(plan: AnimationPlan, *, canvas: tuple[int, int] | None = None
 
 
 def plan_digest(normalized_plan: dict[str, Any]) -> str:
-    """Stable content digest binding a frame plan to its normalized plan."""
+    """Stable content digest binding a frame plan to its normalized plan.
 
-    canonical = json.dumps(
+    Canonicalization is strict JSON; non-finite numbers (only reachable in
+    invalid, hand-edited plans) map to deterministic strings so the digest is
+    always defined and validation can still report the semantic error.
+    """
+
+    canonical = dumps_strict(
         normalized_plan, sort_keys=True, separators=(",", ":"), ensure_ascii=False
     )
     return "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
-def expand_plan(
-    plan: AnimationPlan,
-    normalized_plan: dict[str, Any],
-    *,
-    source_info: dict[str, Any] | None = None,
-) -> dict[str, Any]:
-    """Sample every track at every frame into a frame plan document."""
+def frame_plan_source(normalized_plan: dict[str, Any]) -> dict[str, Any] | None:
+    """The frame plan's source block, derived only from the normalized plan."""
+
+    source = normalized_plan.get("source")
+    if not isinstance(source, dict):
+        return None
+    if not all(field in source for field in ("image", "sha256", "width", "height")):
+        return None
+    return {
+        "path": source["image"],
+        "sha256": source["sha256"],
+        "width": source["width"],
+        "height": source["height"],
+    }
+
+
+def expand_plan(plan: AnimationPlan, normalized_plan: dict[str, Any]) -> dict[str, Any]:
+    """Sample every track at every frame into a frame plan document.
+
+    Every authoritative frame-plan field is derived from ``plan`` and
+    ``normalized_plan`` alone, so validation can recompute the expected
+    document without trusting the frame plan under test.
+    """
 
     events_by_frame: dict[int, list[str]] = {}
     for event in plan.events:
@@ -186,7 +233,7 @@ def expand_plan(
         "animation_id": plan.animation_id,
         "generated_by": f"sprite-harness {__version__}",
         "plan_digest": plan_digest(normalized_plan),
-        "source": source_info,
+        "source": frame_plan_source(normalized_plan),
         "playback": normalized_plan["playback"],
         "canvas": normalized_plan["canvas"],
         "anchor": {"type": plan.anchor_type, "x": anchor_x, "y": anchor_y},

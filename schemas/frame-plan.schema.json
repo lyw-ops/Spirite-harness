@@ -20,7 +20,11 @@
   "properties": {
     "frame_plan_version": { "const": 1 },
     "animation_id": { "type": "string", "minLength": 1 },
-    "generated_by": { "type": "string", "minLength": 1 },
+    "generated_by": {
+      "type": "string",
+      "pattern": "^sprite-harness \\S+$",
+      "description": "Producing harness release. Informational provenance: validated for shape, not digest-bound, so builds stay validatable across releases."
+    },
     "plan_digest": {
       "type": "string",
       "pattern": "^sha256:[0-9a-f]{64}$",
@@ -36,7 +40,7 @@
           "properties": {
             "path": {
               "type": "string",
-              "description": "Source image path relative to the build directory when possible."
+              "description": "Source image path resolving relative to the build directory; equals the plan.json source.image."
             },
             "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
             "width": { "type": "integer", "minimum": 1 },
@@ -128,8 +132,8 @@
           "additionalProperties": false,
           "required": ["x", "y"],
           "properties": {
-            "x": { "type": "number", "description": "Aggregate translation in px; positive is rightward." },
-            "y": { "type": "number", "description": "Aggregate translation in px; positive is downward." }
+            "x": { "type": "number", "description": "Aggregate whole-sprite translation in px (translate tracks targeting 'sprite' only); positive is rightward." },
+            "y": { "type": "number", "description": "Aggregate whole-sprite translation in px (translate tracks targeting 'sprite' only); positive is downward." }
           }
         },
         "events": {

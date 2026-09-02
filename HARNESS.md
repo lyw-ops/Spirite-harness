@@ -88,8 +88,16 @@ build/
 - Frame files are zero-padded, contiguous from `frame_000.png`, and exactly
   match the `file` entries in `frame-plan.json`.
 - `frame-plan.json` carries a `plan_digest` (SHA-256 of the canonical
-  normalized plan); editing `plan.json` without re-running `plan` fails
-  validation.
+  normalized plan) and every authoritative field of the document — playback,
+  canvas, anchor, reduced motion, source binding, and frames — is verified
+  against a deterministic recomputation from `plan.json`. Editing `plan.json`
+  or hand-editing any part of `frame-plan.json` (values, types, or added
+  fields) fails validation. Only `generated_by` is informational provenance,
+  validated for shape so builds stay checkable across harness releases.
+- When a build has a source image, the generated `plan.json` records it with a
+  path that resolves from inside the build directory plus its SHA-256 and
+  dimensions; `validate` re-inspects the source file and fails on missing,
+  replaced, resized, unreadable, or newly opaque sources.
 - Generated JSON artifacts are deterministic: same inputs, byte-identical
   outputs (no timestamps).
 - Frame-manifest animations (the pre-plan format) keep their existing layout:
@@ -99,16 +107,28 @@ build/
 
 - Keep specifications versioned (`plan_version`, `version`,
   `frame_plan_version`, `qa_version`) and validate versions explicitly.
-- Keep `--json` output valid JSON with stable error codes. Do not mix progress
-  text into standard output in JSON mode.
+- Keep `--json` output strictly standards-compliant JSON with stable error
+  codes: serialize with `allow_nan=False`, map non-finite numbers in
+  diagnostics to the strings `"NaN"`/`"Infinity"`/`"-Infinity"`, and reject
+  non-JSON-compatible specification values (YAML dates, sets, non-finite
+  metadata numbers). Do not mix progress text into standard output in JSON
+  mode.
 - Preserve the documented process exit codes (0 success, 1 validation failure,
   2 malformed specification, 3 missing input, 4 processing failure).
 - Treat frame order in manifests and frame plans as authoritative; natural
   sorting is discovery tooling only.
-- Treat `action` (manifests), `target` (tracks), and `metadata` as
-  human/agent-facing labels. Playback uses only file order, durations, FPS, and
-  loop settings, and the harness never claims a flattened sprite can be
-  perfectly decomposed into named body parts.
+- Treat `action` (manifests), non-`sprite` `target` labels (tracks), and
+  `metadata` as human/agent-facing labels. Playback uses only file order,
+  durations, FPS, and loop settings, and the harness never claims a flattened
+  sprite can be perfectly decomposed into named body parts.
+- The track target `sprite` is reserved for whole-sprite transforms: only
+  translate tracks targeting `sprite` contribute to the aggregate per-frame
+  `offset` that displacement constraints and rendered-frame bbox/ground checks
+  verify. Target-local tracks (`head`, `hand_right`, …) are expanded per frame
+  but cannot be pixel-verified until a renderer/layer contract exists.
+- Looping playback (`playback.loop: true`) requires every track to declare a
+  positive integer `cycles` so all curves are continuous across the loop seam;
+  non-looping playback may use positive fractional cycles.
 - Resolve frame paths inside their animation/build directory; reject traversal
   outside it.
 - The deterministic `seed` is reserved for stochastic stages (milestone 4);

@@ -15,11 +15,17 @@ from typing import Any
 
 import yaml
 
+from .jsonio import json_compat_problems
 from .spec import SpecLoadError
 
 
 ANCHOR_TYPES = ("bottom_center", "center", "custom")
 REDUCED_MOTION_MODES = ("full", "hold_first_frame")
+
+# The one reserved track target: transforms that move the whole sprite.
+# Only translate tracks targeting it contribute to the aggregate frame offset;
+# every other target is a semantic part label a layered renderer may honor.
+SPRITE_TARGET = "sprite"
 
 # motion -> required unit
 SUPPORTED_MOTIONS = {
@@ -65,6 +71,9 @@ class AnimationPlan:
     canvas_height: int | None
     background: str
     source_image: str | None
+    source_sha256: str | None
+    source_width: int | None
+    source_height: int | None
     seed: int | None
     max_displacement_px: float | None
     max_frame_delta_px: float | None
@@ -129,7 +138,7 @@ def _required(mapping: dict[str, Any], field: str, path: Path, *, parent: str = 
 def _reject_unknown(
     mapping: dict[str, Any], allowed: set[str], field: str, path: Path
 ) -> None:
-    unknown = sorted(set(mapping) - allowed)
+    unknown = sorted(str(key) for key in set(mapping) - allowed)
     if unknown:
         raise SpecLoadError(
             "MALFORMED_SPEC",
@@ -244,10 +253,19 @@ def load_plan(plan_path: str | Path) -> AnimationPlan:
     _reject_unknown(playback, {"fps", "frame_count", "loop"}, "playback", path)
 
     source_image: str | None = None
+    source_sha256: str | None = None
+    source_width: int | None = None
+    source_height: int | None = None
     if "source" in data:
         source = _mapping(data["source"], "source", path)
-        _reject_unknown(source, {"image"}, "source", path)
+        _reject_unknown(source, {"image", "sha256", "width", "height"}, "source", path)
         source_image = _string(_required(source, "image", path, parent="source"), "source.image", path)
+        if "sha256" in source:
+            source_sha256 = _string(source["sha256"], "source.sha256", path)
+        if "width" in source:
+            source_width = _integer(source["width"], "source.width", path)
+        if "height" in source:
+            source_height = _integer(source["height"], "source.height", path)
 
     canvas_width: int | None = None
     canvas_height: int | None = None
@@ -312,6 +330,16 @@ def load_plan(plan_path: str | Path) -> AnimationPlan:
     metadata = data.get("metadata", {})
     if not isinstance(metadata, dict):
         raise SpecLoadError("MALFORMED_SPEC", "Field 'metadata' must be an object.", path=path)
+    metadata_problems = json_compat_problems(metadata, "metadata")
+    if metadata_problems:
+        raise SpecLoadError(
+            "METADATA_NOT_JSON_COMPATIBLE",
+            "Field 'metadata' must contain only JSON-compatible values "
+            "(null, booleans, integers, finite floats, strings, arrays, "
+            "objects with string keys).",
+            path=path,
+            details={"problems": metadata_problems},
+        )
 
     return AnimationPlan(
         version=_integer(_required(data, "plan_version", path), "plan_version", path),
@@ -332,6 +360,9 @@ def load_plan(plan_path: str | Path) -> AnimationPlan:
         canvas_height=canvas_height,
         background=background,
         source_image=source_image,
+        source_sha256=source_sha256,
+        source_width=source_width,
+        source_height=source_height,
         seed=seed,
         max_displacement_px=max_displacement_px,
         max_frame_delta_px=max_frame_delta_px,

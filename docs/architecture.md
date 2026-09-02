@@ -38,8 +38,9 @@ source frames + animation.yaml (frame-manifest layer)
 | `plan_validator.py` | Value-level plan checks: versions, anchors, tracks, events, displacement budgets |
 | `curves.py` | Deterministic curve sampling (periodic and mirrored easing curves) |
 | `expand.py` | Plan normalization, content digest, and expansion into the frame plan |
-| `build.py` | Build-directory creation, loading, validation (incl. rendered-frame drift checks), manifest adapter |
+| `build.py` | Build-directory creation, loading, validation (full frame-plan recomputation, source identity re-inspection, rendered-frame drift checks), manifest adapter |
 | `qa.py` | Deterministic QA report assembly and JSON artifact writing |
+| `jsonio.py` | Strict JSON boundary: `allow_nan=False` serialization, deterministic non-finite diagnostics, JSON-compatibility checks for free-form metadata |
 | `spec.py` | Locate and parse frame manifests into typed immutable data |
 | `validator.py` | Manifest frame checks: filesystem, image, dimensions, aspect, alpha |
 | `normalize.py` | Explicit uniform scaling, transparent padding, anchor placement, derived manifest |
@@ -53,9 +54,12 @@ source frames + animation.yaml (frame-manifest layer)
 
 Source sprites and source frames are never modified. `plan` writes only into
 its build directory and refuses an output directory that coincides with the
-spec's or source's directory. Normalization writes under `generated/`. The
-generated frame plan and manifests make derived frame sets explicit instead of
-relying on directory conventions at runtime.
+spec's or source's directory. The generated `plan.json` records the source
+with a build-relative path plus its SHA-256 and dimensions, and `validate`
+re-inspects the file read-only against that digest-bound identity.
+Normalization writes under `generated/`. The generated frame plan and
+manifests make derived frame sets explicit instead of relying on directory
+conventions at runtime.
 
 ## Error boundary
 

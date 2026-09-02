@@ -22,8 +22,16 @@
           "type": "string",
           "minLength": 1,
           "description": "Source sprite path, resolved relative to the plan file. The source is immutable input and is never modified."
-        }
-      }
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "description": "Expected SHA-256 of the source bytes. Generated plan.json always records it; declaring it in an input spec pins the source identity."
+        },
+        "width": { "type": "integer", "minimum": 1, "description": "Expected source width in pixels." },
+        "height": { "type": "integer", "minimum": 1, "description": "Expected source height in pixels." }
+      },
+      "description": "Immutable source sprite plus its digest-bound identity. In a generated plan.json the path resolves relative to the build directory and the identity fields are always present; build validation re-inspects the file against them."
     },
     "canvas": {
       "type": "object",
@@ -107,9 +115,36 @@
     },
     "metadata": {
       "type": "object",
-      "description": "Free-form consumer metadata; the harness never interprets it."
+      "description": "Free-form consumer metadata; the harness never interprets it. Values must be JSON-compatible (null, booleans, integers, finite floats, strings, arrays, objects with string keys); YAML-only values such as dates, sets, and non-finite numbers are rejected (METADATA_NOT_JSON_COMPATIBLE)."
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "required": ["playback"],
+        "properties": {
+          "playback": {
+            "required": ["loop"],
+            "properties": { "loop": { "const": true } }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "tracks": {
+            "items": {
+              "properties": {
+                "cycles": {
+                  "multipleOf": 1,
+                  "description": "Looping playback requires a positive integer cycle count so every curve is continuous across the loop seam (NON_INTEGRAL_LOOP_CYCLES)."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "track": {
       "type": "object",
@@ -120,7 +155,7 @@
         "target": {
           "type": "string",
           "minLength": 1,
-          "description": "Semantic region label such as 'body', 'head', 'hand'. Advisory for renderers."
+          "description": "The reserved label 'sprite' addresses the whole sprite: only translate tracks targeting 'sprite' contribute to the aggregate per-frame offset. Any other value ('head', 'hand_right', ...) is a semantic part label, advisory for layered renderers, and never moves the whole-sprite offset."
         },
         "motion": { "enum": ["translate_x", "translate_y", "rotate", "scale", "opacity"] },
         "amplitude": { "type": "number" },

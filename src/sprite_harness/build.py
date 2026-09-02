@@ -21,13 +21,16 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 from PIL import Image, UnidentifiedImageError
 
-from .expand import FRAME_PLAN_VERSION, expand_plan, normalize_plan, plan_digest, sample_offsets
+from . import __version__
+from .expand import FRAME_PLAN_VERSION, expand_plan, normalize_plan, plan_digest
+from .jsonio import dumps_strict
 from .plan import AnimationPlan, load_plan
 from .plan_validator import validate_plan
 from .processing import ProcessingError
@@ -40,6 +43,26 @@ PLAN_FILENAME = "plan.json"
 FRAME_PLAN_FILENAME = "frame-plan.json"
 FRAMES_DIRNAME = "frames"
 BBOX_TOLERANCE_PX = 2.0
+
+# Every authoritative top-level frame-plan field; anything else is unknown.
+FRAME_PLAN_KEYS = frozenset(
+    {
+        "frame_plan_version",
+        "animation_id",
+        "generated_by",
+        "plan_digest",
+        "source",
+        "playback",
+        "canvas",
+        "anchor",
+        "reduced_motion",
+        "frames",
+    }
+)
+GENERATED_BY_PATTERN = re.compile(r"^sprite-harness \S+$")
+
+# Frame-plan sections recomputed from the trusted plan and compared verbatim.
+RECOMPUTED_SECTIONS = ("playback", "canvas", "anchor", "reduced_motion", "frames")
 
 
 def _issue(code: str, message: str, **context: Any) -> ValidationIssue:
@@ -110,6 +133,40 @@ def inspect_source(
     return {"sha256": f"sha256:{digest}", "width": width, "height": height}, issues
 
 
+def _compare_source_identity(
+    plan: AnimationPlan, source_stats: dict[str, Any], source_path: Path
+) -> list[ValidationIssue]:
+    """Compare a plan's declared source identity against the inspected file."""
+
+    issues: list[ValidationIssue] = []
+    if plan.source_sha256 is not None and plan.source_sha256 != source_stats["sha256"]:
+        issues.append(
+            _issue(
+                "SOURCE_DIGEST_MISMATCH",
+                "Source file content does not match the declared SHA-256.",
+                path=str(source_path),
+                expected=plan.source_sha256,
+                actual=source_stats["sha256"],
+            )
+        )
+    declared = (plan.source_width, plan.source_height)
+    actual = (source_stats["width"], source_stats["height"])
+    if any(
+        expected is not None and expected != measured
+        for expected, measured in zip(declared, actual)
+    ):
+        issues.append(
+            _issue(
+                "SOURCE_DIMENSION_MISMATCH",
+                "Source image dimensions do not match the declared width/height.",
+                path=str(source_path),
+                expected=list(declared),
+                actual=list(actual),
+            )
+        )
+    return issues
+
+
 # ---------------------------------------------------------------------------
 # Build creation (the `plan` command)
 
@@ -134,6 +191,8 @@ def create_build(
     if source_path is not None:
         source_stats, source_issues = inspect_source(source_path, background=plan.background)
         errors.extend(source_issues)
+        if source_stats is not None:
+            errors.extend(_compare_source_identity(plan, source_stats, source_path))
 
     canvas: tuple[int, int] | None = None
     if plan.canvas_width is not None and plan.canvas_height is not None:
@@ -177,19 +236,24 @@ def create_build(
             output=str(output),
         )
 
-    source_info: dict[str, Any] | None = None
+    # The written plan.json records the source with a path that resolves from
+    # its new location inside the build directory, plus the inspected identity
+    # (sha256, dimensions) so the plan digest binds the source.
+    plan_source: dict[str, Any] | None = None
     if source_path is not None and source_stats is not None:
-        source_info = {
-            "path": os.path.relpath(source_path, output),
-            **source_stats,
+        plan_source = {
+            "image": os.path.relpath(source_path, output),
+            "sha256": source_stats["sha256"],
+            "width": source_stats["width"],
+            "height": source_stats["height"],
         }
 
-    normalized = normalize_plan(plan, canvas=canvas)
-    frame_plan = expand_plan(plan, normalized, source_info=source_info)
+    normalized = normalize_plan(plan, canvas=canvas, source=plan_source)
+    frame_plan = expand_plan(plan, normalized)
 
     checks = [
         {"id": "plan_semantics", "status": "pass"},
-        {"id": "source_inspected", "status": "pass" if source_info else "skipped"},
+        {"id": "source_inspected", "status": "pass" if plan_source else "skipped"},
         {"id": "canvas_resolved", "status": "pass"},
         {
             "id": "displacement_constraints",
@@ -253,15 +317,15 @@ def load_build(directory: str | Path) -> BuildArtifacts:
             "MALFORMED_SPEC", "Frame plan root must be an object.", path=frame_plan_path
         )
     plan = load_plan(plan_path)
+    # Canvas fallback comes from the trusted plan's declared source dimensions,
+    # never from the untrusted frame plan under validation.
     canvas = None
-    raw_canvas = frame_plan.get("canvas")
     if (
         plan.canvas_width is None
-        and isinstance(raw_canvas, dict)
-        and isinstance(raw_canvas.get("width"), int)
-        and isinstance(raw_canvas.get("height"), int)
+        and plan.source_width is not None
+        and plan.source_height is not None
     ):
-        canvas = (raw_canvas["width"], raw_canvas["height"])
+        canvas = (plan.source_width, plan.source_height)
     normalized = normalize_plan(plan, canvas=canvas)
     return BuildArtifacts(
         build_dir=build_dir, plan=plan, normalized_plan=normalized, frame_plan=frame_plan
@@ -278,7 +342,10 @@ def validate_build(build: BuildArtifacts) -> tuple[ValidationResult, list[dict[s
     warnings.extend(plan_result.warnings)
     checks.append({"id": "plan_semantics", "status": "pass" if plan_result.valid else "fail"})
 
-    consistent = _validate_frame_plan(build, errors)
+    source_status = _validate_source(build, errors)
+    checks.append({"id": "source_identity", "status": source_status})
+
+    consistent = _validate_frame_plan(build, errors, warnings)
     checks.append({"id": "frame_plan_consistency", "status": "pass" if consistent else "fail"})
 
     if build.frames_dir.is_dir():
@@ -292,12 +359,64 @@ def validate_build(build: BuildArtifacts) -> tuple[ValidationResult, list[dict[s
     return ValidationResult(errors=tuple(errors), warnings=tuple(warnings)), checks
 
 
-def _validate_frame_plan(build: BuildArtifacts, errors: list[ValidationIssue]) -> bool:
+def _canonical(value: Any) -> str:
+    """Canonical strict-JSON form; distinguishes 1 from 1.0 and True from 1."""
+
+    return dumps_strict(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+
+def _validate_source(build: BuildArtifacts, errors: list[ValidationIssue]) -> str:
+    """Re-inspect the source image and compare it with the digest-bound identity."""
+
+    plan = build.plan
+    if plan.source_image is None:
+        return "skipped"
+    before = len(errors)
+    source_path = plan.resolved_source_path()
+    source_stats, issues = inspect_source(source_path, background=plan.background)
+    errors.extend(issues)
+    if source_stats is not None:
+        errors.extend(_compare_source_identity(plan, source_stats, source_path))
+    return "pass" if len(errors) == before else "fail"
+
+
+def _validate_frame_plan(
+    build: BuildArtifacts,
+    errors: list[ValidationIssue],
+    warnings: list[ValidationIssue],
+) -> bool:
+    """Verify the entire frame-plan document against a trusted recomputation.
+
+    Nothing in the frame plan under test feeds the recomputation: the expected
+    document is derived from ``plan.json`` alone (loaded, validated, and
+    re-expanded), then compared section by section in canonical JSON form so
+    changed values, changed types, and added/removed fields all fail.
+    """
+
     frame_plan = build.frame_plan
     before = len(errors)
 
+    unknown = sorted(str(key) for key in set(frame_plan) - FRAME_PLAN_KEYS)
+    if unknown:
+        errors.append(
+            _issue(
+                "MALFORMED_FRAME_PLAN",
+                "Frame plan contains unknown top-level fields.",
+                fields=unknown,
+            )
+        )
+    missing = sorted(FRAME_PLAN_KEYS - set(frame_plan))
+    if missing:
+        errors.append(
+            _issue(
+                "MALFORMED_FRAME_PLAN",
+                "Frame plan is missing required top-level fields.",
+                fields=missing,
+            )
+        )
+
     version = frame_plan.get("frame_plan_version")
-    if version != FRAME_PLAN_VERSION:
+    if "frame_plan_version" in frame_plan and version != FRAME_PLAN_VERSION:
         errors.append(
             _issue(
                 "UNSUPPORTED_FRAME_PLAN_VERSION",
@@ -307,6 +426,28 @@ def _validate_frame_plan(build: BuildArtifacts, errors: list[ValidationIssue]) -
             )
         )
         return False
+
+    generated_by = frame_plan.get("generated_by")
+    if "generated_by" in frame_plan:
+        if not isinstance(generated_by, str) or not GENERATED_BY_PATTERN.match(generated_by):
+            errors.append(
+                _issue(
+                    "MALFORMED_FRAME_PLAN",
+                    "Frame plan 'generated_by' must be a 'sprite-harness <version>' string.",
+                    actual=generated_by,
+                )
+            )
+        elif generated_by != f"sprite-harness {__version__}":
+            # Provenance is informational, not digest-bound: builds stay
+            # validatable across harness releases.
+            warnings.append(
+                _issue(
+                    "GENERATED_BY_MISMATCH",
+                    "Frame plan was generated by a different harness release.",
+                    actual=generated_by,
+                    current=f"sprite-harness {__version__}",
+                )
+            )
 
     if frame_plan.get("animation_id") != build.plan.animation_id:
         errors.append(
@@ -352,16 +493,43 @@ def _validate_frame_plan(build: BuildArtifacts, errors: list[ValidationIssue]) -
             )
         )
 
-    # A deep re-expansion catches any hand-edited transform, offset, or event.
-    if len(errors) == before and validate_plan(build.plan).valid:
-        recomputed = expand_plan(
-            build.plan, build.normalized_plan, source_info=frame_plan.get("source")
-        )
-        if recomputed["frames"] != frames:
+    # A full deterministic recomputation of the document from the trusted plan
+    # catches every hand-edited value: playback, canvas, anchor, reduced
+    # motion, source binding, transforms, offsets, events, files, and types.
+    if validate_plan(build.plan).valid:
+        expected = expand_plan(build.plan, build.normalized_plan)
+        if _canonical(expected["source"]) != _canonical(frame_plan.get("source")):
+            errors.append(
+                _issue(
+                    "FRAME_PLAN_SOURCE_MISMATCH",
+                    "Frame plan source binding does not match the plan's source identity.",
+                    expected=expected["source"],
+                    actual=frame_plan.get("source"),
+                )
+            )
+        for section in RECOMPUTED_SECTIONS:
+            if _canonical(expected[section]) == _canonical(frame_plan.get(section)):
+                continue
+            context: dict[str, Any] = {"section": section}
+            if section == "frames":
+                context["first_mismatch_index"] = next(
+                    (
+                        index
+                        for index, frame in enumerate(expected[section])
+                        if index >= len(frames)
+                        or _canonical(frame) != _canonical(frames[index])
+                    ),
+                    min(len(frames), len(expected[section])),
+                )
+            else:
+                context["expected"] = expected[section]
+                context["actual"] = frame_plan.get(section)
             errors.append(
                 _issue(
                     "FRAME_PLAN_STALE",
-                    "Frame plan content does not match a deterministic re-expansion of the plan.",
+                    "Frame plan content does not match a deterministic "
+                    "re-expansion of the plan.",
+                    **context,
                 )
             )
     return len(errors) == before

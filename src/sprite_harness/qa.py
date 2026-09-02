@@ -6,11 +6,11 @@ re-running the same stage over the same inputs yields byte-identical output.
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
 from . import __version__
+from .jsonio import dumps_strict
 from .validator import ValidationResult
 
 
@@ -40,7 +40,7 @@ def build_qa_report(
 def write_json_artifact(path: Path, document: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
-        json.dumps(document, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        dumps_strict(document, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
 
 

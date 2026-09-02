@@ -30,7 +30,7 @@ def plan_spec(tmp_path: Path):
             "tracks": [
                 {
                     "track_id": "bob",
-                    "target": "body",
+                    "target": "sprite",
                     "motion": "translate_y",
                     "amplitude": 2,
                     "unit": "px",

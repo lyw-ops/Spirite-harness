@@ -26,7 +26,7 @@ def make_plan(tmp_path: Path, **overrides) -> Path:
         "tracks": [
             {
                 "track_id": "bob",
-                "target": "body",
+                "target": "sprite",
                 "motion": "translate_y",
                 "amplitude": 2,
                 "unit": "px",
@@ -218,7 +218,7 @@ def test_displacement_constraint_enforced(tmp_path):
         tracks=[
             {
                 "track_id": "jump",
-                "target": "body",
+                "target": "sprite",
                 "motion": "translate_y",
                 "amplitude": 10,
                 "unit": "px",

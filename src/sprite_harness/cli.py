@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
 import sys
 from typing import Any
@@ -24,6 +23,7 @@ from .exit_codes import (
     SUCCESS,
     VALIDATION_FAILURE,
 )
+from .jsonio import dumps_strict
 from .normalize import NormalizationError, normalize_animation
 from .plan import load_plan
 from .processing import ProcessingError
@@ -101,7 +101,7 @@ def _common(parser: argparse.ArgumentParser) -> None:
 
 def _emit(payload: dict[str, Any], as_json: bool, human: str | None = None) -> None:
     if as_json:
-        print(json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False))
+        print(dumps_strict(payload, indent=2, sort_keys=True, ensure_ascii=False))
     elif human is not None:
         print(human)
     elif payload.get("success", payload.get("valid", False)):

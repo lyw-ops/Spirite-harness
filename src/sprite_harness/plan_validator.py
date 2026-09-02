@@ -13,6 +13,7 @@ from .validator import ValidationIssue, ValidationResult
 
 SUPPORTED_PLAN_VERSIONS = {1}
 ANIMATION_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
+SOURCE_DIGEST_PATTERN = re.compile(r"^sha256:[0-9a-f]{64}$")
 
 
 def _issue(code: str, message: str, **context: object) -> ValidationIssue:
@@ -99,6 +100,8 @@ def validate_plan(plan: AnimationPlan) -> ValidationResult:
             )
         )
 
+    _validate_source_identity(plan, errors)
+
     if plan.seed is not None and plan.seed < 0:
         errors.append(_issue("INVALID_SEED", "Seed must be a non-negative integer.", actual=plan.seed))
 
@@ -146,6 +149,29 @@ def validate_plan(plan: AnimationPlan) -> ValidationResult:
         _validate_displacement(plan, errors)
 
     return ValidationResult(errors=tuple(errors), warnings=tuple(warnings))
+
+
+def _validate_source_identity(plan: AnimationPlan, errors: list[ValidationIssue]) -> None:
+    if plan.source_image is None:
+        return
+    if plan.source_sha256 is not None and not SOURCE_DIGEST_PATTERN.match(plan.source_sha256):
+        errors.append(
+            _issue(
+                "INVALID_SOURCE_IDENTITY",
+                "Source sha256 must have the form 'sha256:<64 hex digits>'.",
+                actual=plan.source_sha256,
+            )
+        )
+    for name, value in (("width", plan.source_width), ("height", plan.source_height)):
+        if value is not None and value < 1:
+            errors.append(
+                _issue(
+                    "INVALID_SOURCE_IDENTITY",
+                    "Source dimensions must be positive integers.",
+                    dimension=name,
+                    actual=value,
+                )
+            )
 
 
 def _validate_tracks(plan: AnimationPlan, errors: list[ValidationIssue]) -> bool:
@@ -215,6 +241,20 @@ def _validate_tracks(plan: AnimationPlan, errors: list[ValidationIssue]) -> bool
                 _issue(
                     "INVALID_CYCLES",
                     "Track cycles must be a finite number above zero.",
+                    track_id=track.track_id,
+                    actual=track.cycles,
+                )
+            )
+            found_error = True
+        elif plan.loop and track.cycles != int(track.cycles):
+            # Loop-cycle continuity contract: a looping animation returns to
+            # frame 0, so every track must complete whole cycles or the curve
+            # value jumps at the loop seam.
+            errors.append(
+                _issue(
+                    "NON_INTEGRAL_LOOP_CYCLES",
+                    "Looping playback requires a positive integer cycle count "
+                    "so the curve is continuous across the loop seam.",
                     track_id=track.track_id,
                     actual=track.cycles,
                 )
