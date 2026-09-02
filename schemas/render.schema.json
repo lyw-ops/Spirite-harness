@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lyw-ops/Spirite-harness/schemas/render.schema.json",
+  "title": "Sprite Harness Render Manifest",
+  "description": "Version 1 record of a completed built-in render: plan revision and motion mode of build/frames/. Published last and valid only when no .render-transaction directory exists. Validation recomputes decoded RGBA pixels from trusted inputs. See docs/renderer.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["render_version", "animation_id", "generated_by", "plan_digest", "mode"],
+  "properties": {
+    "render_version": { "type": "integer", "const": 1 },
+    "animation_id": { "type": "string", "minLength": 1 },
+    "generated_by": {
+      "type": "string",
+      "pattern": "^sprite-harness \\S+$",
+      "description": "Producing harness release. Informational provenance: validated for shape, not digest-bound, so builds stay validatable across releases."
+    },
+    "plan_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "Digest of the canonical normalized plan the frames were rendered from; a mismatch with plan.json fails validation as RENDER_MANIFEST_STALE."
+    },
+    "mode": {
+      "enum": ["full", "hold_first_frame"],
+      "description": "Effective motion mode of the rendered frame set. Validation judges the frames by this mode; 'hold_first_frame' requires byte-identical frames matching the frame-0 pose."
+    }
+  }
+}

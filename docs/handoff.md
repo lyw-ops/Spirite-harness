@@ -1,179 +1,260 @@
 # Project handoff
 
-Last updated: 2026-09-03
+Last updated: 2026-09-03 (milestone 2 + independent-review fixes)
 
 ## Status
 
-Milestone 1 (contract + validation) is implemented and hardened. The hardening
-pass closed five contract gaps: full frame-plan integrity validation, source
-identity revalidation, strict JSON at every boundary, loop-cycle continuity,
-and whole-sprite vs target-local offset semantics. No renderer exists yet by
-design; see `docs/roadmap.md`. Example art is placeholder-only or
-specification-only; no finished animation artwork is claimed.
+Milestone 1 (contract + validation, hardened) and milestone 2 (deterministic
+whole-sprite transform renderer) are implemented. `sprite-harness render`
+turns a validated build (source sprite + `plan.json` + `frame-plan.json`) into
+`build/frames/` plus a `render.json` manifest; rendered output passes the
+milestone-1 validation pipeline end to end (validate → preview →
+contact-sheet → QA). Package version 0.4.0. Example art remains
+placeholder-only or specification-only; no finished animation artwork is
+claimed, and the harness still claims no per-part, layered, or AI-assisted
+rendering.
 
-## Delivered scope
+## Delivered scope (milestone 2, 2026-09-03)
 
-- Canonical provider-neutral protocol in `HARNESS.md`; `AGENTS.md` and
-  `CLAUDE.md` are thin pointers to it
-- Animation Plan IR (`docs/animation-plan.md`) with JSON Schema, typed loader
-  (`plan.py`), value-level validator (`plan_validator.py`), deterministic curve
-  sampling (`curves.py`), and expansion into a digest-bound frame plan
-  (`expand.py`)
-- `sprite-harness plan --spec … [--source …] --output build/` writing
-  `plan.json`, `frame-plan.json`, and `qa/plan.qa.json`; nothing is written
-  when validation fails
-- Build-directory validation (`build.py`): full frame-plan recomputation,
-  source identity re-inspection, and rendered-frame checks
-- Strict JSON boundary (`jsonio.py`) shared by the CLI, artifacts, QA reports,
-  and digest canonicalization
-- Frame-manifest layer unchanged in behavior
+- `sprite-harness render <build> [--reduced-motion] [--overwrite] [--json]`
+- `geometry.py`: per-frame whole-sprite pose sampling and the documented
+  anchor-affine transform, shared by renderer and validator
+- `render.py`: pre-render input validation, transactional staged writes,
+  render manifest written last
+- Render manifest contract: `render.json` + `schemas/render.schema.json` +
+  loader/validator in `build.py` + docs + tests (the one new artifact)
+- Mode-aware, model-based rendered-frame validation in `build.py`
+- Effective scale/opacity validation at plan stage (`plan_validator.py` via
+  `geometry.effective_value_issues`)
+- Renderer semantics fixed in `docs/renderer.md` before implementation;
+  README/HARNESS/roadmap/architecture/animation-plan updated
+- `scripts/create_placeholder_sprite.py` for a labeled programmatic demo
+  sprite
+- 78 milestone-2 tests (229 total; all 151 milestone-1 tests unchanged and passing)
 
-## Hardening decisions (2026-09-03)
+## Independent-review fixes
 
-### Full frame-plan integrity
+The initial 200-test implementation passed its suite but failed five independent
+probes. This revision closes four findings and adds 29 regression cases:
 
-`validate` recomputes the **entire** expected frame plan from `plan.json`
-alone (loaded, semantically validated, re-expanded) and compares every
-authoritative section in canonical strict-JSON form, so changed values,
-changed JSON types (`32` vs `32.0`, `true` vs `1`), added fields, and removed
-fields all fail. Nothing from the frame plan under test feeds the
-recomputation. Codes: `MALFORMED_FRAME_PLAN` (unknown/missing top-level fields
-or an invalid document envelope), `FRAME_PLAN_STALE` with a `section` context
-(recomputed content mismatch, including nested added/removed fields; `frames`
-mismatches also report `first_mismatch_index`),
-`FRAME_PLAN_SOURCE_MISMATCH` (source binding differs from the plan's
-digest-bound identity). `generated_by` is deliberately provenance-only: it
-must match `sprite-harness <version>` in shape (error otherwise), and a
-different release yields only the `GENERATED_BY_MISMATCH` warning so builds
-stay validatable across releases.
+1. Symbolic-link output directories could overwrite source artwork outside the
+   build. Render now rejects output symlinks (including dangling links), source
+   paths inside the output slot, and source hard-link aliases. Validation also
+   rejects linked/out-of-build frame paths.
+2. Per-file publication could leave a mixed generation after an OS error, which
+   an absent manifest incorrectly let validation treat as external full motion.
+   Publication now uses reversible directory/manifest renames under an exclusive
+   `.render-transaction/` guard; interrupted processes and failed rollbacks stay
+   fail-closed and preserve recovery material.
+3. Bounding-box checks missed different RGB, opacity, or interior shape with the
+   same silhouette. Built-in manifests now require exact decoded RGBA comparison
+   against trusted source/pose recomputation. External frames remain geometric
+   inputs, not necessarily pixel copies of the built-in renderer.
+4. Python's `True == 1` accepted boolean render versions. The runtime now checks
+   canonical integer type; the schema explicitly declares an integer.
 
-### Source identity and revalidation
+Regression coverage includes every publication rename, initial publication,
+failed rollback/cleanup, staging-manifest failure, concurrent operations,
+abrupt subprocess exit, source collisions, same-bbox corruption, PNG re-encoding,
+external-frame compatibility, and malformed version types.
 
-`create_build` writes the source into the generated `plan.json` as
-`source: {image, sha256, width, height}` with `image` rewritten (via
-`os.path.relpath`) to resolve from inside the build directory — this covers
-`--source` overrides and makes the identity part of `plan_digest`. The
-Animation Plan schema/loader gained optional `source.sha256/width/height`, so
-`plan.json` still round-trips through the loader, and an input spec may pin
-its source. `validate` re-opens the source read-only and compares digest,
-dimensions, and the alpha requirement (`SOURCE_NOT_FOUND`,
-`SOURCE_INVALID_IMAGE`, `SOURCE_DIGEST_MISMATCH`,
-`SOURCE_DIMENSION_MISMATCH`, `SOURCE_ALPHA_REQUIRED`; new check id
-`source_identity`). The canvas fallback in `load_build` now comes from the
-plan's declared source dimensions, never from the untrusted frame plan.
-Builds without a source keep working when the plan declares a canvas.
+## Key design decisions
 
-### Strict JSON
+### Semantics fixed in docs/renderer.md (the contract)
 
-All serialization goes through `jsonio.dumps_strict` (`allow_nan=False`);
-non-finite numbers in diagnostic contexts become the deterministic strings
-`"NaN"`/`"Infinity"`/`"-Infinity"` first, so a `.nan` FPS still reports
-`INVALID_FPS` at exit 1 instead of crashing. Free-form YAML `metadata` is
-recursively validated as JSON-compatible (null, booleans, integers, finite
-floats, strings, arrays, string-keyed objects); dates, sets, non-string keys,
-and non-finite numbers are rejected at load time with
-`METADATA_NOT_JSON_COMPATIBLE` (exit 2). `plan_digest` canonicalization uses
-the same strict serialization (unchanged digests for all valid plans).
+Pixel centers at `(i + 0.5, j + 0.5)`, x right, y down, positive rotation
+clockwise. Forward map `P = A_dst + offset + R(θ)·s·(p − A_src)` where the
+anchor resolves to a source point and a canvas point; rotation and scale pivot
+on that same anchor, translation comes from the frame's aggregate `offset`
+exactly once (translate transforms are never applied a second time).
+Composition across tracks: rotate sums; scale and opacity multiply as factors
+`1 + value`; opacity clamps into `[0, 1]` silently (documented transfer
+function, like CSS). Uniform scale only. Interpolation is explicit bilinear
+(`Image.transform` with `Resampling.BILINEAR`, transparent fill); a pure
+integral translation takes an exact pixel-copy path (`paste`), so static and
+integer-translate frames are byte-exact copies. Opacity applies after geometry
+via the LUT `floor(alpha × o + 0.5)`. The canvas is fixed; transforms clip.
 
-### Loop cycle continuity
+### Invalid effective values fail at plan time
 
-For `playback.loop: true`, every track's `cycles` must be a positive integer
-value (`2` or `2.0`; otherwise `NON_INTEGRAL_LOOP_CYCLES`). Whole cycles make
-the sampled sequence exactly periodic, so every supported curve — periodic or
-mirrored easing, at any phase — returns to its frame-0 value without a position
-jump at the loop seam. Non-looping animations may keep positive fractional cycles. The
-schema expresses the rule with a root-level `if playback.loop then
-tracks[].cycles multipleOf 1`; the semantic validator enforces it
-authoritatively.
+A sprite scale factor `1 + value ≤ 0` (`INVALID_EFFECTIVE_SCALE`), a negative
+opacity factor (`INVALID_EFFECTIVE_OPACITY`), or a frame with effective
+opacity exactly 0 (`FULLY_TRANSPARENT_FRAME`) is rejected by `validate_plan`,
+so `plan` refuses to write the build and `render` (which re-runs plan
+semantics) refuses too. Compatibility note: plans that previously validated
+with such values (they were never renderable) now fail at exit 1.
 
-### Whole-sprite vs target-local offsets
+### Input validation is separate from old-output validation
 
-The track target `sprite` is reserved for whole-sprite transforms; **only**
-translate tracks targeting `sprite` aggregate into the per-frame `offset`.
-Displacement constraints, the frame-plan `offset`, and rendered-frame
-bbox/ground checks all use these same semantics (they share
-`sample_offsets`). Target-local tracks (`head`, `hand_right`, …) remain in
-`transforms`, deterministic and per-frame, but never move the whole-sprite
-expectation — milestone 1 cannot verify target-local pixels until the
-milestone-3 renderer/layer contract exists. The Reimu example's breathing and
-sway tracks now target `sprite`. Compatibility note: frame plans generated
-before this change with translate tracks on part labels re-validate as stale;
-re-run `plan`.
+`validate_build_inputs` (plan semantics + source identity + full frame-plan
+recomputation) is what `render` requires to pass with zero errors; broken or
+stale files under `frames/` never block a re-render and never bypass input
+integrity. `validate_build` = inputs + render-manifest + frame checks.
 
-## Error-code changes
+### Render manifest (`render.json`) — the minimal contract extension
 
-New: `FRAME_PLAN_SOURCE_MISMATCH`, `SOURCE_DIGEST_MISMATCH`,
-`SOURCE_DIMENSION_MISMATCH`, `NON_INTEGRAL_LOOP_CYCLES`,
-`INVALID_SOURCE_IDENTITY`, `METADATA_NOT_JSON_COMPATIBLE`; new warning
-`GENERATED_BY_MISMATCH`. Broadened: `MALFORMED_FRAME_PLAN` (top-level envelope
-problems), `FRAME_PLAN_STALE` (recomputed content mismatches, including nested
-structural differences; now carries `section` /
-`first_mismatch_index` context), and the `SOURCE_*` codes now also fire during
-build validation. Exit codes 0–4 are unchanged.
+`{render_version, animation_id, generated_by, plan_digest, mode}`. Written
+**after** all frames are published, with `.render-transaction/` removed only
+after commit succeeds. Its presence is meaningful only without a transaction
+marker. Validation: interrupted transaction → error; otherwise
+absent → judged as `full` (backward compatible with externally rendered
+milestone-1 builds); `MALFORMED_RENDER_MANIFEST`,
+`UNSUPPORTED_RENDER_MANIFEST_VERSION`, `RENDER_MANIFEST_STALE` (digest),
+`ANIMATION_ID_MISMATCH`, `RENDER_MODE_MISMATCH` (claiming `hold_first_frame`
+on a plan declaring `full`); `generated_by` stays provenance-only
+(`GENERATED_BY_MISMATCH` warning).
+
+### Reduced motion
+
+`render` renders full motion by default; `--reduced-motion` renders the
+variant the plan declares (`full` → identical to full; `hold_first_frame` →
+the frame-0 pose written to every declared file, byte-identical, count and
+naming preserved). Validation judges a hold set against the frame-0 pose and
+enforces byte identity (`HOLD_FRAME_MISMATCH`) — it never judges hold output
+against full-motion offsets, and full/reduced outputs occupy the same
+`frames/` slot so they cannot mix.
+
+### Model-based frame verification (no self-certification)
+
+With a bound source, expected per-frame geometry is the trusted source's alpha
+channel transformed through the verified pose (shared `geometry` module),
+clipped to the canvas; measured bbox center/bottom must match within the
+existing 2 px tolerance. Built-in renders additionally compare decoded RGBA
+exactly, detecting wrong RGB/opacity/shape even with an unchanged bbox. External
+frame sets retain geometry-only validation and do not claim content identity.
+Expectations never come from the frames under test. Without a bound
+source: pure-translation builds keep the milestone-1 relative-offset check
+(and the measured `FRAME_DELTA_EXCEEDED` check, which now applies only on
+that path); rotate/scale/opacity builds get the stable `GEOMETRY_UNVERIFIED`
+warning instead of a fake pass. Renderer and validator share the geometry
+module deliberately; independent hand-computed reference tests (single pixel
+rotated 90° about a known anchor, 2× scale bbox, exact opacity LUT values,
+anchor placement tables) exist so a shared bug still fails the suite.
+
+### Output safety
+
+Source images are read-only (tests assert the source hash is unchanged).
+Frames and the manifest are staged under the exclusive `.render-transaction/`
+guard. Whole-directory and manifest publication uses reversible renames and
+backup paths; staging/publication failures preserve the old generation when
+rollback succeeds. Failed rollback, cleanup, or abrupt process termination
+retains the guard and remaining recovery material, blocking validation and
+further writes. Recovery instructions are in `docs/renderer.md`; never remove
+the guard merely to bypass validation. Overwrite scope is the declared products
+(frame-plan file names + `render.json`); unknown files in `frames/` abort with
+`FRAMES_DIR_CONFLICT` and are never deleted. Without `--overwrite`, existing
+declared output is refused (`FRAMES_ALREADY_RENDERED`). Renders are
+deterministic (no timestamps/random metadata/absolute paths in artifacts) and
+never consume `plan.seed`.
+
+## Error-code changes (all documented in docs/renderer.md and animation-plan.md)
+
+New plan-stage (exit 1): `INVALID_EFFECTIVE_SCALE`,
+`INVALID_EFFECTIVE_OPACITY`, `FULLY_TRANSPARENT_FRAME`.
+New validate-stage (exit 1): `MALFORMED_RENDER_MANIFEST`,
+`UNSUPPORTED_RENDER_MANIFEST_VERSION`, `RENDER_MANIFEST_STALE`,
+`RENDER_MODE_MISMATCH`, `HOLD_FRAME_MISMATCH`.
+New render-stage (exit 4): `RENDER_SOURCE_REQUIRED`, `UNSUPPORTED_BACKGROUND`,
+`FRAMES_ALREADY_RENDERED`, `FRAMES_DIR_CONFLICT`, `RENDERED_FRAME_EMPTY`,
+`RENDER_SOURCE_UNREADABLE` (defensive), `RENDER_RECOVERY_REQUIRED`.
+New review gates: `RENDER_TRANSACTION_INCOMPLETE` (exit 1 validate / 4 render),
+`FRAME_PATH_OUTSIDE_BUILD`, `FRAME_CONTENT_MISMATCH`,
+`FRAME_CONTENT_UNVERIFIED` (exit 1).
+New warnings: `TARGET_TRACKS_SKIPPED` (render), `GEOMETRY_UNVERIFIED`
+(validate). Process exit codes 0–4 unchanged.
 
 ## Schema changes
 
-- `animation-plan.schema.json`: optional `source.sha256/width/height`;
-  loop→integer-cycles conditional (`allOf`/`if`/`then`, `multipleOf: 1`);
-  reserved-`sprite` target description; JSON-compatible metadata description.
-- `frame-plan.schema.json`: `generated_by` pattern
-  `^sprite-harness \S+$`; clarified `source.path` (build-relative, equals
-  `plan.json` `source.image`) and whole-sprite `offset` descriptions. No
-  structural changes; existing untampered artifacts still conform.
+- New `schemas/render.schema.json` (render manifest v1, explicit integer version).
+- `animation-plan.schema.json`, `frame-plan.schema.json`, `qa.schema.json`
+  unchanged; existing artifacts still conform.
 
-## Verification
+## Compatibility notes
 
-Verified on macOS with Python 3.14.5, Pillow 12.3.0, PyYAML 6.0.3,
-jsonschema 4.x, pytest 9.1.1. The package requires Python 3.11+.
+- Builds rendered externally (no `render.json`) validate as before (full
+  motion, relative check when no source is bound).
+- Builds **with a bound source and frames** are verified model-based against
+  source geometry. Built-in renders with a manifest additionally require exact
+  RGBA agreement; external frames remain geometry-only. Legal clipped
+  translation passes (previously the relative check could flag it).
+- Plans with sprite scale/opacity tracks whose effective values are
+  unrenderable (factor ≤ 0 / < 0 / opacity 0) now fail plan validation.
+- The measured `FRAME_DELTA_EXCEEDED` frame check applies only on the
+  no-source relative path; the plan-stage offset-delta constraint is
+  unchanged.
+- `report` gained a `render_manifest` artifact row; `validate` gained the
+  `render_manifest` check id.
+
+## Verification (macOS, Python 3.14.5, Pillow 12.3.0, PyYAML 6.0.3, pytest 9.1.1)
 
 ```text
-$ .venv/bin/pytest
-151 passed            # was 73; +78 hardening regression tests
-$ python -m compileall src/sprite_harness tests   # clean
-$ pip check                                       # no broken requirements
+$ .venv/bin/pytest                                   # 229 passed (was 151; +78)
+$ .venv/bin/python -m compileall src/sprite_harness tests scripts   # clean
+$ .venv/bin/pip install --no-deps --no-build-isolation .            # installed 0.4.0 wheel
+$ .venv/bin/pip check                                             # no broken requirements
+$ git diff --check                                                   # clean
+$ .venv/bin/sprite-harness --version                                 # 0.4.0 (installed CLI, matches pyproject/__init__)
 
-# plan + validate, human and JSON modes, exit codes verified
-$ sprite-harness plan --spec examples/reimu-eating/eating-loop.json --output <tmp>          # exit 0
-$ sprite-harness validate <tmp> --write-qa [--json]                                         # exit 0
-$ <edit frame-plan.json canvas.width to 999>; sprite-harness validate <tmp> --json          # exit 1, FRAME_PLAN_STALE(section=canvas)
-$ sprite-harness plan --source base.png …; <replace base.png>; validate                     # exit 1, SOURCE_DIGEST_MISMATCH
-$ plan with playback.fps: .nan (YAML)                                                       # exit 1, INVALID_FPS, "actual": "NaN"
-$ sprite-harness validate examples/reimu-eating-task2 [--json]                              # exit 0 (manifest layer intact)
+# Installed-CLI end-to-end (placeholder sprite + examples/reimu-eating):
+$ python scripts/create_placeholder_sprite.py <demo>/sprite.png
+$ sprite-harness plan --spec examples/reimu-eating/eating-loop.json \
+    --source <demo>/sprite.png --output <demo>/build                 # exit 0
+$ sprite-harness render <demo>/build                                 # exit 0, 12 frames,
+                                                                     # TARGET_TRACKS_SKIPPED: head_bob, eating_hand
+$ sprite-harness validate <demo>/build --write-qa                    # exit 0
+$ sprite-harness preview <demo>/build; sprite-harness contact-sheet <demo>/build  # exit 0
+$ sprite-harness render <demo>/build --reduced-motion --overwrite    # exit 0, mode hold_first_frame
+$ sprite-harness validate <demo>/build --json                        # valid: true (hold mode)
+$ shasum -c source.sha                                               # source unchanged by rendering
+
+# Two independent plan+render runs: frames/*.png, render.json, plan.json,
+# frame-plan.json byte-identical across builds.
+# Failure paths: tampered frame-plan -> render exit 1 (FRAME_PLAN_STALE);
+# existing output w/o --overwrite -> exit 4 (FRAMES_ALREADY_RENDERED);
+# missing build -> exit 3; malformed frame-plan JSON -> exit 2.
 ```
 
-Every demonstrated `--json` output and persisted artifact was parsed with a
-strict JSON parser (`json.loads(..., parse_constant=<reject>)`); no
-NaN/Infinity tokens. Two builds from identical inputs and layout are
-byte-identical (`plan.json`, `frame-plan.json`, `qa/plan.qa.json`), including
-builds with a `--source`.
+All `--json` outputs and artifacts parse under a strict JSON parser (tests use
+`parse_constant` rejection). Post-review installed-CLI acceptance ran 22 checks
+outside the repository with `PYTHONPATH` removed and imports confirmed from
+site-packages: two independent full renders were byte-identical, full motion
+produced 12 distinct frames, reduced motion produced one distinct frame across
+12 files, source bytes were unchanged, and same-bbox RGB corruption failed
+validation and was repaired by overwrite. All five original independent
+failure probes also passed against the installed package.
 
-Local quirk: Python 3.14 on macOS skips `.pth` files carrying the hidden file
-flag, which a sandboxed `pip install -e` can set. If `sprite_harness` cannot be
-imported after an editable install, run
-`chflags nohidden .venv/lib/python3.14/site-packages/*.pth`, or use a regular
-`pip install '.[dev]'` (pytest uses `pythonpath=src` regardless).
+Local quirk (unchanged): Python 3.14 on macOS can
+skip `.pth` files carrying the hidden flag after a sandboxed editable install;
+use a regular `pip install '.[dev]'` (pytest uses `pythonpath=src` regardless).
 
 ## Known limitations and non-goals
 
-- No renderer: `build/frames/` must currently be produced externally; preview
-  on a build without frames fails with `FRAMES_NOT_RENDERED`.
-- Target-local (non-`sprite`) transforms are expanded and digest-bound but
-  cannot be pixel-verified until the milestone-3 layer contract exists.
-- `generated_by` is provenance, not digest-bound (deliberate: builds must stay
-  validatable across harness releases); tampering with it alone is detected
-  only when the string shape breaks or the release differs (warning).
-- `rotate`/`scale`/`opacity` tracks are expanded and schema-checked but not
-  yet exercised by any renderer or measured validation.
-- Background values other than `transparent` are metadata only.
-- Source revalidation proves identity at validate time; it cannot prevent a
-  swap after validation (no filesystem locking, by design).
-- No provider APIs, diffusion/image-generation dependencies, ComfyUI, Live2D,
-  interpolation, optical flow, video output, or ffmpeg.
+- Whole-sprite transforms only: target-local tracks are expanded and
+  digest-bound but skipped at render time (`TARGET_TRACKS_SKIPPED`); no
+  automatic decomposition of flattened sprites is claimed. Layered rendering
+  is milestone 3.
+- Only `canvas.background: transparent` renders (`UNSUPPORTED_BACKGROUND`
+  otherwise); other backgrounds remain metadata.
+- Pixel-exact output is guaranteed per environment (Python/Pillow versions);
+  Pillow's resampling may differ across releases. Built-in RGBA verification
+  is exact; re-render under the current environment if resampling differs.
+  The 2 px tolerance applies to geometry, not pixel identity.
+- Transaction recovery handles exceptions and detects interrupted processes;
+  it does not guarantee power-loss durability or defend against a hostile
+  process replacing filesystem paths between system calls.
+- Re-render replaces frames and the manifest; regenerate existing preview,
+  contact-sheet and QA snapshots before distributing that generation.
+- Builds with rotate/scale/opacity but no bound source cannot be
+  geometry-verified (`GEOMETRY_UNVERIFIED` warning, honest skip).
+- No provider APIs, no image generation, no interpolation/optical flow/video,
+  no ffmpeg, no GUI. `plan.seed` is still never consumed (milestone 4).
 
-## Suggested next work (milestone 2)
+## Suggested next work (milestone 3 boundary)
 
-Deterministic whole-sprite transform renderer with Pillow: render
-`build/frames/` from the frame plan (translate + anchor placement first),
-golden-file tests that rendered output passes `validate`, and a
-reduced-motion render mode. Any new plan fields require schema, docs, loader,
-validator, JSON, and compatibility tests in the same change.
+Layered-sprite input: one PNG per declared `target`, a layer manifest bound
+into `plan_digest`, per-layer anchors and composition order, per-layer pose
+rendering reusing `geometry.py`, and layer-aware validation that finally
+pixel-verifies target-local tracks. Keep the milestone-2 whole-sprite path as
+the flattened fallback. Any new artifact/field again requires schema, loader,
+validator, docs, and tests in the same change; still no claim that a flattened
+sprite can be decomposed automatically.

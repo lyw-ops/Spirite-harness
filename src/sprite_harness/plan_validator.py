@@ -6,6 +6,7 @@ import re
 
 from .curves import SUPPORTED_CURVES
 from .expand import sample_offsets
+from .geometry import effective_value_issues
 from .plan import ANCHOR_TYPES, REDUCED_MOTION_MODES, SUPPORTED_MOTIONS, AnimationPlan
 from .spec import is_finite_number
 from .validator import ValidationIssue, ValidationResult
@@ -141,12 +142,12 @@ def validate_plan(plan: AnimationPlan) -> ValidationResult:
         )
 
     # Constraint enforcement requires structurally sound tracks and playback.
-    if (
-        not track_errors
-        and plan.frame_count >= 1
-        and (plan.max_displacement_px is not None or plan.max_frame_delta_px is not None)
-    ):
-        _validate_displacement(plan, errors)
+    if not track_errors and plan.frame_count >= 1:
+        # Effective scale/opacity chains no renderer could honor are plan
+        # errors, so both `plan` and `render` reject them (docs/renderer.md).
+        errors.extend(effective_value_issues(plan))
+        if plan.max_displacement_px is not None or plan.max_frame_delta_px is not None:
+            _validate_displacement(plan, errors)
 
     return ValidationResult(errors=tuple(errors), warnings=tuple(warnings))
 

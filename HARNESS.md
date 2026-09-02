@@ -18,8 +18,11 @@ static sprite (PNG)                     Animation Plan spec (JSON/YAML)
                     v
         build/  plan.json  frame-plan.json  qa/plan.qa.json
                     |
-                    v  (renderer, milestone 2+)
-        build/frames/frame_000.png ...
+                    v
+        sprite-harness render build/  [--reduced-motion]
+                    |
+                    v
+        build/frames/frame_000.png ...   build/render.json
                     |
                     v
         sprite-harness validate build/   -->  qa/frames.qa.json
@@ -55,9 +58,14 @@ Every animation task follows the same steps, whichever agent executes them:
    [--source …] --output build/` writes the canonical `plan.json`.
 4. **Validate the plan** — `plan` refuses to write artifacts for an invalid
    plan; `sprite-harness validate build/` re-checks any existing build.
-5. **Produce frames if a renderer is available** — into `build/frames/`,
-   following the frame plan's file names. Milestone 1 ships no renderer; that
-   is expected.
+5. **Render frames** — `sprite-harness render build/ [--reduced-motion]
+   [--overwrite]` applies the frame plan's whole-sprite transforms (translate,
+   rotate, uniform scale, opacity) to the bound source sprite with Pillow and
+   writes `build/frames/` plus the `render.json` manifest (see
+   `docs/renderer.md`). Tracks targeting sprite parts are skipped with the
+   stable `TARGET_TRACKS_SKIPPED` warning — never silently approximated.
+   Externally rendered frames that follow the frame plan's file names remain
+   valid input for validation.
 6. **Validate generated frames** — `sprite-harness validate build/` checks
    dimensions, alpha, numbering, drift, and displacement against the frame plan.
 7. **Generate a preview** — `sprite-harness preview build/` and
@@ -81,6 +89,7 @@ build/
     plan.qa.json     # QA report for the plan stage
     frames.qa.json   # QA report from `validate --write-qa` once frames exist
   frames/            # renderer output: frame_000.png, frame_001.png, ...
+  render.json        # render manifest: plan digest + motion mode of the frame set
   preview.gif        # optional preview artifacts
   contact-sheet.png
 ```
@@ -98,15 +107,29 @@ build/
   path that resolves from inside the build directory plus its SHA-256 and
   dimensions; `validate` re-inspects the source file and fails on missing,
   replaced, resized, unreadable, or newly opaque sources.
-- Generated JSON artifacts are deterministic: same inputs, byte-identical
-  outputs (no timestamps).
+- A successful render writes `render.json`
+  (`schemas/render.schema.json`) **after** all frame files, binding the frame
+  set to its plan revision (`plan_digest`) and recording the effective motion
+  mode (`full` or `hold_first_frame`); validation judges the frames by that
+  mode and recomputes their decoded RGBA pixels from the bound source. An
+  absent manifest means an externally rendered frame set, judged geometrically
+  as full motion, **only when no `.render-transaction/` marker exists**.
+- Rendering stages complete frame directories and uses reversible renames.
+  Publication failures roll back the previous output; an interrupted process
+  or failed recovery retains `.render-transaction/` and blocks validation and
+  further rendering until recovery. Source/output aliases and symlink output
+  paths are rejected before writing. See `docs/renderer.md` for recovery.
+- Generated artifacts are deterministic: same inputs, same mode, and the same
+  runtime environment yield byte-identical outputs (no timestamps, no random
+  metadata, no absolute temporary paths) — for rendered PNGs as well as JSON.
 - Frame-manifest animations (the pre-plan format) keep their existing layout:
   the manifest plus source frames, with derived products under `generated/`.
 
 ## 4. Stable contracts
 
 - Keep specifications versioned (`plan_version`, `version`,
-  `frame_plan_version`, `qa_version`) and validate versions explicitly.
+  `frame_plan_version`, `render_version`, `qa_version`) and validate versions
+  explicitly.
 - Keep `--json` output strictly standards-compliant JSON with stable error
   codes: serialize with `allow_nan=False`, map non-finite numbers in
   diagnostics to the strings `"NaN"`/`"Infinity"`/`"-Infinity"`, and reject
@@ -124,8 +147,12 @@ build/
 - The track target `sprite` is reserved for whole-sprite transforms: only
   translate tracks targeting `sprite` contribute to the aggregate per-frame
   `offset` that displacement constraints and rendered-frame bbox/ground checks
-  verify. Target-local tracks (`head`, `hand_right`, …) are expanded per frame
-  but cannot be pixel-verified until a renderer/layer contract exists.
+  verify, and only `sprite`-target tracks are rendered by the milestone-2
+  renderer (rotate values add; scale/opacity factors `1 + value` multiply,
+  opacity clamped into `[0, 1]`; semantics fixed in `docs/renderer.md`).
+  Target-local tracks (`head`, `hand_right`, …) are expanded per frame and
+  skipped at render time with a stable warning; they cannot be pixel-verified
+  until a renderer/layer contract exists.
 - Looping playback (`playback.loop: true`) requires every track to declare a
   positive integer `cycles` so all curves are continuous across the loop seam;
   non-looping playback may use positive fractional cycles.
@@ -163,9 +190,11 @@ jsonschema for development. No ffmpeg, no GUI frameworks.
 
 ## 7. Milestone boundaries
 
-The roadmap lives in `docs/roadmap.md`. Milestone 1 (current) is contract +
-validation: `plan` normalizes and expands specifications deterministically but
-synthesizes no pixels. Do not implement model APIs, provider integrations,
-diffusion/image-generation dependencies, ComfyUI, Live2D, interpolation,
-optical flow, or video generation ahead of their milestone, and do not
-generate new copyrighted character artwork at any milestone.
+The roadmap lives in `docs/roadmap.md`. Milestone 1 (contract + validation)
+and milestone 2 (deterministic whole-sprite transform renderer,
+`docs/renderer.md`) are implemented. Layered/per-part rendering is milestone 3
+and is not approximated from flattened sprites. Do not implement model APIs,
+provider integrations, diffusion/image-generation dependencies, ComfyUI,
+Live2D, interpolation, optical flow, or video generation ahead of their
+milestone, and do not generate new copyrighted character artwork at any
+milestone.

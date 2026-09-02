@@ -29,6 +29,7 @@ from .plan import load_plan
 from .processing import ProcessingError
 from .preview import create_preview
 from .qa import build_qa_report, qa_report_path, write_json_artifact
+from .render import render_build
 from .report import build_report, human_report
 from .spec import SpecLoadError, load_spec
 from .validator import validate_animation
@@ -55,6 +56,25 @@ def _parser() -> argparse.ArgumentParser:
         help="Build directory (default: 'build' beside the spec file).",
     )
     plan.add_argument("--json", action="store_true", dest="as_json")
+
+    render = subparsers.add_parser(
+        "render",
+        help="Render build/frames/ by applying the frame plan's whole-sprite "
+        "transforms to the bound source sprite.",
+    )
+    render.add_argument("build", type=Path, help="Build directory produced by 'plan'.")
+    render.add_argument(
+        "--reduced-motion",
+        action="store_true",
+        help="Render the reduced-motion variant the plan declares "
+        "(reduced_motion.mode) instead of full motion.",
+    )
+    render.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Replace previously rendered declared frame files and render.json.",
+    )
+    render.add_argument("--json", action="store_true", dest="as_json")
 
     validate = subparsers.add_parser(
         "validate", help="Validate an animation directory or a plan build directory."
@@ -139,6 +159,36 @@ def _run_plan(args: argparse.Namespace) -> int:
     return SUCCESS if payload["success"] else VALIDATION_FAILURE
 
 
+def _run_render(args: argparse.Namespace) -> int:
+    try:
+        build = load_build(args.build)
+    except SpecLoadError as exc:
+        return _spec_error_payload(args.command, exc, args.as_json)
+    payload = render_build(
+        build, reduced_motion=args.reduced_motion, overwrite=args.overwrite
+    )
+    payload = {"command": args.command, **payload}
+    human: str | None = None
+    if payload["success"]:
+        lines = [
+            f"Rendered {payload['frame_count']} frames "
+            f"(mode: {payload['mode']}) -> {payload['frames_dir']}"
+        ]
+        for warning in payload.get("warnings", []):
+            if warning.get("code") == "TARGET_TRACKS_SKIPPED":
+                skipped = ", ".join(
+                    f"{track['track_id']} ({track['target']})"
+                    for track in warning.get("tracks", [])
+                )
+                lines.append(
+                    "Skipped target-local tracks (not rendered, whole-sprite "
+                    f"transforms only): {skipped}"
+                )
+        human = "\n".join(lines)
+    _emit(payload, args.as_json, human=human)
+    return SUCCESS if payload["success"] else VALIDATION_FAILURE
+
+
 def _run_build_command(args: argparse.Namespace) -> int:
     try:
         build = load_build(args.animation)
@@ -174,6 +224,7 @@ def _run_build_command(args: argparse.Namespace) -> int:
     if args.command == "report":
         artifacts = {
             "frames": build.frames_dir,
+            "render_manifest": build.build_dir / "render.json",
             "preview": build.build_dir / "preview.gif",
             "contact_sheet": build.build_dir / "contact-sheet.png",
             "plan_qa": qa_report_path(build.build_dir, "plan"),
@@ -242,6 +293,9 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "plan":
             return _run_plan(args)
+
+        if args.command == "render":
+            return _run_render(args)
 
         if args.command != "normalize" and is_build_dir(Path(args.animation).expanduser()):
             return _run_build_command(args)

@@ -17,8 +17,8 @@ source sprite + Animation Plan spec
         |
         `--> plan ----> build/plan.json + build/frame-plan.json + build/qa/plan.qa.json
                  |
-                 v  (renderer, milestone 2+)
-             build/frames/*.png
+                 v
+             render [--reduced-motion] --> build/frames/*.png + build/render.json
                  |
                  +--> validate [--write-qa] --> build/qa/frames.qa.json
                  +--> preview / contact-sheet --> build/preview.gif, build/contact-sheet.png
@@ -38,7 +38,9 @@ source frames + animation.yaml (frame-manifest layer)
 | `plan_validator.py` | Value-level plan checks: versions, anchors, tracks, events, displacement budgets |
 | `curves.py` | Deterministic curve sampling (periodic and mirrored easing curves) |
 | `expand.py` | Plan normalization, content digest, and expansion into the frame plan |
-| `build.py` | Build-directory creation, loading, validation (full frame-plan recomputation, source identity re-inspection, rendered-frame drift checks), manifest adapter |
+| `build.py` | Build-directory creation, loading, validation (full frame-plan recomputation, source identity re-inspection, transaction/manifest gates, mode-aware geometry and built-in RGBA verification), manifest adapter |
+| `geometry.py` | Whole-sprite pose sampling (rotate sums, scale/opacity factor products) and the documented anchor-affine transform shared by renderer and validator |
+| `render.py` | Deterministic renderer: input/output safety checks, exclusive transaction marker, whole-directory publication, rollback/recovery, render manifest (docs/renderer.md) |
 | `qa.py` | Deterministic QA report assembly and JSON artifact writing |
 | `jsonio.py` | Strict JSON boundary: `allow_nan=False` serialization, deterministic non-finite diagnostics, JSON-compatibility checks for free-form metadata |
 | `spec.py` | Locate and parse frame manifests into typed immutable data |
@@ -57,8 +59,13 @@ its build directory and refuses an output directory that coincides with the
 spec's or source's directory. The generated `plan.json` records the source
 with a build-relative path plus its SHA-256 and dimensions, and `validate`
 re-inspects the file read-only against that digest-bound identity.
-Normalization writes under `generated/`. The generated frame plan and
-manifests make derived frame sets explicit instead of relying on directory
+Normalization writes under `generated/`. `render` reads the source read-only,
+re-validates every input, rejects output symlinks and source collisions, and
+stages frames under an exclusive `.render-transaction/` marker. Whole-directory
+publication replaces only declared derived products (`frames/frame_NNN.png`
+and `render.json`) with backups and rollback — unknown files are never deleted.
+Unfinished transactions block consumers until recovery. The generated frame plan
+and manifests make derived frame sets explicit instead of relying on directory
 conventions at runtime.
 
 ## Error boundary

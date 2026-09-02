@@ -30,8 +30,9 @@ from PIL import Image, UnidentifiedImageError
 
 from . import __version__
 from .expand import FRAME_PLAN_VERSION, expand_plan, normalize_plan, plan_digest
+from .geometry import expected_alpha_bbox, render_pose, sample_poses
 from .jsonio import dumps_strict
-from .plan import AnimationPlan, load_plan
+from .plan import AnimationPlan, load_plan, resolved_anchor
 from .plan_validator import validate_plan
 from .processing import ProcessingError
 from .qa import build_qa_report, qa_report_path, write_json_artifact
@@ -43,6 +44,16 @@ PLAN_FILENAME = "plan.json"
 FRAME_PLAN_FILENAME = "frame-plan.json"
 FRAMES_DIRNAME = "frames"
 BBOX_TOLERANCE_PX = 2.0
+
+# Render manifest (docs/renderer.md): written by `sprite-harness render` after
+# a complete frame set, binding the frames to a plan revision and a motion mode.
+RENDER_MANIFEST_FILENAME = "render.json"
+RENDER_MANIFEST_VERSION = 1
+RENDER_TRANSACTION_DIRNAME = ".render-transaction"
+RENDER_MODES = ("full", "hold_first_frame")
+RENDER_MANIFEST_KEYS = frozenset(
+    {"render_version", "animation_id", "generated_by", "plan_digest", "mode"}
+)
 
 # Every authoritative top-level frame-plan field; anything else is unknown.
 FRAME_PLAN_KEYS = frozenset(
@@ -332,7 +343,16 @@ def load_build(directory: str | Path) -> BuildArtifacts:
     )
 
 
-def validate_build(build: BuildArtifacts) -> tuple[ValidationResult, list[dict[str, Any]]]:
+def validate_build_inputs(
+    build: BuildArtifacts,
+) -> tuple[ValidationResult, list[dict[str, Any]]]:
+    """Validate everything rendering depends on: plan, source, frame plan.
+
+    Deliberately excludes checks on previously rendered frames so broken or
+    stale derived output never blocks a safe re-render, while a tampered plan,
+    source, or frame plan always does.
+    """
+
     errors: list[ValidationIssue] = []
     warnings: list[ValidationIssue] = []
     checks: list[dict[str, Any]] = []
@@ -348,13 +368,42 @@ def validate_build(build: BuildArtifacts) -> tuple[ValidationResult, list[dict[s
     consistent = _validate_frame_plan(build, errors, warnings)
     checks.append({"id": "frame_plan_consistency", "status": "pass" if consistent else "fail"})
 
-    if build.frames_dir.is_dir():
-        frame_errors, frame_warnings = _validate_frames(build)
+    return ValidationResult(errors=tuple(errors), warnings=tuple(warnings)), checks
+
+
+def validate_build(build: BuildArtifacts) -> tuple[ValidationResult, list[dict[str, Any]]]:
+    transaction = build.build_dir / RENDER_TRANSACTION_DIRNAME
+    if transaction.exists() or transaction.is_symlink():
+        return ValidationResult(errors=(
+            _issue(
+                "RENDER_TRANSACTION_INCOMPLETE",
+                "A render transaction is active or interrupted; recover it before validation.",
+                transaction=str(transaction),
+            ),
+        )), [{"id": "render_transaction", "status": "fail"}]
+    result, checks = validate_build_inputs(build)
+    errors = list(result.errors)
+    warnings = list(result.warnings)
+
+    manifest_path = build.build_dir / RENDER_MANIFEST_FILENAME
+    if (build.frames_dir.exists() or build.frames_dir.is_symlink()
+            or manifest_path.exists() or manifest_path.is_symlink()):
+        mode, manifest_status = _validate_render_manifest(build, manifest_path, errors, warnings)
+        checks.append({"id": "render_manifest", "status": manifest_status})
+        frame_errors, frame_warnings = _validate_frames(
+            build, mode=mode, verify_pixels=manifest_status == "pass"
+        )
         errors.extend(frame_errors)
         warnings.extend(frame_warnings)
         checks.append({"id": "frame_files", "status": "pass" if not frame_errors else "fail"})
     else:
         checks.append({"id": "frame_files", "status": "skipped"})
+
+    if transaction.exists() or transaction.is_symlink():
+        errors.append(_issue(
+            "RENDER_TRANSACTION_INCOMPLETE", "Output changed during validation; retry after recovery.",
+            transaction=str(transaction),
+        ))
 
     return ValidationResult(errors=tuple(errors), warnings=tuple(warnings)), checks
 
@@ -535,19 +584,189 @@ def _validate_frame_plan(
     return len(errors) == before
 
 
-def _expected_offsets(build: BuildArtifacts) -> list[tuple[float, float]]:
-    offsets: list[tuple[float, float]] = []
-    for frame in build.frame_plan.get("frames", []):
-        offset = frame.get("offset", {}) if isinstance(frame, dict) else {}
-        offsets.append((float(offset.get("x", 0.0)), float(offset.get("y", 0.0))))
-    return offsets
+def _validate_render_manifest(
+    build: BuildArtifacts,
+    manifest_path: Path,
+    errors: list[ValidationIssue],
+    warnings: list[ValidationIssue],
+) -> tuple[str, str]:
+    """Validate ``render.json`` and return (effective mode, check status).
+
+    An absent manifest means an externally rendered frame set and is judged as
+    full motion (backward compatible with pre-renderer builds).
+    """
+
+    if manifest_path.is_symlink() or (
+        manifest_path.exists() and not manifest_path.is_file()
+    ):
+        errors.append(_issue(
+            "MALFORMED_RENDER_MANIFEST", "Render manifest must be a regular, non-symlink file.",
+            path=str(manifest_path),
+        ))
+        return "full", "fail"
+    if not manifest_path.is_file():
+        return "full", "skipped"
+    before = len(errors)
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(
+            _issue(
+                "MALFORMED_RENDER_MANIFEST",
+                "Render manifest is not valid JSON.",
+                path=str(manifest_path),
+                detail=str(exc),
+            )
+        )
+        return "full", "fail"
+    if not isinstance(manifest, dict):
+        errors.append(
+            _issue(
+                "MALFORMED_RENDER_MANIFEST",
+                "Render manifest root must be an object.",
+                path=str(manifest_path),
+            )
+        )
+        return "full", "fail"
+
+    unknown = sorted(str(key) for key in set(manifest) - RENDER_MANIFEST_KEYS)
+    if unknown:
+        errors.append(
+            _issue(
+                "MALFORMED_RENDER_MANIFEST",
+                "Render manifest contains unknown fields.",
+                fields=unknown,
+            )
+        )
+    missing = sorted(RENDER_MANIFEST_KEYS - set(manifest))
+    if missing:
+        errors.append(
+            _issue(
+                "MALFORMED_RENDER_MANIFEST",
+                "Render manifest is missing required fields.",
+                fields=missing,
+            )
+        )
+
+    version = manifest.get("render_version")
+    if "render_version" in manifest and type(version) is not int:
+        errors.append(_issue(
+            "MALFORMED_RENDER_MANIFEST", "render_version must be an integer, not a boolean or string.",
+            actual=version,
+        ))
+    elif "render_version" in manifest and version != RENDER_MANIFEST_VERSION:
+        errors.append(
+            _issue(
+                "UNSUPPORTED_RENDER_MANIFEST_VERSION",
+                "Render manifest version is not supported.",
+                actual=version,
+                supported=[RENDER_MANIFEST_VERSION],
+            )
+        )
+
+    generated_by = manifest.get("generated_by")
+    if "generated_by" in manifest:
+        if not isinstance(generated_by, str) or not GENERATED_BY_PATTERN.match(generated_by):
+            errors.append(
+                _issue(
+                    "MALFORMED_RENDER_MANIFEST",
+                    "Render manifest 'generated_by' must be a "
+                    "'sprite-harness <version>' string.",
+                    actual=generated_by,
+                )
+            )
+        elif generated_by != f"sprite-harness {__version__}":
+            warnings.append(
+                _issue(
+                    "GENERATED_BY_MISMATCH",
+                    "Render manifest was generated by a different harness release.",
+                    artifact=RENDER_MANIFEST_FILENAME,
+                    actual=generated_by,
+                    current=f"sprite-harness {__version__}",
+                )
+            )
+
+    if "animation_id" in manifest and manifest.get("animation_id") != build.plan.animation_id:
+        errors.append(
+            _issue(
+                "ANIMATION_ID_MISMATCH",
+                "Render manifest and plan disagree on the animation id.",
+                plan=build.plan.animation_id,
+                render_manifest=manifest.get("animation_id"),
+            )
+        )
+
+    expected_digest = plan_digest(build.normalized_plan)
+    if "plan_digest" in manifest and manifest.get("plan_digest") != expected_digest:
+        errors.append(
+            _issue(
+                "RENDER_MANIFEST_STALE",
+                "Frames were rendered from a different plan revision.",
+                expected=expected_digest,
+                actual=manifest.get("plan_digest"),
+            )
+        )
+
+    mode = manifest.get("mode")
+    if "mode" in manifest and mode not in RENDER_MODES:
+        errors.append(
+            _issue(
+                "MALFORMED_RENDER_MANIFEST",
+                "Render manifest mode is not supported.",
+                actual=mode,
+                supported=list(RENDER_MODES),
+            )
+        )
+        mode = "full"
+    elif mode == "hold_first_frame" and build.plan.reduced_motion != "hold_first_frame":
+        # The plan declares no reduced variant distinct from full motion, so a
+        # hold render cannot be a faithful output of this plan.
+        errors.append(
+            _issue(
+                "RENDER_MODE_MISMATCH",
+                "Render manifest claims a reduced-motion mode the plan does not declare.",
+                manifest_mode=mode,
+                plan_reduced_motion=build.plan.reduced_motion,
+            )
+        )
+    if not isinstance(mode, str) or mode not in RENDER_MODES:
+        mode = "full"
+    return mode, "pass" if len(errors) == before else "fail"
+
+
+def _load_source_rgba(plan: AnimationPlan) -> Image.Image | None:
+    """The trusted source sprite as RGBA, or None when it cannot be read.
+
+    Read-only; identity errors are reported by the source_identity stage, so
+    callers only need the pixels (for modeling expected geometry).
+    """
+
+    source_path = plan.resolved_source_path()
+    if source_path is None or not source_path.is_file():
+        return None
+    try:
+        with Image.open(source_path) as image:
+            image.load()
+            return image.convert("RGBA")
+    except (UnidentifiedImageError, OSError, ValueError):
+        return None
 
 
 def _validate_frames(
     build: BuildArtifacts,
+    *,
+    mode: str = "full",
+    verify_pixels: bool = False,
 ) -> tuple[list[ValidationIssue], list[ValidationIssue]]:
     errors: list[ValidationIssue] = []
     warnings: list[ValidationIssue] = []
+    if build.frames_dir.is_symlink() or (
+        build.frames_dir.exists() and not build.frames_dir.is_dir()
+    ):
+        return [_issue(
+            "FRAMES_DIR_CONFLICT", "frames must be a real directory inside the build.",
+            path=str(build.frames_dir),
+        )], warnings
     plan = build.plan
     frame_plan = build.frame_plan
     canvas = frame_plan.get("canvas", {})
@@ -555,6 +774,19 @@ def _validate_frames(
         (canvas.get("width"), canvas.get("height")) if isinstance(canvas, dict) else (None, None)
     )
     transparent = plan.background.casefold() == "transparent"
+    pixel_source = None
+    pixel_poses = []
+    if verify_pixels and validate_plan(plan).valid:
+        pixel_source = _load_source_rgba(plan)
+        if pixel_source is None:
+            errors.append(_issue(
+                "FRAME_CONTENT_UNVERIFIED",
+                "A built-in render manifest requires a readable bound source for pixel verification.",
+            ))
+        else:
+            pixel_poses = sample_poses(plan)
+            if mode == "hold_first_frame" and pixel_poses:
+                pixel_poses = [pixel_poses[0]] * len(pixel_poses)
 
     expected_files = [
         frame.get("file")
@@ -573,15 +805,25 @@ def _validate_frames(
                 )
             )
 
-    offsets = _expected_offsets(build)
     bboxes: list[tuple[float, float, int] | None] = []  # (center_x, bottom, index)
+    digests: list[str | None] = []
     for index, file in enumerate(expected_files):
         frame_path = build.build_dir / file
+        if frame_path.is_symlink() or not frame_path.resolve().is_relative_to(build.build_dir):
+            errors.append(_issue(
+                "FRAME_PATH_OUTSIDE_BUILD",
+                "Frame paths must stay inside the build and must not be symbolic links.",
+                frame=file, index=index,
+            ))
+            bboxes.append(None)
+            digests.append(None)
+            continue
         if not frame_path.is_file():
             errors.append(
                 _issue("FRAME_MISSING", "Frame file does not exist.", frame=file, index=index)
             )
             bboxes.append(None)
+            digests.append(None)
             continue
         try:
             with Image.open(frame_path) as image:
@@ -603,7 +845,27 @@ def _validate_frames(
                 )
             )
             bboxes.append(None)
+            digests.append(None)
             continue
+        digests.append(hashlib.sha256(frame_path.read_bytes()).hexdigest())
+
+        # Built-in renders promise deterministic RGBA content, not just a
+        # matching silhouette. Recompute from trusted inputs, never from a
+        # digest supplied by the output under test. External frame sets retain
+        # their geometric contract and need not imitate this renderer.
+        if pixel_source is not None and index < len(pixel_poses):
+            trusted_canvas = build.normalized_plan.get("canvas", {})
+            trusted_size = (trusted_canvas.get("width"), trusted_canvas.get("height"))
+            if all(type(dimension) is int and dimension > 0 for dimension in trusted_size):
+                expected_pixels = render_pose(
+                    pixel_source, pixel_poses[index], trusted_size, resolved_anchor(plan)
+                )
+                if rgba.size != expected_pixels.size or rgba.tobytes() != expected_pixels.tobytes():
+                    errors.append(_issue(
+                        "FRAME_CONTENT_MISMATCH",
+                        "Decoded RGBA pixels do not match the deterministic source transform.",
+                        frame=file, index=index,
+                    ))
 
         if expected_size != (None, None) and size != expected_size:
             errors.append(
@@ -649,8 +911,115 @@ def _validate_frames(
             )
         bboxes.append(((left + right) / 2.0, float(bottom), index))
 
-    _validate_drift(build, offsets, bboxes, errors)
+    if mode == "hold_first_frame":
+        # A hold_first_frame render keeps the declared frame count and file
+        # names, so every frame must be byte-identical to the first one.
+        reference = next((digest for digest in digests if digest is not None), None)
+        for index, digest in enumerate(digests):
+            if digest is not None and reference is not None and digest != reference:
+                errors.append(
+                    _issue(
+                        "HOLD_FRAME_MISMATCH",
+                        "hold_first_frame output frames must be byte-identical.",
+                        frame=expected_files[index],
+                        index=index,
+                    )
+                )
+
+    _validate_geometry(build, mode, bboxes, errors, warnings)
     return errors, warnings
+
+
+def _validate_geometry(
+    build: BuildArtifacts,
+    mode: str,
+    bboxes: list[tuple[float, float, int] | None],
+    errors: list[ValidationIssue],
+    warnings: list[ValidationIssue],
+) -> None:
+    """Compare measured frame geometry against trusted expectations.
+
+    Expectations come from the validated plan (recomputed poses) and, when
+    rotation/scale/opacity are involved, from the trusted source image
+    transformed through the documented pose geometry — never from the frames
+    under test (docs/renderer.md).
+    """
+
+    plan = build.plan
+    if not validate_plan(plan).valid:
+        return  # No trusted geometry; plan errors are already reported.
+    poses = sample_poses(plan)
+    if mode == "hold_first_frame" and poses:
+        poses = [poses[0]] * len(poses)
+    if len(poses) != len(bboxes):
+        return  # Count mismatch is reported by frame-plan consistency.
+
+    source = _load_source_rgba(plan) if plan.source_image is not None else None
+    if source is None:
+        # No trusted pixels to model against. Pure translations keep the
+        # relative offset check; rotate/scale/opacity cannot be verified
+        # honestly, so say so instead of guessing.
+        if all(pose.is_translation_only for pose in poses):
+            offsets = [(pose.dx, pose.dy) for pose in poses]
+            _validate_drift(build, offsets, bboxes, errors)
+        else:
+            warnings.append(
+                _issue(
+                    "GEOMETRY_UNVERIFIED",
+                    "Build uses rotate/scale/opacity but binds no readable source "
+                    "image; bbox and ground checks were skipped instead of guessed.",
+                    skipped_checks=["BBOX_DRIFT_EXCEEDED", "GROUND_DRIFT_EXCEEDED"],
+                )
+            )
+        return
+
+    canvas = build.normalized_plan.get("canvas", {})
+    width = canvas.get("width") if isinstance(canvas, dict) else None
+    height = canvas.get("height") if isinstance(canvas, dict) else None
+    if not isinstance(width, int) or not isinstance(height, int):
+        return
+    anchor = resolved_anchor(plan)
+    for box, pose in zip(bboxes, poses):
+        if box is None:
+            continue
+        center, bottom, index = box
+        expected = expected_alpha_bbox(source, pose, (width, height), anchor)
+        if expected is None:
+            errors.append(
+                _issue(
+                    "BBOX_DRIFT_EXCEEDED",
+                    "Frame shows content where the modeled transform produces none.",
+                    index=index,
+                    expected_bbox=None,
+                    actual_center_x=center,
+                    tolerance=BBOX_TOLERANCE_PX,
+                )
+            )
+            continue
+        left, _top, right, expected_bottom = expected
+        expected_center = (left + right) / 2.0
+        if abs(center - expected_center) > BBOX_TOLERANCE_PX:
+            errors.append(
+                _issue(
+                    "BBOX_DRIFT_EXCEEDED",
+                    "Frame content drifts horizontally from the modeled transform.",
+                    index=index,
+                    expected_center_x=expected_center,
+                    actual_center_x=center,
+                    tolerance=BBOX_TOLERANCE_PX,
+                )
+            )
+        if abs(bottom - float(expected_bottom)) > BBOX_TOLERANCE_PX:
+            errors.append(
+                _issue(
+                    "GROUND_DRIFT_EXCEEDED",
+                    "Frame ground line drifts from the modeled transform.",
+                    index=index,
+                    expected_bottom=float(expected_bottom),
+                    actual_bottom=bottom,
+                    tolerance=BBOX_TOLERANCE_PX,
+                )
+            )
 
 
 def _validate_drift(

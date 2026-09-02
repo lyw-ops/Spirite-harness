@@ -22,13 +22,24 @@ it, so every agent executes the same steps and produces the same artifacts.
 python3 -m venv .venv
 .venv/bin/pip install '.[dev]'
 
+# A clearly labeled programmatic placeholder sprite for the demo
+.venv/bin/python scripts/create_placeholder_sprite.py /tmp/demo/sprite.png
+
 # Expand the example Animation Plan into a build directory
 .venv/bin/sprite-harness plan \
   --spec examples/reimu-eating/eating-loop.json \
-  --output /tmp/eating-build/
+  --source /tmp/demo/sprite.png \
+  --output /tmp/demo/build/
 
-# Validate the build (plan + frame plan + rendered frames when present)
-.venv/bin/sprite-harness validate /tmp/eating-build/ --write-qa
+# Render the frame set deterministically from the frame plan
+.venv/bin/sprite-harness render /tmp/demo/build/
+
+# Validate the build (plan + frame plan + rendered frames)
+.venv/bin/sprite-harness validate /tmp/demo/build/ --write-qa
+
+# Preview artifacts
+.venv/bin/sprite-harness preview /tmp/demo/build/
+.venv/bin/sprite-harness contact-sheet /tmp/demo/build/
 
 # Frame-manifest animations (existing frame sets) work too
 .venv/bin/sprite-harness validate examples/reimu-eating-task2 --json
@@ -39,13 +50,18 @@ python3 -m venv .venv
 
 Milestone 1 is **contract + validation**: `plan` normalizes an Animation Plan
 and deterministically expands it into a per-frame transform table
-(`frame-plan.json`) without synthesizing pixels. Renderers arrive in later
-milestones — see [`docs/roadmap.md`](docs/roadmap.md).
+(`frame-plan.json`). Milestone 2 is the **deterministic transform renderer**:
+`render` applies the frame plan's whole-sprite transforms (translate, rotate,
+uniform scale, opacity) to the bound source sprite — semantics in
+[`docs/renderer.md`](docs/renderer.md). Layered per-part rendering and
+AI-assisted generation are later milestones — see
+[`docs/roadmap.md`](docs/roadmap.md).
 
 ## Commands
 
 ```text
 sprite-harness plan --spec FILE [--source PNG] [--output DIR] [--json]
+sprite-harness render <build-dir> [--reduced-motion] [--overwrite] [--json]
 sprite-harness validate <animation|build-dir> [--write-qa] [--json]
 sprite-harness normalize <animation> [--scale none|fit] [--output DIR] [--json]
 sprite-harness preview <animation|build-dir> [--output FILE] [--json]
@@ -63,6 +79,7 @@ or a build directory produced by `plan`.
 | --- | --- | --- |
 | **Animation Plan** (动画计划) | [`schemas/animation-plan.schema.json`](schemas/animation-plan.schema.json) | Declarative intent: source, canvas, FPS, loop, anchor, motion tracks, easing curves, displacement budgets, blink events, reduced motion, seed. See [`docs/animation-plan.md`](docs/animation-plan.md). |
 | **Frame plan** | [`schemas/frame-plan.schema.json`](schemas/frame-plan.schema.json) | Deterministic expansion: one entry per frame with sampled transform values, digest-bound to the plan. |
+| **Render manifest** | [`schemas/render.schema.json`](schemas/render.schema.json) | Record of a completed render: plan digest + motion mode of `build/frames/`. See [`docs/renderer.md`](docs/renderer.md). |
 | **Frame manifest** | [`schemas/animation.schema.json`](schemas/animation.schema.json) | Playable frame sets that already exist on disk. See [`docs/animation-spec.md`](docs/animation-spec.md). |
 | **QA report** | [`schemas/qa.schema.json`](schemas/qa.schema.json) | Deterministic validation record per stage. |
 
@@ -81,6 +98,8 @@ or a build directory produced by `plan`.
 - [`HARNESS.md`](HARNESS.md) — canonical protocol: workflow, artifact
   conventions, stable contracts, artwork safety
 - [`docs/animation-plan.md`](docs/animation-plan.md) — Animation Plan v1
+- [`docs/renderer.md`](docs/renderer.md) — milestone-2 renderer: transform
+  semantics, anchors, reduced motion, overwrite policy, error codes
 - [`docs/animation-spec.md`](docs/animation-spec.md) — frame manifest v1 and
   exit codes
 - [`docs/architecture.md`](docs/architecture.md) — module layout

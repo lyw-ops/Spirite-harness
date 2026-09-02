@@ -12,11 +12,13 @@ and when*, without prescribing how pixels are produced.
 A plan file may be JSON or YAML. `sprite-harness plan` normalizes it into a
 canonical `plan.json` and deterministically expands it into a
 [`frame-plan.json`](../schemas/frame-plan.schema.json) — one entry per frame
-with concrete sampled transform values. No pixels are synthesized in
-milestone 1.
+with concrete sampled transform values. `sprite-harness render` (milestone 2,
+see [`docs/renderer.md`](renderer.md)) turns those values into
+`build/frames/`.
 
 ```bash
 sprite-harness plan --spec animation.json --source base.png --output build/
+sprite-harness render build/
 sprite-harness validate build/ --write-qa
 ```
 
@@ -57,6 +59,12 @@ A track applies one motion to one semantic target:
 
 - `motion` / `unit` pairs: `translate_x`/`translate_y` → `px`, `rotate` →
   `deg`, `scale`/`opacity` → `ratio` (effective value is `1 + sampled value`).
+  Across multiple `sprite` tracks of one motion, rotate samples add and
+  scale/opacity factors multiply; effective opacity is clamped into `[0, 1]`.
+  A sprite scale factor reaching zero or below, a negative opacity factor, or
+  a frame with effective opacity exactly zero is rejected at plan validation
+  (`INVALID_EFFECTIVE_SCALE`, `INVALID_EFFECTIVE_OPACITY`,
+  `FULLY_TRANSPARENT_FRAME`) — see [`docs/renderer.md`](renderer.md).
 - The reserved target `sprite` addresses the whole sprite. Every other
   `target` is an advisory semantic part label (`head`, `hand_right`, …); the
   harness does not claim an arbitrary flattened sprite can be decomposed into
@@ -130,7 +138,9 @@ Plan-stage codes: `UNSUPPORTED_PLAN_VERSION`, `INVALID_ANIMATION_ID`,
 `NON_INTEGRAL_LOOP_CYCLES`, `INVALID_PHASE`, `DUPLICATE_EVENT_ID`,
 `EVENT_FRAME_OUT_OF_RANGE`, `DISPLACEMENT_EXCEEDED`, `FRAME_DELTA_EXCEEDED`,
 `SOURCE_NOT_FOUND`, `SOURCE_INVALID_IMAGE`, `SOURCE_ALPHA_REQUIRED`,
-`SOURCE_DIGEST_MISMATCH`, `SOURCE_DIMENSION_MISMATCH`, `CANVAS_UNRESOLVED`.
+`SOURCE_DIGEST_MISMATCH`, `SOURCE_DIMENSION_MISMATCH`, `CANVAS_UNRESOLVED`,
+`INVALID_EFFECTIVE_SCALE`, `INVALID_EFFECTIVE_OPACITY`,
+`FULLY_TRANSPARENT_FRAME`.
 Warnings: `ZERO_MOTION`, `CANVAS_SOURCE_MISMATCH`.
 
 Build/frame-stage codes: `UNSUPPORTED_FRAME_PLAN_VERSION`,
@@ -141,9 +151,25 @@ Build/frame-stage codes: `UNSUPPORTED_FRAME_PLAN_VERSION`,
 `SOURCE_DIMENSION_MISMATCH`, `FRAME_MISSING`, `UNEXPECTED_FRAME_FILE`,
 `FRAME_INVALID_IMAGE`, `FRAME_DIMENSION_MISMATCH`, `FRAME_ALPHA_REQUIRED`,
 `FRAME_EMPTY`, `BBOX_DRIFT_EXCEEDED`, `GROUND_DRIFT_EXCEEDED`,
-`FRAME_DELTA_EXCEEDED`. Warnings: `CONTENT_TOUCHES_EDGE` (possible cropping),
-`GENERATED_BY_MISMATCH` (build produced by a different harness release).
-Measured-pixel checks use a fixed 2 px tolerance for subpixel rendering.
+`FRAME_DELTA_EXCEEDED`, `MALFORMED_RENDER_MANIFEST`,
+`UNSUPPORTED_RENDER_MANIFEST_VERSION`, `RENDER_MANIFEST_STALE`,
+`RENDER_MODE_MISMATCH`, `HOLD_FRAME_MISMATCH`, `RENDER_TRANSACTION_INCOMPLETE`,
+`FRAMES_DIR_CONFLICT`, `FRAME_PATH_OUTSIDE_BUILD`, `FRAME_CONTENT_MISMATCH`,
+`FRAME_CONTENT_UNVERIFIED`. Warnings:
+`CONTENT_TOUCHES_EDGE` (possible cropping), `GENERATED_BY_MISMATCH` (build
+produced by a different harness release), `GEOMETRY_UNVERIFIED`
+(rotate/scale/opacity with no bound source to model against).
+Geometric checks use a fixed 2 px tolerance for subpixel rendering;
+builds with a bound source are verified against the source image transformed
+through the documented pose geometry. Built-in outputs with `render.json`
+additionally require exact decoded RGBA agreement with that recomputation;
+external frame sets keep the geometric contract (see [`docs/renderer.md`](renderer.md)).
+
+Render-stage codes (exit 4, `sprite-harness render`):
+`RENDER_SOURCE_REQUIRED`, `UNSUPPORTED_BACKGROUND`, `FRAMES_ALREADY_RENDERED`,
+`FRAMES_DIR_CONFLICT`, `RENDERED_FRAME_EMPTY`, `RENDER_SOURCE_UNREADABLE`,
+`RENDER_TRANSACTION_INCOMPLETE`, `RENDER_RECOVERY_REQUIRED`.
+Warning: `TARGET_TRACKS_SKIPPED`.
 
 Loading errors (exit 2) additionally include `METADATA_NOT_JSON_COMPATIBLE`
 for YAML metadata that cannot be represented as standard JSON.

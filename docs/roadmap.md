@@ -4,7 +4,7 @@ Milestones are strictly separated so the contract stabilizes before any pixel
 synthesis exists. Each milestone builds on the artifacts of the previous one;
 none may weaken the provider-neutral boundary in [`HARNESS.md`](../HARNESS.md).
 
-## Milestone 1 — Contract + validation (current)
+## Milestone 1 — Contract + validation (implemented)
 
 - Animation Plan IR, JSON Schemas (plan, frame plan, QA report, frame manifest)
 - `sprite-harness plan`: normalization and deterministic expansion into a
@@ -14,15 +14,21 @@ none may weaken the provider-neutral boundary in [`HARNESS.md`](../HARNESS.md).
 - GIF preview and contact sheet from rendered frame directories
 - Deterministic QA reports
 
-## Milestone 2 — Deterministic transform renderer
+## Milestone 2 — Deterministic transform renderer (implemented)
 
-- Render `build/frames/` from a single source sprite by applying the frame
-  plan's whole-sprite transforms (translate; then rotate/scale/opacity) with
-  Pillow, honoring anchor placement and transparent padding
-- Golden-file tests: rendered frames must pass milestone-1 validation
-- Reduced-motion variants rendered from the same plan
+- `sprite-harness render`: `build/frames/` from a single source sprite by
+  applying the frame plan's whole-sprite transforms (translate, rotate,
+  uniform scale, opacity) with Pillow, honoring anchor placement and
+  transparent padding — semantics fixed in `docs/renderer.md`
+- Render manifest (`render.json`, `schemas/render.schema.json`) binding the
+  frame set to its plan revision and motion mode; transactional writes;
+  model-based frame validation from the trusted source image
+- Hand-computed reference tests; rendered frames pass milestone-1 validation
+- Reduced-motion variants (`--reduced-motion`, `hold_first_frame`) rendered
+  from the same plan
+- Target-local tracks are skipped with a stable warning, never approximated
 
-## Milestone 3 — Layered-sprite animation
+## Milestone 3 — Layered-sprite animation (next)
 
 - Optional layered input (one PNG per declared `target`) so tracks address
   real parts instead of the whole sprite
