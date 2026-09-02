@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lyw-ops/Spirite-harness/schemas/qa.schema.json",
+  "title": "Sprite Harness QA Report",
+  "description": "Version 1 deterministic QA report written by the plan and validate stages. Contains no wall-clock timestamps so identical inputs produce identical reports.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "qa_version",
+    "stage",
+    "animation_id",
+    "generated_by",
+    "valid",
+    "errors",
+    "warnings",
+    "checks"
+  ],
+  "properties": {
+    "qa_version": { "const": 1 },
+    "stage": {
+      "enum": ["plan", "build", "frames"],
+      "description": "'plan' after plan normalization/expansion, 'build' for a build directory without rendered frames, 'frames' when rendered frames were validated."
+    },
+    "animation_id": { "type": "string", "minLength": 1 },
+    "generated_by": { "type": "string", "minLength": 1 },
+    "valid": { "type": "boolean" },
+    "errors": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/issue" }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/issue" }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "status"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["pass", "fail", "skipped"] }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "issue": {
+      "type": "object",
+      "required": ["code", "message"],
+      "properties": {
+        "code": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

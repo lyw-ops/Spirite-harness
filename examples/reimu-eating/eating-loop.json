@@ -1,0 +1,87 @@
+{
+  "plan_version": 1,
+  "animation_id": "eating_loop",
+  "canvas": {
+    "width": 192,
+    "height": 208,
+    "background": "transparent"
+  },
+  "playback": {
+    "fps": 8,
+    "frame_count": 12,
+    "loop": true
+  },
+  "anchor": {
+    "type": "bottom_center"
+  },
+  "seed": 20260902,
+  "constraints": {
+    "max_displacement_px": 4,
+    "max_frame_delta_px": 2
+  },
+  "reduced_motion": {
+    "mode": "hold_first_frame"
+  },
+  "tracks": [
+    {
+      "track_id": "breathing",
+      "target": "body",
+      "motion": "translate_y",
+      "amplitude": 1.5,
+      "unit": "px",
+      "curve": "sine",
+      "cycles": 1,
+      "phase": 0.75
+    },
+    {
+      "track_id": "head_bob",
+      "target": "head",
+      "motion": "translate_y",
+      "amplitude": 1,
+      "unit": "px",
+      "curve": "ease_in_out",
+      "cycles": 2,
+      "phase": 0.1
+    },
+    {
+      "track_id": "eating_hand",
+      "target": "hand_right",
+      "motion": "translate_y",
+      "amplitude": -1.5,
+      "unit": "px",
+      "curve": "ease_in_out",
+      "cycles": 2,
+      "phase": 0
+    },
+    {
+      "track_id": "sway",
+      "target": "body",
+      "motion": "translate_x",
+      "amplitude": 0.5,
+      "unit": "px",
+      "curve": "sine",
+      "cycles": 1,
+      "phase": 0
+    }
+  ],
+  "events": [
+    {
+      "event_id": "blink_mid",
+      "type": "blink",
+      "target": "eyes",
+      "frames": [5, 6]
+    },
+    {
+      "event_id": "chew_a",
+      "type": "mouth_chew",
+      "target": "mouth",
+      "frames": [2, 3, 8, 9]
+    }
+  ],
+  "metadata": {
+    "character": "reimu",
+    "consumer": "gensokyo-codex-pets",
+    "consumer_state": "work_eating",
+    "notes": "Restrained secondary motion by design: Reimu should feel alive, not busy. Amplitudes stay within the 4 px displacement budget of a 192x208 desktop-pet cell."
+  }
+}

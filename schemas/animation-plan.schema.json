@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lyw-ops/Spirite-harness/schemas/animation-plan.schema.json",
+  "title": "Sprite Harness Animation Plan",
+  "description": "Version 1 declarative intermediate representation (动画计划) describing how a static source sprite becomes an animation. Character- and provider-neutral by design.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["plan_version", "animation_id", "playback"],
+  "properties": {
+    "plan_version": { "const": 1 },
+    "animation_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+      "description": "Filesystem-safe slug naming this animation."
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["image"],
+      "properties": {
+        "image": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Source sprite path, resolved relative to the plan file. The source is immutable input and is never modified."
+        }
+      }
+    },
+    "canvas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "background": { "type": "string", "minLength": 1, "default": "transparent" }
+      },
+      "description": "Output frame dimensions. When omitted, the source image dimensions are inherited; a plan with neither canvas nor source cannot be expanded."
+    },
+    "playback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fps", "frame_count", "loop"],
+      "properties": {
+        "fps": { "type": "number", "exclusiveMinimum": 0 },
+        "frame_count": { "type": "integer", "minimum": 1 },
+        "loop": { "type": "boolean" }
+      }
+    },
+    "anchor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "enum": ["bottom_center", "center", "custom"] },
+        "x": { "type": "number", "minimum": 0, "maximum": 1 },
+        "y": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "description": "Stable reference point of the sprite in normalized canvas coordinates. 'custom' requires x and y; the named types forbid them. Default: bottom_center.",
+      "if": { "properties": { "type": { "const": "custom" } } },
+      "then": { "required": ["type", "x", "y"] },
+      "else": {
+        "properties": {
+          "type": { "enum": ["bottom_center", "center"] }
+        },
+        "not": { "anyOf": [{ "required": ["x"] }, { "required": ["y"] }] }
+      }
+    },
+    "seed": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Deterministic seed for stochastic stages (e.g. AI-assisted rendering). Milestone 1 expansion is fully deterministic and does not consume it."
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_displacement_px": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Maximum per-axis whole-sprite offset from the base pose."
+        },
+        "max_frame_delta_px": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Maximum per-axis offset change between consecutive frames (including the loop seam)."
+        }
+      }
+    },
+    "reduced_motion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode"],
+      "properties": {
+        "mode": { "enum": ["full", "hold_first_frame"] }
+      },
+      "description": "How runtimes should honor an OS reduced-motion preference."
+    },
+    "tracks": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/track" },
+      "description": "Deterministic motion tracks. Targets are semantic labels; the harness does not guarantee that a flattened sprite can be decomposed into them."
+    },
+    "events": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/event" },
+      "description": "Discrete per-frame annotations (e.g. blink) for renderers and runtimes."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Free-form consumer metadata; the harness never interprets it."
+    }
+  },
+  "$defs": {
+    "track": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["track_id", "target", "motion", "amplitude", "unit"],
+      "properties": {
+        "track_id": { "type": "string", "minLength": 1 },
+        "target": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Semantic region label such as 'body', 'head', 'hand'. Advisory for renderers."
+        },
+        "motion": { "enum": ["translate_x", "translate_y", "rotate", "scale", "opacity"] },
+        "amplitude": { "type": "number" },
+        "unit": {
+          "enum": ["px", "deg", "ratio"],
+          "description": "Must match the motion: translate_* -> px, rotate -> deg, scale/opacity -> ratio."
+        },
+        "curve": {
+          "enum": ["sine", "triangle", "linear", "ease_in", "ease_out", "ease_in_out", "hold"],
+          "default": "sine",
+          "description": "Periodic curves span [-1, 1]; easing curves are mirrored per cycle and span [0, 1]; 'hold' is constant zero."
+        },
+        "cycles": { "type": "number", "exclusiveMinimum": 0, "default": 1 },
+        "phase": { "type": "number", "minimum": 0, "exclusiveMaximum": 1, "default": 0 }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event_id", "type", "frames"],
+      "properties": {
+        "event_id": { "type": "string", "minLength": 1 },
+        "type": { "type": "string", "minLength": 1 },
+        "target": { "type": "string", "minLength": 1 },
+        "frames": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  }
+}

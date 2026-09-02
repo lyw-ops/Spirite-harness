@@ -1,0 +1,35 @@
+version: 1
+id: reimu_eating_task_2.normalized
+character:
+  id: reimu
+state:
+  id: eating.task_2
+canvas:
+  width: 1024
+  height: 1024
+  background: transparent
+anchor:
+  x: 0.5
+  y: 0.94
+playback:
+  fps: 6.0
+  loop: true
+frames:
+- file: normalized/frame_000.png
+  duration: 1.0
+  action: hold_onigiri
+- file: normalized/frame_001.png
+  duration: 1.0
+  action: raise_onigiri
+- file: normalized/frame_002.png
+  duration: 1.0
+  action: bite
+- file: normalized/frame_003.png
+  duration: 1.0
+  action: puff_cheeks
+- file: normalized/frame_004.png
+  duration: 1.0
+  action: chew
+- file: normalized/frame_005.png
+  duration: 1.0
+  action: return

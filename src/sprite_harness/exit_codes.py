@@ -1,0 +1,8 @@
+"""Stable process exit codes for all CLI clients."""
+
+SUCCESS = 0
+VALIDATION_FAILURE = 1
+MALFORMED_SPECIFICATION = 2
+MISSING_INPUT = 3
+PROCESSING_FAILURE = 4
+
