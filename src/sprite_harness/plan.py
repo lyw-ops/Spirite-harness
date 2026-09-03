@@ -58,6 +58,20 @@ class PlanEvent:
 
 
 @dataclass(frozen=True)
+class Layer:
+    target: str
+    source_image: str
+    anchor_type: str
+    anchor_x: float | None
+    anchor_y: float | None
+    position_x: float
+    position_y: float
+    source_sha256: str | None = None
+    source_width: int | None = None
+    source_height: int | None = None
+
+
+@dataclass(frozen=True)
 class AnimationPlan:
     version: int
     animation_id: str
@@ -82,6 +96,19 @@ class AnimationPlan:
     events: tuple[PlanEvent, ...]
     metadata: dict[str, Any]
     spec_path: Path
+    layers: tuple[Layer, ...] | None = None
+    reference_width: int | None = None
+    reference_height: int | None = None
+
+    @property
+    def layered(self) -> bool:
+        return self.layers is not None
+
+    def protected_paths(self) -> tuple[Path, ...]:
+        """All immutable runtime inputs, including the layer description."""
+        images = ((self.spec_dir / layer.source_image).resolve() for layer in self.layers or ())
+        single = self.resolved_source_path()
+        return (self.spec_path, *images, *((single,) if single else ()))
 
     @property
     def spec_dir(self) -> Path:
@@ -151,7 +178,11 @@ def _reject_unknown(
 def _number(value: Any, field: str, path: Path) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise SpecLoadError("MALFORMED_SPEC", f"Field '{field}' must be a number.", path=path)
-    return float(value)
+    try:
+        return float(value)
+    except OverflowError:
+        # Semantic finite-value validation reports this with strict JSON diagnostics.
+        return float("-inf") if value < 0 else float("inf")
 
 
 def _integer(value: Any, field: str, path: Path) -> int:
@@ -221,6 +252,28 @@ def _load_event(raw: Any, index: int, path: Path) -> PlanEvent:
     )
 
 
+def _load_layer(raw: Any, index: int, path: Path) -> Layer:
+    field = f"source.layers[{index}]"
+    layer = _mapping(raw, field, path)
+    _reject_unknown(layer, {"target", "image", "anchor", "position", "sha256", "width", "height"}, field, path)
+    anchor = _mapping(_required(layer, "anchor", path), f"{field}.anchor", path)
+    _reject_unknown(anchor, {"type", "x", "y"}, f"{field}.anchor", path)
+    position = _mapping(_required(layer, "position", path), f"{field}.position", path)
+    _reject_unknown(position, {"x", "y"}, f"{field}.position", path)
+    return Layer(
+        target=_string(_required(layer, "target", path), f"{field}.target", path),
+        source_image=_string(_required(layer, "image", path), f"{field}.image", path),
+        anchor_type=_string(_required(anchor, "type", path), f"{field}.anchor.type", path),
+        anchor_x=_number(anchor["x"], f"{field}.anchor.x", path) if "x" in anchor else None,
+        anchor_y=_number(anchor["y"], f"{field}.anchor.y", path) if "y" in anchor else None,
+        position_x=_number(_required(position, "x", path), f"{field}.position.x", path),
+        position_y=_number(_required(position, "y", path), f"{field}.position.y", path),
+        source_sha256=_string(layer["sha256"], f"{field}.sha256", path) if "sha256" in layer else None,
+        source_width=_integer(layer["width"], f"{field}.width", path) if "width" in layer else None,
+        source_height=_integer(layer["height"], f"{field}.height", path) if "height" in layer else None,
+    )
+
+
 def load_plan(plan_path: str | Path) -> AnimationPlan:
     """Load a JSON or YAML Animation Plan into the typed representation."""
 
@@ -256,7 +309,21 @@ def load_plan(plan_path: str | Path) -> AnimationPlan:
     source_sha256: str | None = None
     source_width: int | None = None
     source_height: int | None = None
-    if "source" in data:
+    layers = None
+    reference_width = reference_height = None
+    if "source" in data and isinstance(data["source"], dict) and "layers" in data["source"]:
+        source = data["source"]
+        if "image" in source:
+            raise SpecLoadError("SOURCE_MODE_CONFLICT", "source.image and source.layers are mutually exclusive.", path=path)
+        _reject_unknown(source, {"layers", "reference_canvas"}, "source", path)
+        reference = _mapping(_required(source, "reference_canvas", path), "source.reference_canvas", path)
+        _reject_unknown(reference, {"width", "height"}, "source.reference_canvas", path)
+        reference_width = _integer(_required(reference, "width", path), "source.reference_canvas.width", path)
+        reference_height = _integer(_required(reference, "height", path), "source.reference_canvas.height", path)
+        if not isinstance(source["layers"], list):
+            raise SpecLoadError("MALFORMED_SPEC", "source.layers must be an array.", path=path)
+        layers = tuple(_load_layer(raw, index, path) for index, raw in enumerate(source["layers"]))
+    elif "source" in data:
         source = _mapping(data["source"], "source", path)
         _reject_unknown(source, {"image", "sha256", "width", "height"}, "source", path)
         source_image = _string(_required(source, "image", path, parent="source"), "source.image", path)
@@ -371,10 +438,13 @@ def load_plan(plan_path: str | Path) -> AnimationPlan:
         events=tuple(_load_event(raw, index, path) for index, raw in enumerate(raw_events)),
         metadata=metadata,
         spec_path=path,
+        layers=layers,
+        reference_width=reference_width,
+        reference_height=reference_height,
     )
 
 
-def resolved_anchor(plan: AnimationPlan) -> tuple[float, float]:
+def resolved_anchor(plan: AnimationPlan | Layer) -> tuple[float, float]:
     """Normalized anchor coordinates implied by the anchor type."""
 
     if plan.anchor_type == "bottom_center":

@@ -46,3 +46,11 @@ def write_json_artifact(path: Path, document: dict[str, Any]) -> None:
 
 def qa_report_path(build_dir: Path, stage: str) -> Path:
     return build_dir / QA_DIRNAME / f"{stage}.qa.json"
+
+
+def subject_qa(stage: str, subjects: dict, passed: list[str], *, skipped=()) -> dict:
+    """V2 snapshots bind what was checked; consumers still validate live inputs."""
+    return {'qa_version': 2, 'stage': stage, 'subjects': subjects,
+            'valid': True, 'errors': [], 'warnings': [],
+            'checks': [{'id': name, 'status': 'pass'} for name in passed]
+                      + [{'id': name, 'status': 'skipped'} for name in skipped]}

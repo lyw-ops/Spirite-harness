@@ -19,6 +19,21 @@ class ProcessingError(Exception):
         return {"code": self.code, "message": self.message, **self.details}
 
 
+def ensure_safe_build_output(inputs: tuple[Path, ...], output: Path, build_dir: Path) -> None:
+    """Guard a derived file against all bound artwork and description files."""
+    # Check the output itself and its parents within the build before resolve(),
+    # which would erase evidence of dangling or outward-pointing symlinks.
+    for path in (output, *output.parents):
+        if path == build_dir.parent:
+            break
+        if path.is_symlink():
+            raise ProcessingError("OUTPUT_OVERLAPS_SOURCE", "Artifact output must not use symbolic links.", output=str(path))
+    target = output.resolve()
+    for source in inputs:
+        if target == source.resolve() or (target.is_file() and source.is_file() and target.samefile(source)):
+            raise ProcessingError("OUTPUT_OVERLAPS_SOURCE", "Artifact output aliases an immutable input.", output=str(output), source=str(source))
+
+
 def ensure_safe_artifact_output(spec: AnimationSpec, output: Path) -> None:
     """Reject output locations that could overwrite or mix with source artwork."""
 
@@ -39,4 +54,3 @@ def ensure_safe_artifact_output(spec: AnimationSpec, output: Path) -> None:
                 output=str(target),
                 source=str(source),
             )
-

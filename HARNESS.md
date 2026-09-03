@@ -7,11 +7,11 @@ link here and must not duplicate or extend it with provider-specific behavior.
 
 ## 1. Product boundary
 
-Sprite Harness turns a **static transparent sprite** plus a **declarative
+Sprite Harness turns a **static transparent sprite or explicit PNG layers** plus a **declarative
 animation specification** into validated animation frame sequences:
 
 ```text
-static sprite (PNG)                     Animation Plan spec (JSON/YAML)
+sprite / explicit PNG layers           Animation Plan spec (JSON/YAML)
         \                                  /
          `--> sprite-harness plan --------'
                     |
@@ -59,11 +59,12 @@ Every animation task follows the same steps, whichever agent executes them:
 4. **Validate the plan** — `plan` refuses to write artifacts for an invalid
    plan; `sprite-harness validate build/` re-checks any existing build.
 5. **Render frames** — `sprite-harness render build/ [--reduced-motion]
-   [--overwrite]` applies the frame plan's whole-sprite transforms (translate,
-   rotate, uniform scale, opacity) to the bound source sprite with Pillow and
+   [--overwrite]` applies local layer transforms/composition (v2 inputs), then
+   global sprite transforms (translate, rotate, uniform scale, opacity) with Pillow and
    writes `build/frames/` plus the `render.json` manifest (see
-   `docs/renderer.md`). Tracks targeting sprite parts are skipped with the
-   stable `TARGET_TRACKS_SKIPPED` warning — never silently approximated.
+   `docs/renderer.md`). In single-image mode, tracks targeting sprite parts are skipped with the
+   stable `TARGET_TRACKS_SKIPPED` warning. Layered mode requires explicit target
+   bindings; see [the layered contract](docs/layered-sprites.md).
    Externally rendered frames that follow the frame plan's file names remain
    valid input for validation.
 6. **Validate generated frames** — `sprite-harness validate build/` checks
@@ -76,6 +77,11 @@ Every animation task follows the same steps, whichever agent executes them:
 9. **Never silently modify source assets** — all products are written under the
    build directory (or `generated/` for frame-manifest animations); scaling is
    explicit and uniform, never per-axis.
+
+Optional M4 runs after plan validation: explicitly `generate`, then
+`render --generated-input`. Optional M5 runs after frame validation:
+`export --spec FILE --output DIR`, then `validate-export DIR`. These stages
+never run implicitly. Their contracts and transactions are specified below.
 
 ## 3. Artifact conventions
 
@@ -103,6 +109,11 @@ build/
   or hand-editing any part of `frame-plan.json` (values, types, or added
   fields) fails validation. Only `generated_by` is informational provenance,
   validated for shape so builds stay checkable across harness releases.
+- In layered mode every layer has a build-relative path, SHA-256, dimensions,
+  anchor and static position; layer order and explicit reference canvas are
+  digest-bound. Validation re-inspects all layers and recomputes the complete
+  frame-plan and final RGBA from the trusted plan. No runtime data is hidden
+  in metadata and no original authoring file is needed after normalization.
 - When a build has a source image, the generated `plan.json` records it with a
   path that resolves from inside the build directory plus its SHA-256 and
   dimensions; `validate` re-inspects the source file and fails on missing,
@@ -140,25 +151,29 @@ build/
   2 malformed specification, 3 missing input, 4 processing failure).
 - Treat frame order in manifests and frame plans as authoritative; natural
   sorting is discovery tooling only.
-- Treat `action` (manifests), non-`sprite` `target` labels (tracks), and
+- Treat `action` (manifests), single-image non-`sprite` target labels, and
   `metadata` as human/agent-facing labels. Playback uses only file order,
   durations, FPS, and loop settings, and the harness never claims a flattened
   sprite can be perfectly decomposed into named body parts.
 - The track target `sprite` is reserved for whole-sprite transforms: only
   translate tracks targeting `sprite` contribute to the aggregate per-frame
   `offset` that displacement constraints and rendered-frame bbox/ground checks
-  verify, and only `sprite`-target tracks are rendered by the milestone-2
-  renderer (rotate values add; scale/opacity factors `1 + value` multiply,
+  verify. In layered mode local translation never contributes to this offset.
+  Both modes use the same global transform rules (rotate values add; scale/opacity factors `1 + value` multiply,
   opacity clamped into `[0, 1]`; semantics fixed in `docs/renderer.md`).
-  Target-local tracks (`head`, `hand_right`, …) are expanded per frame and
-  skipped at render time with a stable warning; they cannot be pixel-verified
-  until a renderer/layer contract exists.
+  Single-image local tracks remain skipped with a stable warning. Layered
+  v2 plans bind every target to an explicit PNG and render local transforms
+  on a fixed reference canvas, alpha-over in array order, followed by one
+  global transform. Invisible local layers are legal; final empty frames fail.
+  Input modes are exclusive; `--source` with layers is rejected. Plan/frame-plan
+  v1 remain supported; v2 is required for layers. Render/QA/frame-manifest v1
+  stay unchanged. No automatic decomposition is claimed.
 - Looping playback (`playback.loop: true`) requires every track to declare a
   positive integer `cycles` so all curves are continuous across the loop seam;
   non-looping playback may use positive fractional cycles.
 - Resolve frame paths inside their animation/build directory; reject traversal
   outside it.
-- The deterministic `seed` is reserved for stochastic stages (milestone 4);
+- The explicit `seed` is used only by generation request derivation (milestone 4);
   deterministic stages must not consume it.
 
 ## 5. Artwork safety
@@ -188,13 +203,42 @@ placeholders or ship as specification-only.
 Keep dependencies small: Python 3.11+, Pillow, PyYAML for the core; pytest and
 jsonschema for development. No ffmpeg, no GUI frameworks.
 
-## 7. Milestone boundaries
+## 7. Optional generation and atlas export
+
+Package 0.7.0 implements M4's explicit external generation and M5's grid
+export. Read [generation.md](docs/generation.md), [adapters.md](docs/adapters.md),
+[atlas.md](docs/atlas.md), and [transactions.md](docs/transactions.md).
+
+`generate BUILD --spec FILE --adapter-argv JSON` checks and freezes source-space
+PNG replacements in `BUILD/generation/`. `render --generated-input` explicitly
+uses them before the unchanged M2/M3 transformations. Default render remains
+deterministic and offline. No event or target name triggers generation.
+Offline validate rechecks original and accepted inputs and final decoded RGBA.
+Render v1 remains deterministic; render v2 binds backend/request/accepted input
+digests. Hold freezes the complete frame-0 selection, local composition and
+whole-sprite transform. Generation success alone says nothing about final QA.
+
+`export --spec FILE --output DIR` validates explicit ordered input builds and
+publishes one grid atlas; `validate-export DIR` recomputes metadata/layout and
+compares every source-frame crop and every unused pixel. Single-clip sheets use
+the same path. Report validates current inputs; saved QA remains a snapshot.
+Generation/export QA v2 binds its subjects; plan/frame/frame-manifest versions
+remain compatible. Generation and export have fail-closed directory transactions.
+Sources, generation requests, frozen inputs and export inputs remain read-only
+through all consuming operations. No automatic commit, publishing or deployment.
+
+## 8. Milestone boundaries
 
 The roadmap lives in `docs/roadmap.md`. Milestone 1 (contract + validation)
-and milestone 2 (deterministic whole-sprite transform renderer,
-`docs/renderer.md`) are implemented. Layered/per-part rendering is milestone 3
-and is not approximated from flattened sprites. Do not implement model APIs,
-provider integrations, diffusion/image-generation dependencies, ComfyUI,
+milestone 2 (whole-sprite transforms), and milestone 3 (explicit layered PNG
+rendering, `docs/layered-sprites.md`) are implemented. Milestones 4 and 5
+are implemented as the explicit optional
+generation and deterministic grid export contracts above. The optional real
+provider adapter is implemented and tested locally; live provider acceptance
+requires separately authorized credentials/calls. Layered parts must be
+provided explicitly and are never approximated from flattened sprites.
+Keep all model APIs and provider integrations outside the core. Do not add
+diffusion/image-generation dependencies to the core, ComfyUI,
 Live2D, interpolation, optical flow, or video generation ahead of their
 milestone, and do not generate new copyrighted character artwork at any
 milestone.

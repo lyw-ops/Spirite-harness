@@ -1,4 +1,4 @@
-"""Deterministic whole-sprite transform renderer (milestone 2).
+"""Deterministic single-image and explicit layered renderer (milestones 2/3).
 
 Renders ``build/frames/`` from a build directory's digest-verified inputs
 (``plan.json``, ``frame-plan.json``, the bound source sprite) by applying the
@@ -28,7 +28,8 @@ from .build import (
     validate_build_inputs,
 )
 from .expand import expand_plan, plan_digest
-from .geometry import FramePose, render_pose, sample_poses
+from .geometry import FramePose, sample_poses
+from .layers import LayerScene, render_source_pose
 from .plan import SPRITE_TARGET, resolved_anchor
 from .processing import ProcessingError
 from .qa import write_json_artifact
@@ -71,15 +72,15 @@ def _check_output_slot(
             "FRAMES_DIR_CONFLICT", "render.json must be a regular file.",
             paths=[str(manifest_path)],
         )
-    source_path = build.plan.resolved_source_path()
-    if source_path is not None and (
-        source_path.is_relative_to(frames_dir.resolve())
-        or source_path == manifest_path.resolve()
-    ):
-        raise ProcessingError(
-            "FRAMES_DIR_CONFLICT", "Render output overlaps the immutable source.",
-            paths=[str(source_path)],
-        )
+    sources = build.protected_paths
+    for source_path in sources:
+        if (source_path.is_relative_to(frames_dir.resolve())
+            or source_path == manifest_path.resolve()
+            or (manifest_path.is_file() and manifest_path.samefile(source_path))):
+            raise ProcessingError(
+                "FRAMES_DIR_CONFLICT", "Render output overlaps or aliases an immutable input.",
+                paths=[str(source_path)],
+            )
     declared_set = set(declared)
     existing: list[str] = []
     if frames_dir.is_dir():
@@ -95,9 +96,9 @@ def _check_output_slot(
                 "move them away — render never deletes unknown files.",
                 paths=extras,
             )
-        if source_path is not None:
+        if sources:
             aliases = [str(entry) for entry in frames_dir.iterdir()
-                       if entry.samefile(source_path)]
+                       if any(entry.samefile(source_path) for source_path in sources)]
             if aliases:
                 raise ProcessingError(
                     "FRAMES_DIR_CONFLICT", "Render output aliases the immutable source.",
@@ -159,7 +160,12 @@ def _publish_generation(build: BuildArtifacts, transaction: Path) -> None:
         raise
 
 
-def _load_source(build: BuildArtifacts) -> Image.Image:
+def _load_source(build: BuildArtifacts) -> Image.Image | LayerScene:
+    if build.plan.layered:
+        try:
+            return LayerScene.load(build.plan)
+        except (UnidentifiedImageError, OSError, ValueError) as exc:
+            raise ProcessingError("RENDER_SOURCE_UNREADABLE", "A source layer became unreadable.", detail=str(exc)) from exc
     source_path = build.plan.resolved_source_path()
     if source_path is None:
         raise ProcessingError(
@@ -183,6 +189,8 @@ def _load_source(build: BuildArtifacts) -> Image.Image:
 
 
 def _skipped_tracks(build: BuildArtifacts) -> list[dict[str, str]]:
+    if build.plan.layered:
+        return []
     return [
         {"track_id": track.track_id, "target": track.target, "motion": track.motion}
         for track in build.plan.tracks
@@ -195,6 +203,7 @@ def render_build(
     *,
     reduced_motion: bool = False,
     overwrite: bool = False,
+    generated_input: bool = False,
 ) -> dict[str, Any]:
     """Render the build's frame set; returns a JSON-ready result payload.
 
@@ -203,6 +212,13 @@ def render_build(
     build's inputs do not validate.
     """
 
+    from .transactions import snapshot, recheck
+    from .generation import load_generation
+    from .layers import ReplacementScene
+    generation_marker = build.build_dir / '.generation-transaction'
+    if generation_marker.exists() or generation_marker.is_symlink():
+        raise ProcessingError('GENERATION_TRANSACTION_INCOMPLETE', 'Generation is active or needs recovery.')
+    before = snapshot(build.protected_paths)
     result, checks = validate_build_inputs(build)
     if not result.valid:
         return {
@@ -224,13 +240,17 @@ def render_build(
     if plan.background.casefold() != "transparent":
         raise ProcessingError(
             "UNSUPPORTED_BACKGROUND",
-            "The milestone-2 renderer only renders transparent backgrounds.",
+            "The built-in renderer only renders transparent backgrounds.",
             actual=plan.background,
         )
 
     declared = _declared_frame_names(build)
     _check_output_slot(build, declared, overwrite=overwrite)
     source = _load_source(build)
+    binding = None
+    if generated_input:
+        images, binding = load_generation(build)
+        source = ReplacementScene(source, images)
 
     mode = plan.reduced_motion if reduced_motion else "full"
     canvas = build.normalized_plan["canvas"]
@@ -263,13 +283,15 @@ def render_build(
         write_json_artifact(
             transaction / "new-render.json",
             {
-                "render_version": RENDER_MANIFEST_VERSION,
+                "render_version": 2 if generated_input else RENDER_MANIFEST_VERSION,
+                **({"backend": "generated-input", "generation": binding} if generated_input else {}),
                 "animation_id": plan.animation_id,
                 "generated_by": f"sprite-harness {__version__}",
                 "plan_digest": plan_digest(build.normalized_plan),
                 "mode": mode,
             },
         )
+        recheck(before)
         # Recheck after rendering in case the output slot changed while staging.
         _check_output_slot(build, declared, overwrite=overwrite)
         try:
@@ -308,6 +330,7 @@ def render_build(
         "build": str(build.build_dir),
         "animation_id": build.animation_id,
         "mode": mode,
+        "backend": "generated-input" if generated_input else "deterministic",
         "frame_count": len(declared),
         "frames_dir": str(frames_dir),
         "render_manifest": str(manifest_path),
@@ -319,13 +342,13 @@ def render_build(
 
 
 def _render_frame(
-    source: Image.Image,
+    source: Image.Image | LayerScene,
     pose: FramePose,
     canvas_size: tuple[int, int],
     anchor: tuple[float, float],
     path: Path,
 ) -> None:
-    frame = render_pose(source, pose, canvas_size, anchor)
+    frame = render_source_pose(source, pose, canvas_size, anchor)
     if frame.getchannel("A").getbbox() is None:
         raise ProcessingError(
             "RENDERED_FRAME_EMPTY",

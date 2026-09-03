@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lyw-ops/Spirite-harness/schemas/export-spec.schema.json",
+  "title": "Sprite Harness export-spec v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "export_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "clips": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$"
+          },
+          "build": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "build"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 65536
+    },
+    "grid": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cell_width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16384
+        },
+        "cell_height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16384
+        },
+        "columns": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16384
+        },
+        "padding": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16384
+        }
+      },
+      "required": [
+        "cell_width",
+        "cell_height",
+        "columns",
+        "padding"
+      ]
+    }
+  },
+  "required": [
+    "export_version",
+    "clips",
+    "grid"
+  ]
+}

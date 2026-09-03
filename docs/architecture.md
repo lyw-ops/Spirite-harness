@@ -13,7 +13,7 @@ never requires an LLM.
 ## Pipeline
 
 ```text
-source sprite + Animation Plan spec
+single sprite / explicit PNG layers + Animation Plan spec
         |
         `--> plan ----> build/plan.json + build/frame-plan.json + build/qa/plan.qa.json
                  |
@@ -39,7 +39,8 @@ source frames + animation.yaml (frame-manifest layer)
 | `curves.py` | Deterministic curve sampling (periodic and mirrored easing curves) |
 | `expand.py` | Plan normalization, content digest, and expansion into the frame plan |
 | `build.py` | Build-directory creation, loading, validation (full frame-plan recomputation, source identity re-inspection, transaction/manifest gates, mode-aware geometry and built-in RGBA verification), manifest adapter |
-| `geometry.py` | Whole-sprite pose sampling (rotate sums, scale/opacity factor products) and the documented anchor-affine transform shared by renderer and validator |
+| `geometry.py` | Global and target-local pose sampling, finite effective-value checks, (rotate sums, scale/opacity factor products) and the documented anchor-affine transform shared by renderer and validator |
+| `layers.py` | Loads all explicit PNG layers, samples local poses, clips and alpha-over composites on the reference canvas, then dispatches through unchanged M2 `render_pose` |
 | `render.py` | Deterministic renderer: input/output safety checks, exclusive transaction marker, whole-directory publication, rollback/recovery, render manifest (docs/renderer.md) |
 | `qa.py` | Deterministic QA report assembly and JSON artifact writing |
 | `jsonio.py` | Strict JSON boundary: `allow_nan=False` serialization, deterministic non-finite diagnostics, JSON-compatibility checks for free-form metadata |
@@ -54,7 +55,7 @@ source frames + animation.yaml (frame-manifest layer)
 
 ## Artwork lifecycle
 
-Source sprites and source frames are never modified. `plan` writes only into
+Source sprites, all layer PNGs, and layer descriptions are never modified. `plan` writes only into
 its build directory and refuses an output directory that coincides with the
 spec's or source's directory. The generated `plan.json` records the source
 with a build-relative path plus its SHA-256 and dimensions, and `validate`
@@ -75,3 +76,35 @@ inputs exit 3). Parsed but invalid values, constraint violations, and frame
 problems are validation failures (exit 1). Rendering, output, and other
 operational failures are processing failures (exit 4). CLI exit codes and
 structured JSON preserve that distinction for shell scripts and CI.
+
+## Layered contract
+
+V2 Animation Plans use an inline `source.layers` array and explicit
+`source.reference_canvas`; the normalized plan is the runtime layer description.
+There is no external manifest loader or metadata fallback. `plan.py` enforces
+shape; `plan_validator.py` enforces targets, anchors, finite positions and
+composed transforms. `build.py` inspects all PNGs and binds paths/hash/dimensions;
+`expand.py` emits a v2 frame plan with ordered local poses and a global pose.
+V1 normalization/expansion stays compatible. `render.json` and QA stay v1.
+
+The renderer and validator both use `LayerScene` to reconstruct the composite
+from verified inputs. Independent hand-computed RGBA/coordinate tests guard
+against shared implementation errors. Input errors stop frame consumption;
+output artifacts never supply missing expected values. `processing.py` also
+protects all inputs from plan/QA/preview output aliases. The full contract and
+external-frame verification boundary are in [layered-sprites.md](layered-sprites.md).
+
+## Generation and export (0.7.0)
+
+`contracts.py` provides strict bounded JSON and packaged schema checking without
+adding a runtime jsonschema dependency. The root schemas and packaged copies
+must match. `generation.py` normalizes requests, runs an explicit subprocess,
+accepts PNGs and verifies frozen bundles offline. `ReplacementScene` selects
+source pixels before existing LayerScene/global rendering. `transactions.py`
+provides input identity snapshots and reversible directory publication for
+new stages; the existing render transaction implementation remains in place.
+`atlas.py` validates builds, computes one grid layout, publishes artifacts and
+checks every crop against trusted input pixels. `adapters/openai` is a separate
+Python distribution; it is never imported by the core. Credentials stay only
+in the adapter process environment. See the new contracts for precise versions,
+trust limits, quotas and recovery.

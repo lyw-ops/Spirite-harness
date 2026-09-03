@@ -1,0 +1,355 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lyw-ops/Spirite-harness/schemas/atlas.schema.json",
+  "title": "Sprite Harness atlas v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "atlas_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "config_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string",
+          "const": "atlas.png"
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16384
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16384
+        },
+        "rgba_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "file",
+        "width",
+        "height",
+        "rgba_digest"
+      ]
+    },
+    "grid": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cell_width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16384
+        },
+        "cell_height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16384
+        },
+        "columns": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16384
+        },
+        "padding": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16384
+        }
+      },
+      "required": [
+        "cell_width",
+        "cell_height",
+        "columns",
+        "padding",
+        "rows"
+      ]
+    },
+    "clips": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$"
+          },
+          "build": {
+            "type": "string",
+            "minLength": 1
+          },
+          "plan_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "identities": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "plan": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "frame_plan": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "render": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "generation": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "request_digest": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      },
+                      "accepted_digest": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "request_digest",
+                      "accepted_digest"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "plan",
+              "frame_plan",
+              "render",
+              "generation"
+            ]
+          },
+          "backend": {
+            "enum": [
+              "deterministic",
+              "generated-input",
+              "external"
+            ]
+          },
+          "mode": {
+            "enum": [
+              "full",
+              "hold_first_frame"
+            ]
+          },
+          "fps": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "loop": {
+            "type": "boolean"
+          },
+          "anchor": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "x",
+              "y"
+            ]
+          },
+          "frame_count": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "frames": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "index": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "file": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "byte_digest": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                },
+                "rgba_digest": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$"
+                },
+                "width": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 16384
+                },
+                "height": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 16384
+                },
+                "duration": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "duration_ms": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "rect": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "x": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "y": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "width": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 16384
+                    },
+                    "height": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 16384
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y",
+                    "width",
+                    "height"
+                  ]
+                },
+                "placement": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "x": {
+                      "type": "number"
+                    },
+                    "y": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y"
+                  ]
+                },
+                "pivot": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "x": {
+                      "type": "number"
+                    },
+                    "y": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y"
+                  ]
+                },
+                "atlas_pivot": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "x": {
+                      "type": "number"
+                    },
+                    "y": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "x",
+                    "y"
+                  ]
+                }
+              },
+              "required": [
+                "index",
+                "file",
+                "byte_digest",
+                "rgba_digest",
+                "width",
+                "height",
+                "duration",
+                "duration_ms",
+                "rect",
+                "placement",
+                "pivot",
+                "atlas_pivot"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 65536
+          }
+        },
+        "required": [
+          "id",
+          "build",
+          "plan_digest",
+          "identities",
+          "backend",
+          "mode",
+          "fps",
+          "loop",
+          "anchor",
+          "frame_count",
+          "frames"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 65536
+    }
+  },
+  "required": [
+    "atlas_version",
+    "config_digest",
+    "image",
+    "grid",
+    "clips"
+  ]
+}

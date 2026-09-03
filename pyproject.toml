@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sprite-animation-harness"
-version = "0.4.0"
+version = "0.7.0"
 description = "A provider-agnostic CLI and JSON protocol for validating and preparing sprite animations."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -21,6 +21,9 @@ sprite-harness = "sprite_harness.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+sprite_harness = ["contracts/*.json"]
 
 [tool.pytest.ini_options]
 addopts = "-q"

@@ -28,23 +28,38 @@ none may weaken the provider-neutral boundary in [`HARNESS.md`](../HARNESS.md).
   from the same plan
 - Target-local tracks are skipped with a stable warning, never approximated
 
-## Milestone 3 — Layered-sprite animation (next)
+## Milestone 3 — Layered-sprite animation (implemented, 0.5.0)
 
-- Optional layered input (one PNG per declared `target`) so tracks address
-  real parts instead of the whole sprite
-- Layer composition order, per-layer anchors, and layer-aware validation
+- Animation Plan/frame-plan v2: inline ordered PNG layers, explicit reference
+  canvas, build-relative paths and every layer identity bound to the plan digest
+- Independent local translation/rotation/uniform scale/opacity, alpha-over
+  composition then one M2 global transform; anchors and clipping fixed in
+  [layered-sprites.md](layered-sprites.md)
+- Layer-aware source/transform/final RGBA validation, reduced-motion hold,
+  existing transaction safety and complete CLI/QA pipeline
+- V1 single-image plans and their pixel algorithm remain supported
 - Still no claim that flattened sprites can be decomposed automatically
 
-## Milestone 4 — Optional AI-assisted frame generation
+## Milestone 4 — Optional source-space generation (implemented, 0.7.0)
 
-- A renderer adapter interface where an image model proposes frames for
-  targets the deterministic renderer cannot honor (mouth shapes, blinks)
-- The plan's `seed` becomes meaningful; generated frames must still pass the
-  same deterministic validation and QA gates
-- Adapters live outside the core; the core never depends on a provider SDK
+- Strict spec/request/response/accepted-input contracts and explicit subprocess
+  argv; copied references and accepted PNGs; stable seed derivation.
+- Frozen source replacement before unchanged local/global rendering; offline
+  original/generated identity and final RGBA validation, full/hold modes.
+- External separately installable OpenAI image edit adapter and offline geometric
+  test substitute. Real adapter transport tests pass; live provider acceptance
+  remains uncompleted pending explicit authorization and credentials.
+- Bounded subprocesses/responses/images, transactional publication and recovery.
 
-## Milestone 5 — Sprite-sheet / atlas exporters
+## Milestone 5 — Deterministic grid atlases (implemented, 0.7.0)
 
-- Pack validated frame sets into sprite sheets and atlas layouts (e.g. fixed
-  cell grids such as the 8×11 / 192×208 desktop-pet contract) with metadata
-- Export manifests for common runtimes; round-trip validation of packed atlases
+- One exporter for a single build or explicit ordered clips, fixed cell/padding,
+  computed or fixed capacity, full canvases and transparent unused pixels.
+- Versioned layout/provenance/timing/pivot metadata and subject-bound QA.
+- Offline input revalidation and complete per-frame RGBA round trip; metadata,
+  mode changes, padding and stale QA are checked from recomputed expectations.
+- PNG byte identity observations stay distinct from pixel equivalence.
+
+Later work: runtime-specific adapters, optional standalone atlas trust modes,
+trimming/rotation and other packing algorithms require separate contracts.
+No interpolation, optical flow, video, automatic decomposition or GUI is included.

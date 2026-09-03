@@ -54,11 +54,11 @@ class FramePose:
         return self.rotate_deg == 0.0 and self.scale == 1.0 and self.opacity == 1.0
 
 
-def _sprite_tracks(plan: AnimationPlan, motion: str) -> list[Track]:
+def _target_tracks(plan: AnimationPlan, motion: str, target: str = SPRITE_TARGET) -> list[Track]:
     return [
         track
         for track in plan.tracks
-        if track.target == SPRITE_TARGET and track.motion == motion
+        if track.target == target and track.motion == motion
     ]
 
 
@@ -78,19 +78,19 @@ def _sample(track: Track, index: int, plan: AnimationPlan) -> float:
     )
 
 
-def sample_poses(plan: AnimationPlan) -> list[FramePose]:
-    """Compose the per-frame whole-sprite pose from the plan's tracks.
+def sample_poses(plan: AnimationPlan, target: str = SPRITE_TARGET, *, clamp_opacity: bool = True) -> list[FramePose]:
+    """Compose per-frame poses for one target (the global sprite by default).
 
     Translation is the aggregate frame offset (translate tracks targeting
     ``sprite``, applied exactly once). Rotate samples add; scale and opacity
     factors ``1 + value`` multiply; opacity is clamped into ``[0, 1]``.
-    Target-local tracks never contribute.
+    A target's tracks never contribute to another target's pose.
     """
 
-    offsets = sample_offsets(plan)
-    rotate_tracks = _sprite_tracks(plan, "rotate")
-    scale_tracks = _sprite_tracks(plan, "scale")
-    opacity_tracks = _sprite_tracks(plan, "opacity")
+    offsets = sample_offsets(plan, target)
+    rotate_tracks = _target_tracks(plan, "rotate", target)
+    scale_tracks = _target_tracks(plan, "scale", target)
+    opacity_tracks = _target_tracks(plan, "opacity", target)
 
     poses: list[FramePose] = []
     for index in range(plan.frame_count):
@@ -110,80 +110,79 @@ def sample_poses(plan: AnimationPlan) -> list[FramePose]:
                 dy=offsets[index][1],
                 rotate_deg=round_value(rotate_deg),
                 scale=scale,
-                opacity=min(max(opacity, 0.0), 1.0),
+                opacity=min(max(opacity, 0.0), 1.0) if clamp_opacity else opacity,
             )
         )
     return poses
 
 
-def effective_value_issues(plan: AnimationPlan) -> list[ValidationIssue]:
-    """Reject scale/opacity chains no renderer could honor.
+def pose_document(pose: FramePose) -> dict:
+    return {"translation": {"x": pose.dx, "y": pose.dy},
+            "rotate_deg": pose.rotate_deg, "scale": pose.scale, "opacity": pose.opacity}
 
-    Per ``docs/renderer.md``: a sprite scale track whose factor ``1 + value``
-    reaches zero or below is ``INVALID_EFFECTIVE_SCALE``; a sprite opacity
-    factor below zero is ``INVALID_EFFECTIVE_OPACITY``; a frame whose effective
-    opacity is exactly zero is ``FULLY_TRANSPARENT_FRAME`` (it could only
-    render as an empty frame, which frame validation always rejects). Opacity
-    above one is clamped silently and is not an error. One issue is reported
-    per offending track (first offending frame), and one per first fully
-    transparent frame.
+
+def effective_value_issues(plan: AnimationPlan) -> list[ValidationIssue]:
+    """Validate factors, composed values and affine coefficients before rendering.
+
+    Local zero opacity is legal. Global opacity zero and any scale product
+    underflow are not. Check the raw opacity product before clamping infinity.
     """
+    from .plan import resolved_anchor
 
     issues: list[ValidationIssue] = []
-    for track in _sprite_tracks(plan, "scale"):
-        for index in range(plan.frame_count):
-            factor = 1.0 + _sample(track, index, plan)
-            if factor <= 0.0:
-                issues.append(
-                    ValidationIssue(
-                        code="INVALID_EFFECTIVE_SCALE",
-                        message=(
-                            "Effective scale factor (1 + sampled value) must stay "
-                            "above zero on every frame."
-                        ),
-                        context={
-                            "track_id": track.track_id,
-                            "frame": index,
-                            "factor": factor,
-                        },
-                    )
-                )
-                break
-    opacity_tracks = _sprite_tracks(plan, "opacity")
-    for track in opacity_tracks:
-        for index in range(plan.frame_count):
-            factor = 1.0 + _sample(track, index, plan)
-            if factor < 0.0:
-                issues.append(
-                    ValidationIssue(
-                        code="INVALID_EFFECTIVE_OPACITY",
-                        message=(
-                            "Effective opacity factor (1 + sampled value) must not "
-                            "be negative."
-                        ),
-                        context={
-                            "track_id": track.track_id,
-                            "frame": index,
-                            "factor": factor,
-                        },
-                    )
-                )
-                break
-    if opacity_tracks and not any(
-        issue.code == "INVALID_EFFECTIVE_OPACITY" for issue in issues
-    ):
-        for pose in sample_poses(plan):
-            if pose.opacity == 0.0:
-                issues.append(
-                    ValidationIssue(
-                        code="FULLY_TRANSPARENT_FRAME",
-                        message=(
-                            "Effective opacity reaches zero; the frame would render "
-                            "fully transparent and always fail frame validation."
-                        ),
-                        context={"frame": pose.index},
-                    )
-                )
+    targets = [SPRITE_TARGET, *(layer.target for layer in plan.layers or ())]
+    for target in targets:
+        before = len(issues)
+        for track in (t for t in plan.tracks if t.target == target):
+            for index in range(plan.frame_count):
+                value = _sample(track, index, plan)
+                code = None
+                if not math.isfinite(value):
+                    code = "NONFINITE_EFFECTIVE_TRANSFORM"
+                elif track.motion == "scale" and 1.0 + value <= 0:
+                    code = "INVALID_EFFECTIVE_SCALE"
+                elif track.motion == "opacity" and 1.0 + value < 0:
+                    code = "INVALID_EFFECTIVE_OPACITY"
+                if code:
+                    issues.append(ValidationIssue(code=code,
+                        message="Track has an invalid effective transform value.",
+                        context={"target": target, "track_id": track.track_id, "frame": index,
+                                 "factor": 1.0 + value}))
+                    break
+        if len(issues) != before:
+            continue
+        layer = next((layer for layer in plan.layers or () if layer.target == target), None)
+        for pose in sample_poses(plan, target, clamp_opacity=False):
+            values = [pose.dx, pose.dy, pose.rotate_deg, pose.scale, pose.opacity]
+            code = None
+            if not all(math.isfinite(value) for value in values):
+                code = "NONFINITE_EFFECTIVE_TRANSFORM"
+            elif pose.scale <= 0:
+                code = "INVALID_EFFECTIVE_SCALE"
+            elif target == SPRITE_TARGET and pose.opacity == 0:
+                code = "FULLY_TRANSPARENT_FRAME"
+            else:
+                # Also reject finite components whose placement/inverse arithmetic
+                # overflows. Actual source sizes are bound during build creation.
+                if layer:
+                    ax, ay = resolved_anchor(layer)
+                    a_src = ((layer.source_width or 1) * ax, (layer.source_height or 1) * ay)
+                    a_dst = (layer.position_x, layer.position_y)
+                else:
+                    ax, ay = resolved_anchor(plan)
+                    sw = plan.reference_width if plan.layered else plan.source_width
+                    sh = plan.reference_height if plan.layered else plan.source_height
+                    a_src = ((sw or 1) * ax, (sh or 1) * ay)
+                    a_dst = ((plan.canvas_width or sw or 1) * ax,
+                             (plan.canvas_height or sh or 1) * ay)
+                coeffs = inverse_affine_coeffs(pose, a_src, a_dst)
+                if not all(math.isfinite(value) for value in (*coeffs,
+                        a_dst[0] + pose.dx, a_dst[1] + pose.dy)):
+                    code = "NONFINITE_EFFECTIVE_TRANSFORM"
+            if code:
+                issues.append(ValidationIssue(code=code,
+                    message="Composed transform must be finite, with positive scale and visible global opacity.",
+                    context={"target": target, "frame": pose.index}))
                 break
     return issues
 

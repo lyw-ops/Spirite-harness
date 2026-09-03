@@ -1,0 +1,101 @@
+[
+  {
+    "gate": "pytest",
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/python",
+      "-m",
+      "pytest"
+    ],
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "........................................................................ [ 12%]\n........................................................................ [ 24%]\n........................................................................ [ 37%]\n........................................................................ [ 49%]\n........................................................................ [ 61%]\n........................................................................ [ 74%]\n........................................................................ [ 86%]\n........................................................................ [ 98%]\n......                                                                   [100%]\n582 passed in 11.63s\n",
+    "stderr": ""
+  },
+  {
+    "gate": "compileall",
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/python",
+      "-m",
+      "compileall",
+      "-q",
+      "src",
+      "adapters/openai/src",
+      "scripts",
+      "tests"
+    ],
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "gate": "install-core",
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/python",
+      "-m",
+      "pip",
+      "install",
+      "--no-deps",
+      "--no-build-isolation",
+      "."
+    ],
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "Processing ./.\n  Preparing metadata (pyproject.toml): started\n  Preparing metadata (pyproject.toml): finished with status 'done'\nBuilding wheels for collected packages: sprite-animation-harness\n  Building wheel for sprite-animation-harness (pyproject.toml): started\n  Building wheel for sprite-animation-harness (pyproject.toml): finished with status 'done'\n  Created wheel for sprite-animation-harness: filename=sprite_animation_harness-0.7.0-py3-none-any.whl size=76813 sha256=eef164237a3c69947cfdd8311cace9dbeee949bd023193d3271f1e428a19a230\n  Stored in directory: /private/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/pip-ephem-wheel-cache-37ay0enh/wheels/4f/a0/5c/802444ea27531c6bc887953537e290a7c9d1cd36cfcc677c6c\nSuccessfully built sprite-animation-harness\nInstalling collected packages: sprite-animation-harness\n  Attempting uninstall: sprite-animation-harness\n    Found existing installation: sprite-animation-harness 0.7.0\n    Uninstalling sprite-animation-harness-0.7.0:\n      Successfully uninstalled sprite-animation-harness-0.7.0\nSuccessfully installed sprite-animation-harness-0.7.0\n",
+    "stderr": "\n[notice] A new release of pip is available: 26.1.1 -> 26.2.1\n[notice] To update, run: /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/python -m pip install --upgrade pip\n"
+  },
+  {
+    "gate": "install-provider",
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/python",
+      "-m",
+      "pip",
+      "install",
+      "--no-deps",
+      "--no-build-isolation",
+      "./adapters/openai"
+    ],
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "Processing ./adapters/openai\n  Preparing metadata (pyproject.toml): started\n  Preparing metadata (pyproject.toml): finished with status 'done'\nBuilding wheels for collected packages: sprite-openai-adapter\n  Building wheel for sprite-openai-adapter (pyproject.toml): started\n  Building wheel for sprite-openai-adapter (pyproject.toml): finished with status 'done'\n  Created wheel for sprite-openai-adapter: filename=sprite_openai_adapter-0.1.0-py3-none-any.whl size=5044 sha256=7e5a580badb870edaef684c7e2bc439688d2c1ca97d2653900f373dc84bfc5ae\n  Stored in directory: /private/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/pip-ephem-wheel-cache-0qbahkn2/wheels/5a/5b/94/a118f6e674f48d3518a77643026dfd8226d23679d8433f89c1\nSuccessfully built sprite-openai-adapter\nInstalling collected packages: sprite-openai-adapter\n  Attempting uninstall: sprite-openai-adapter\n    Found existing installation: sprite-openai-adapter 0.1.0\n    Uninstalling sprite-openai-adapter-0.1.0:\n      Successfully uninstalled sprite-openai-adapter-0.1.0\nSuccessfully installed sprite-openai-adapter-0.1.0\n",
+    "stderr": "\n[notice] A new release of pip is available: 26.1.1 -> 26.2.1\n[notice] To update, run: /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/python -m pip install --upgrade pip\n"
+  },
+  {
+    "gate": "pip-check",
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/python",
+      "-m",
+      "pip",
+      "check"
+    ],
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "No broken requirements found.\n",
+    "stderr": ""
+  },
+  {
+    "gate": "diff-check",
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "gate": "acceptance",
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/python",
+      "scripts/acceptance_m4_m5.py",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final"
+    ],
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"legacy_builds_verified\": [\n    \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m3-acceptance-final/single/build\",\n    \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m3-acceptance-final/single/build-hold\",\n    \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m3-acceptance-final/layered/build\",\n    \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m3-acceptance-final/layered/build-hold\"\n  ],\n  \"identity\": {\n    \"runtime\": \"0.7.0\",\n    \"distribution\": \"0.7.0\",\n    \"module\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/lib/python3.14/site-packages/sprite_harness/__init__.py\",\n    \"provider_distribution\": \"0.1.0\"\n  },\n  \"subprocess_calls\": 103,\n  \"harness_calls\": 101,\n  \"all_expected_exits_matched\": true,\n  \"exit_codes\": [\n    0,\n    1,\n    2,\n    3,\n    4\n  ],\n  \"strict_json\": true,\n  \"pythonpath_removed\": true,\n  \"cwd_outside_repository\": true,\n  \"source_hashes_unchanged\": {\n    \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/single/animation.json\": \"46efaace62dd7e05afaebca82e7774877f4c5af03a84a48128a85a9abb1455aa\",\n    \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/single/sprite.png\": \"2d90293f7c3f69b15077eca2d61a7a4893166a8cc8abe6c858b3b9e4767e24dc\",\n    \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/layered/animation.json\": \"09343fd302be9ed822329e70d2a6116f0a12a30a1381dc183c62d9fd6df16336\",\n    \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/layered/assets/body.png\": \"b2f28b4c590b70eb3527398208af462691e711a1ddc67f8435b5be52181b5d06\",\n    \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/layered/assets/hand.png\": \"bf5f98df05b17693158e0928edf861361e6525db847af2150a6a7c77971c775f\",\n    \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/layered/assets/head.png\": \"daa0a3f38aa2d78386a94d5d50052dc217876f38d203c1f8243b56e06c6d2750\",\n    \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/generated/animation.json\": \"0176e5fc53d2f2d423a28142e86f68f7b34263d8698df3c2f228fbdf2b9cbae4\",\n    \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/generated/generation.json\": \"c058da6d095bfaf4996dd0db8eb84b1c528062c2616c5cfef6948da93889b953\",\n    \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/generated/assets/body.png\": \"b2f28b4c590b70eb3527398208af462691e711a1ddc67f8435b5be52181b5d06\",\n    \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/generated/assets/hand.png\": \"bf5f98df05b17693158e0928edf861361e6525db847af2150a6a7c77971c775f\",\n    \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/generated/assets/head.png\": \"daa0a3f38aa2d78386a94d5d50052dc217876f38d203c1f8243b56e06c6d2750\"\n  },\n  \"pipelines\": {\n    \"single-full\": {\n      \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/single/build-full\",\n      \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/single/atlas-full\",\n      \"frames\": 12,\n      \"mode\": \"full\",\n      \"backend\": \"deterministic\"\n    },\n    \"single-hold\": {\n      \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/single/build-hold\",\n      \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/single/atlas-hold\",\n      \"frames\": 12,\n      \"mode\": \"hold_first_frame\",\n      \"backend\": \"deterministic\"\n    },\n    \"layered-full\": {\n      \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/layered/build-full\",\n      \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/layered/atlas-full\",\n      \"frames\": 12,\n      \"mode\": \"full\",\n      \"backend\": \"deterministic\"\n    },\n    \"layered-hold\": {\n      \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/layered/build-hold\",\n      \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/layered/atlas-hold\",\n      \"frames\": 12,\n      \"mode\": \"hold_first_frame\",\n      \"backend\": \"deterministic\"\n    },\n    \"generated-full\": {\n      \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/generated/build-full\",\n      \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/generated/atlas-full\",\n      \"frames\": 12,\n      \"mode\": \"full\",\n      \"backend\": \"generated-input\"\n    },\n    \"generated-hold\": {\n      \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/generated/build-hold\",\n      \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-final/generated/atlas-hold\",\n      \"frames\": 12,\n      \"mode\": \"hold_first_frame\",\n      \"backend\": \"generated-input\"\n    }\n  },\n  \"multi_clip_order\": [\n    \"generated\",\n    \"single\",\n    \"layered\"\n  ],\n  \"fixed_grid\": {\n    \"columns\": 8,\n    \"rows\": 11,\n    \"cell_width\": 192,\n    \"cell_height\": 208,\n    \"used_cells\": 36,\n    \"empty_cells\": 52\n  },\n  \"provider_transport\": \"tested separately with real adapter and local HTTP service\",\n  \"provider_live\": \"NOT COMPLETED: no credential or authorization; no live call made\"\n}\n",
+    "stderr": ""
+  }
+]

@@ -7,12 +7,12 @@ import re
 from .curves import SUPPORTED_CURVES
 from .expand import sample_offsets
 from .geometry import effective_value_issues
-from .plan import ANCHOR_TYPES, REDUCED_MOTION_MODES, SUPPORTED_MOTIONS, AnimationPlan
+from .plan import ANCHOR_TYPES, REDUCED_MOTION_MODES, SUPPORTED_MOTIONS, AnimationPlan, Layer
 from .spec import is_finite_number
 from .validator import ValidationIssue, ValidationResult
 
 
-SUPPORTED_PLAN_VERSIONS = {1}
+SUPPORTED_PLAN_VERSIONS = {1, 2}
 ANIMATION_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
 SOURCE_DIGEST_PATTERN = re.compile(r"^sha256:[0-9a-f]{64}$")
 
@@ -102,6 +102,7 @@ def validate_plan(plan: AnimationPlan) -> ValidationResult:
         )
 
     _validate_source_identity(plan, errors)
+    _validate_layers(plan, errors)
 
     if plan.seed is not None and plan.seed < 0:
         errors.append(_issue("INVALID_SEED", "Seed must be a non-negative integer.", actual=plan.seed))
@@ -142,7 +143,7 @@ def validate_plan(plan: AnimationPlan) -> ValidationResult:
         )
 
     # Constraint enforcement requires structurally sound tracks and playback.
-    if not track_errors and plan.frame_count >= 1:
+    if not track_errors and plan.frame_count >= 1 and not errors:
         # Effective scale/opacity chains no renderer could honor are plan
         # errors, so both `plan` and `render` reject them (docs/renderer.md).
         errors.extend(effective_value_issues(plan))
@@ -152,7 +153,7 @@ def validate_plan(plan: AnimationPlan) -> ValidationResult:
     return ValidationResult(errors=tuple(errors), warnings=tuple(warnings))
 
 
-def _validate_source_identity(plan: AnimationPlan, errors: list[ValidationIssue]) -> None:
+def _validate_source_identity(plan: AnimationPlan | Layer, errors: list[ValidationIssue]) -> None:
     if plan.source_image is None:
         return
     if plan.source_sha256 is not None and not SOURCE_DIGEST_PATTERN.match(plan.source_sha256):
@@ -334,3 +335,35 @@ def _validate_displacement(plan: AnimationPlan, errors: list[ValidationIssue]) -
                         limit=plan.max_frame_delta_px,
                     )
                 )
+
+
+def _validate_layers(plan: AnimationPlan, errors: list[ValidationIssue]) -> None:
+    if (plan.version == 1 and plan.layered) or (plan.version == 2 and not plan.layered):
+        errors.append(_issue("PLAN_SOURCE_VERSION_MISMATCH", "V1 uses single-image input; v2 requires layered input."))
+    if not plan.layered:
+        return
+    if not plan.layers:
+        errors.append(_issue("EMPTY_LAYERS", "At least one explicit layer is required."))
+    if any(type(value) is not int or value <= 0
+           for value in (plan.reference_width, plan.reference_height)):
+        errors.append(_issue("INVALID_REFERENCE_CANVAS", "Reference canvas dimensions must be positive integers."))
+    seen = set()
+    for layer in plan.layers:
+        if layer.target == "sprite":
+            errors.append(_issue("RESERVED_LAYER_TARGET", "sprite is reserved for global transforms."))
+        if layer.target in seen:
+            errors.append(_issue("DUPLICATE_LAYER_TARGET", "Layer targets must be unique.", target=layer.target))
+        seen.add(layer.target)
+        _validate_source_identity(layer, errors)
+        custom_valid = (layer.anchor_x is not None and layer.anchor_y is not None
+                        and all(is_finite_number(v) and 0 <= v <= 1
+                                for v in (layer.anchor_x, layer.anchor_y)))
+        if (layer.anchor_type not in ANCHOR_TYPES
+            or (layer.anchor_type == "custom" and not custom_valid)
+            or (layer.anchor_type != "custom" and (layer.anchor_x is not None or layer.anchor_y is not None))):
+            errors.append(_issue("INVALID_LAYER_ANCHOR", "Layer anchor must be named or normalized custom coordinates.", target=layer.target))
+        if not all(is_finite_number(v) for v in (layer.position_x, layer.position_y)):
+            errors.append(_issue("INVALID_LAYER_POSITION", "Layer position must be finite reference-canvas pixels.", target=layer.target))
+    for item in (*plan.tracks, *plan.events):
+        if item.target is not None and item.target not in seen | {"sprite"}:
+            errors.append(_issue("UNKNOWN_LAYER_TARGET", "Target has no declared layer.", target=item.target))

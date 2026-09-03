@@ -1,0 +1,18 @@
+Processing ./.
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: sprite-animation-harness
+  Building wheel for sprite-animation-harness (pyproject.toml): started
+  Building wheel for sprite-animation-harness (pyproject.toml): finished with status 'done'
+  Created wheel for sprite-animation-harness: filename=sprite_animation_harness-0.7.0-py3-none-any.whl size=76813 sha256=eef164237a3c69947cfdd8311cace9dbeee949bd023193d3271f1e428a19a230
+  Stored in directory: /private/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/pip-ephem-wheel-cache-37ay0enh/wheels/4f/a0/5c/802444ea27531c6bc887953537e290a7c9d1cd36cfcc677c6c
+Successfully built sprite-animation-harness
+Installing collected packages: sprite-animation-harness
+  Attempting uninstall: sprite-animation-harness
+    Found existing installation: sprite-animation-harness 0.7.0
+    Uninstalling sprite-animation-harness-0.7.0:
+      Successfully uninstalled sprite-animation-harness-0.7.0
+Successfully installed sprite-animation-harness-0.7.0
+
+[notice] A new release of pip is available: 26.1.1 -> 26.2.1
+[notice] To update, run: /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/python -m pip install --upgrade pip

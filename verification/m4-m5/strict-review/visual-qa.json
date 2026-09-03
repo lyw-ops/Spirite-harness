@@ -1,0 +1,75 @@
+{
+  "method": "Opened and visually inspected the actual new contact sheet and atlas in Codex; layout and every RGBA byte also checked by installed CLI.",
+  "artifacts": [
+    {
+      "file": "build/m4-m5-strict-review/generated/build-full/contact-sheet.png",
+      "sha256": "e1fcede507460217cdf7dd38d91fa18ab8946d32764dc2cfe5d162a8f3ef6c89"
+    },
+    {
+      "file": "build/m4-m5-strict-review/multi-atlas-full/atlas.png",
+      "sha256": "4267e7015a9b8b3f64dde7d967ae16d8dc559b714645307f7e0fdd03dea8ef3c"
+    }
+  ],
+  "previews": [
+    {
+      "file": "build/m4-m5-strict-review/single/build-full/preview.gif",
+      "sha256": "677288ca6e56f4da62dd913bef91a2465e83c949a2e3bf1e8a6df139e016a2e5",
+      "size": [
+        96,
+        112
+      ],
+      "gif_frames": 12
+    },
+    {
+      "file": "build/m4-m5-strict-review/single/build-hold/preview.gif",
+      "sha256": "01bcf7395ecbca8fe9c24accea9db616125029b63208398955eabda5496ec5c9",
+      "size": [
+        96,
+        112
+      ],
+      "gif_frames": 1
+    },
+    {
+      "file": "build/m4-m5-strict-review/layered/build-full/preview.gif",
+      "sha256": "dc9f5f7a3aac8cbde2c623cb2c6afeb158f381e7f4c4565a753fa4edee00e467",
+      "size": [
+        80,
+        80
+      ],
+      "gif_frames": 12
+    },
+    {
+      "file": "build/m4-m5-strict-review/layered/build-hold/preview.gif",
+      "sha256": "5131e0c9284a52b1ab5a69689fdd7c252581331915eedfbcc7fa40e73c1f38ca",
+      "size": [
+        80,
+        80
+      ],
+      "gif_frames": 1
+    },
+    {
+      "file": "build/m4-m5-strict-review/generated/build-full/preview.gif",
+      "sha256": "006818ee7971d38b1590821e34fca748aa1d7f72db8e0d3ef460701e2d39796d",
+      "size": [
+        80,
+        80
+      ],
+      "gif_frames": 12
+    },
+    {
+      "file": "build/m4-m5-strict-review/generated/build-hold/preview.gif",
+      "sha256": "eef10c5082e8bc7f61978dda8a04f4b27845477b924b040f1888704fd3ece035",
+      "size": [
+        80,
+        80
+      ],
+      "gif_frames": 1
+    }
+  ],
+  "findings": [
+    "Head replacements at zero-based frames 2,3,4,8,9; hand replacements at 0,6.",
+    "Clip order generated, single, layered; 36 used and 52 transparent empty cells.",
+    "Full/hold and input source identities validated for all three pipelines."
+  ],
+  "provider_live": "NOT COMPLETED; geometric offline test adapter only."
+}

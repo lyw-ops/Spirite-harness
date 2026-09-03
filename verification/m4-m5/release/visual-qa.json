@@ -1,0 +1,19 @@
+{
+  "method": "Actual final PNGs opened and visually inspected in Codex; pixel/empty-region claims additionally checked by CLI round trip.",
+  "artifacts": [
+    {
+      "file": "build/m4-m5-acceptance-release/generated/build-full/contact-sheet.png",
+      "sha256": "e1fcede507460217cdf7dd38d91fa18ab8946d32764dc2cfe5d162a8f3ef6c89"
+    },
+    {
+      "file": "build/m4-m5-acceptance-release/multi-atlas-full/atlas.png",
+      "sha256": "4267e7015a9b8b3f64dde7d967ae16d8dc559b714645307f7e0fdd03dea8ef3c"
+    }
+  ],
+  "findings": [
+    "Generated head squares appear at specified frames 2,3,4,8,9; hand replacements at 0,6.",
+    "Atlas follows generated, single, layered clip order from left to right and top to bottom.",
+    "Fixed grid has 36 populated and 52 empty cells; full-canvas padding and remaining rows are clear."
+  ],
+  "semantic_model_qa": "Not performed; all shown images use a geometric test adapter, not a real AI result."
+}

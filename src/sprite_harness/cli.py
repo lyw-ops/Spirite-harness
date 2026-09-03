@@ -16,6 +16,7 @@ from .build import (
     validate_build,
 )
 from .contact_sheet import create_contact_sheet
+from .contracts import ContractViolation
 from .exit_codes import (
     MALFORMED_SPECIFICATION,
     MISSING_INPUT,
@@ -26,7 +27,7 @@ from .exit_codes import (
 from .jsonio import dumps_strict
 from .normalize import NormalizationError, normalize_animation
 from .plan import load_plan
-from .processing import ProcessingError
+from .processing import ProcessingError, ensure_safe_build_output
 from .preview import create_preview
 from .qa import build_qa_report, qa_report_path, write_json_artifact
 from .render import render_build
@@ -48,7 +49,7 @@ def _parser() -> argparse.ArgumentParser:
     )
     plan.add_argument("--spec", type=Path, required=True, help="Animation Plan JSON/YAML file.")
     plan.add_argument(
-        "--source", type=Path, help="Source sprite PNG; overrides the plan's source.image."
+        "--source", type=Path, help="Single source PNG; overrides source.image, conflicts with source.layers."
     )
     plan.add_argument(
         "--output",
@@ -59,8 +60,7 @@ def _parser() -> argparse.ArgumentParser:
 
     render = subparsers.add_parser(
         "render",
-        help="Render build/frames/ by applying the frame plan's whole-sprite "
-        "transforms to the bound source sprite.",
+        help="Render build/frames/ from a bound single sprite or explicit PNG layers.",
     )
     render.add_argument("build", type=Path, help="Build directory produced by 'plan'.")
     render.add_argument(
@@ -74,6 +74,7 @@ def _parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Replace previously rendered declared frame files and render.json.",
     )
+    render.add_argument("--generated-input", action="store_true", help="Use accepted source replacements; never calls an adapter.")
     render.add_argument("--json", action="store_true", dest="as_json")
 
     validate = subparsers.add_parser(
@@ -111,6 +112,21 @@ def _parser() -> argparse.ArgumentParser:
 
     report = subparsers.add_parser("report", help="Report metadata and artifact status.")
     _common(report)
+    generation = subparsers.add_parser('generate', help='Explicitly run an external adapter and freeze checked source replacements.')
+    generation.add_argument('build', type=Path)
+    generation.add_argument('--spec', type=Path, required=True)
+    generation.add_argument('--adapter-argv', required=True, help='JSON array of explicit executable and arguments; no shell.')
+    generation.add_argument('--timeout', type=float, default=120)
+    generation.add_argument('--overwrite', action='store_true')
+    generation.add_argument('--json', action='store_true', dest='as_json')
+    exporter = subparsers.add_parser('export', help='Pack validated builds into one deterministic grid atlas.')
+    exporter.add_argument('--spec', type=Path, required=True)
+    exporter.add_argument('--output', type=Path, required=True)
+    exporter.add_argument('--overwrite', action='store_true')
+    exporter.add_argument('--json', action='store_true', dest='as_json')
+    export_validator = subparsers.add_parser('validate-export', help='Revalidate inputs and every atlas pixel offline.')
+    export_validator.add_argument('output', type=Path)
+    export_validator.add_argument('--json', action='store_true', dest='as_json')
     return parser
 
 
@@ -150,10 +166,10 @@ def _load_or_error(args: argparse.Namespace) -> tuple[Any | None, int | None]:
 def _run_plan(args: argparse.Namespace) -> int:
     try:
         plan = load_plan(args.spec)
+        output = args.output if args.output is not None else plan.spec_dir / "build"
+        payload = create_build(plan, output, source_override=args.source)
     except SpecLoadError as exc:
         return _spec_error_payload(args.command, exc, args.as_json)
-    output = args.output if args.output is not None else plan.spec_dir / "build"
-    payload = create_build(plan, output, source_override=args.source)
     payload = {"command": args.command, "spec": str(plan.spec_path), **payload}
     _emit(payload, args.as_json)
     return SUCCESS if payload["success"] else VALIDATION_FAILURE
@@ -165,7 +181,7 @@ def _run_render(args: argparse.Namespace) -> int:
     except SpecLoadError as exc:
         return _spec_error_payload(args.command, exc, args.as_json)
     payload = render_build(
-        build, reduced_motion=args.reduced_motion, overwrite=args.overwrite
+        build, reduced_motion=args.reduced_motion, overwrite=args.overwrite, generated_input=args.generated_input
     )
     payload = {"command": args.command, **payload}
     human: str | None = None
@@ -196,17 +212,26 @@ def _run_build_command(args: argparse.Namespace) -> int:
         return _spec_error_payload(args.command, exc, args.as_json)
 
     result, checks = validate_build(build)
+    from .contracts import read_json
+    state = {'backend': 'external', 'mode': 'full'}
+    if result.valid and (build.build_dir / 'render.json').is_file():
+        manifest = read_json(build.build_dir / 'render.json')
+        state = {'backend': manifest.get('backend', 'deterministic'), 'mode': manifest['mode']}
+    elif not result.valid:
+        state = {'backend': 'unverified', 'mode': 'unverified'}
     if args.command == "validate":
         payload = {
             "command": args.command,
             "build": str(build.build_dir),
             "animation_id": build.animation_id,
             "checks": checks,
+            **state,
             **result.as_dict(),
         }
-        if args.write_qa:
+        if args.write_qa and not any(e.code.endswith('TRANSACTION_INCOMPLETE') for e in result.errors):
             stage = "frames" if build.frames_dir.is_dir() else "build"
             qa_path = qa_report_path(build.build_dir, stage)
+            ensure_safe_build_output((*build.protected_paths, build.build_dir / 'render.json', *(build.build_dir / f'frames/frame_{i:03d}.png' for i in range(build.plan.frame_count))), qa_path, build.build_dir)
             write_json_artifact(
                 qa_path,
                 build_qa_report(
@@ -217,7 +242,7 @@ def _run_build_command(args: argparse.Namespace) -> int:
                 ),
             )
             payload["qa_report"] = str(qa_path)
-        human = "Validation passed." if result.valid else None
+        human = f"Validation passed ({state['backend']}, {state['mode']})." if result.valid else None
         _emit(payload, args.as_json, human=human)
         return SUCCESS if result.valid else VALIDATION_FAILURE
 
@@ -237,6 +262,10 @@ def _run_build_command(args: argparse.Namespace) -> int:
             "canvas": build.frame_plan.get("canvas"),
             "anchor": build.frame_plan.get("anchor"),
             "frame_count": len(build.frame_plan.get("frames", [])),
+            "source_mode": "layered" if build.plan.layered else "single",
+            **state,
+            "checks": checks,
+            "layer_targets": [layer.target for layer in build.plan.layers or ()],
             "validation": result.as_dict(),
             "artifacts": {
                 name: {"path": str(path), "exists": path.exists()}
@@ -247,6 +276,7 @@ def _run_build_command(args: argparse.Namespace) -> int:
             f"Animation: {build.animation_id}",
             f"Build: {build.build_dir}",
             f"Frames planned: {payload['frame_count']}",
+            f"Backend: {state['backend']}; motion: {state['mode']}",
             f"Validation: {'valid' if result.valid else 'invalid'}",
         ]
         for name, artifact in payload["artifacts"].items():
@@ -262,6 +292,7 @@ def _run_build_command(args: argparse.Namespace) -> int:
     spec = build_to_animation_spec(build)
     if args.command == "preview":
         output = args.output if args.output is not None else build.build_dir / "preview.gif"
+        ensure_safe_build_output((*build.protected_paths, build.build_dir / 'render.json', *(build.build_dir / f'frames/frame_{i:03d}.png' for i in range(build.plan.frame_count))), output, build.build_dir)
         payload = create_preview(spec, output)
     else:
         if args.thumb_size < 32:
@@ -283,14 +314,62 @@ def _run_build_command(args: argparse.Namespace) -> int:
         output = (
             args.output if args.output is not None else build.build_dir / "contact-sheet.png"
         )
+        ensure_safe_build_output((*build.protected_paths, build.build_dir / 'render.json', *(build.build_dir / f'frames/frame_{i:03d}.png' for i in range(build.plan.frame_count))), output, build.build_dir)
         payload = create_contact_sheet(spec, output, thumb_size=args.thumb_size)
     _emit({"command": args.command, **payload}, args.as_json)
     return SUCCESS
 
 
+def _atlas_human(payload):
+    return '\n'.join([f"Atlas validated: {payload['frame_count']} frames, {payload['clip_count']} clips.",
+                       *(f"  {clip['id']}: {clip['backend']}, {clip['mode']}" for clip in payload['clips'])])
+
+
 def main(argv: list[str] | None = None) -> int:
-    args = _parser().parse_args(argv)
+    arguments = sys.argv[1:] if argv is None else argv
+    if '--json' in arguments:
+        import contextlib
+        import io
+        try:
+            with contextlib.redirect_stderr(io.StringIO()):
+                args = _parser().parse_args(arguments)
+        except SystemExit as exc:
+            if exc.code != 2:
+                raise
+            _emit({'command': arguments[0] if arguments else '', 'valid': False,
+                   'errors': [{'code': 'MALFORMED_COMMAND', 'message': 'Invalid command arguments; use --help for the command contract.'}]}, True)
+            return MALFORMED_SPECIFICATION
+    else:
+        args = _parser().parse_args(arguments)
     try:
+        if args.command in ('generate', 'export', 'validate-export'):
+            from .atlas import export_atlas, validate_export
+            from .generation import generate_build
+            from .contracts import parse_json
+            if args.command == 'generate':
+                try:
+                    argv = parse_json(args.adapter_argv)
+                except ValueError as exc:
+                    raise SpecLoadError('MALFORMED_SPEC', '--adapter-argv must be a JSON array.') from exc
+                payload = generate_build(load_build(args.build), args.spec, argv, timeout=args.timeout, overwrite=args.overwrite)
+            elif args.command == 'export':
+                payload = export_atlas(args.spec, args.output, overwrite=args.overwrite)
+            else:
+                payload = validate_export(args.output)
+            human = None
+            if args.command == 'validate-export':
+                human = _atlas_human(payload)
+            elif args.command == 'generate':
+                human = f"Accepted {payload['accepted_count']} source replacements -> {payload['output']} (frames require render and validate)."
+            _emit({'command': args.command, **payload}, args.as_json, human=human)
+            return SUCCESS
+        if args.command == 'report':
+            from .atlas import export_marker, validate_export
+            candidate = Path(args.animation).expanduser().absolute()
+            if (candidate / 'export-config.json').exists() or export_marker(candidate).exists():
+                payload = validate_export(candidate)
+                _emit({'command': 'report', **payload}, args.as_json, human=_atlas_human(payload))
+                return SUCCESS
         if args.command == "plan":
             return _run_plan(args)
 
@@ -375,6 +454,11 @@ def main(argv: list[str] | None = None) -> int:
 
         _emit({"command": args.command, **result}, args.as_json)
         return SUCCESS
+    except SpecLoadError as exc:
+        return _spec_error_payload(args.command, exc, args.as_json)
+    except ContractViolation as exc:
+        _emit({'command': args.command, 'valid': False, 'success': False, 'errors': [exc.as_error()]}, args.as_json)
+        return VALIDATION_FAILURE
     except ProcessingError as exc:
         payload = {
             "command": args.command,

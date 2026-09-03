@@ -1,0 +1,15 @@
+{
+  "generation_version": 1,
+  "request_id": "geometric-replacements",
+  "adapter": {
+    "id": "offline-test",
+    "version": "1",
+    "model": "geometry-test-substitute",
+    "parameters": {},
+    "seed_policy": "required"
+  },
+  "requests": [
+    {"id": "head-square", "target": "head", "frames": [2, 3, 4, 8, 9], "instruction": "Draw a geometric square; this is an offline test substitute."},
+    {"id": "hand-square", "target": "hand", "frames": [0, 6], "instruction": "Draw a geometric square; explicitly reuse this candidate at both frames."}
+  ]
+}

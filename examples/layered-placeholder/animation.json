@@ -1,0 +1,25 @@
+{
+  "plan_version": 2,
+  "animation_id": "layered_placeholder",
+  "source": {
+    "reference_canvas": {"width": 64, "height": 64},
+    "layers": [
+      {"target": "body", "image": "assets/body.png", "anchor": {"type": "bottom_center"}, "position": {"x": 32, "y": 56}},
+      {"target": "head", "image": "assets/head.png", "anchor": {"type": "bottom_center"}, "position": {"x": 32, "y": 30}},
+      {"target": "hand", "image": "assets/hand.png", "anchor": {"type": "center"}, "position": {"x": 47, "y": 39}}
+    ]
+  },
+  "canvas": {"width": 80, "height": 80, "background": "transparent"},
+  "anchor": {"type": "bottom_center"},
+  "playback": {"fps": 12, "frame_count": 12, "loop": true},
+  "reduced_motion": {"mode": "hold_first_frame"},
+  "constraints": {"max_displacement_px": 3, "max_frame_delta_px": 2},
+  "tracks": [
+    {"track_id": "tilt", "target": "head", "motion": "rotate", "amplitude": 18, "unit": "deg", "phase": 0.25},
+    {"track_id": "wave", "target": "hand", "motion": "translate_y", "amplitude": 5, "unit": "px"},
+    {"track_id": "fade", "target": "hand", "motion": "opacity", "amplitude": -0.5, "unit": "ratio", "curve": "linear"},
+    {"track_id": "sway", "target": "sprite", "motion": "translate_x", "amplitude": 2, "unit": "px"}
+  ],
+  "events": [{"event_id": "beat", "type": "annotation", "target": "head", "frames": [3, 9]}],
+  "metadata": {"artwork": "Programmatically drawn geometric placeholders; not final artwork."}
+}

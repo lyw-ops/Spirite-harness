@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/lyw-ops/Spirite-harness/schemas/frame-plan.schema.json",
   "title": "Sprite Harness Frame Plan",
-  "description": "Version 1 deterministic expansion of an Animation Plan: one entry per frame with concrete sampled transform values. Produced by 'sprite-harness plan'; consumed by renderers and validators.",
+  "description": "Deterministic expansion: v1 single-image, v2 layered source bindings and per-frame global/local poses.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -18,8 +18,17 @@
     "frames"
   ],
   "properties": {
-    "frame_plan_version": { "const": 1 },
-    "animation_id": { "type": "string", "minLength": 1 },
+    "frame_plan_version": {
+      "type": "integer",
+      "enum": [
+        1,
+        2
+      ]
+    },
+    "animation_id": {
+      "type": "string",
+      "minLength": 1
+    },
     "generated_by": {
       "type": "string",
       "pattern": "^sprite-harness \\S+$",
@@ -32,94 +41,375 @@
     },
     "source": {
       "oneOf": [
-        { "type": "null" },
         {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["path", "sha256", "width", "height"],
-          "properties": {
-            "path": {
-              "type": "string",
-              "description": "Source image path resolving relative to the build directory; equals the plan.json source.image."
-            },
-            "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
-            "width": { "type": "integer", "minimum": 1 },
-            "height": { "type": "integer", "minimum": 1 }
-          }
+          "$ref": "#/$defs/single_source"
+        },
+        {
+          "$ref": "#/$defs/layered_source"
         }
       ]
     },
     "playback": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["fps", "frame_count", "loop"],
+      "required": [
+        "fps",
+        "frame_count",
+        "loop"
+      ],
       "properties": {
-        "fps": { "type": "number", "exclusiveMinimum": 0 },
-        "frame_count": { "type": "integer", "minimum": 1 },
-        "loop": { "type": "boolean" }
+        "fps": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "frame_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "loop": {
+          "type": "boolean"
+        }
       }
     },
     "canvas": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["width", "height", "background"],
+      "required": [
+        "width",
+        "height",
+        "background"
+      ],
       "properties": {
-        "width": { "type": "integer", "minimum": 1 },
-        "height": { "type": "integer", "minimum": 1 },
-        "background": { "type": "string", "minLength": 1 }
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "background": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "anchor": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type", "x", "y"],
+      "required": [
+        "type",
+        "x",
+        "y"
+      ],
       "properties": {
-        "type": { "enum": ["bottom_center", "center", "custom"] },
-        "x": { "type": "number", "minimum": 0, "maximum": 1 },
-        "y": { "type": "number", "minimum": 0, "maximum": 1 }
+        "type": {
+          "enum": [
+            "bottom_center",
+            "center",
+            "custom"
+          ]
+        },
+        "x": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "y": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
       },
       "description": "Anchor with coordinates fully resolved."
     },
     "reduced_motion": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["mode"],
+      "required": [
+        "mode"
+      ],
       "properties": {
-        "mode": { "enum": ["full", "hold_first_frame"] }
+        "mode": {
+          "enum": [
+            "full",
+            "hold_first_frame"
+          ]
+        }
       }
     },
     "frames": {
       "type": "array",
       "minItems": 1,
-      "items": { "$ref": "#/$defs/frame" }
+      "items": {
+        "$ref": "#/$defs/frame"
+      }
     }
   },
   "$defs": {
     "frame": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/single_frame"
+        },
+        {
+          "$ref": "#/$defs/layered_frame"
+        }
+      ]
+    },
+    "single_source": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "sha256",
+            "width",
+            "height"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Source image path resolving relative to the build directory; equals the plan.json source.image."
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "width": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      ]
+    },
+    "layered_source": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["index", "file", "time_s", "transforms", "offset", "events"],
+      "required": [
+        "reference_canvas",
+        "layers"
+      ],
       "properties": {
-        "index": { "type": "integer", "minimum": 0 },
+        "reference_canvas": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "width",
+            "height"
+          ],
+          "properties": {
+            "width": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "layers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "target",
+              "image",
+              "anchor",
+              "position",
+              "sha256",
+              "width",
+              "height"
+            ],
+            "properties": {
+              "target": {
+                "type": "string",
+                "minLength": 1,
+                "not": {
+                  "const": "sprite"
+                }
+              },
+              "image": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Source sprite path, resolved relative to the plan file. The source is immutable input and is never modified."
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "description": "Expected SHA-256 of the source bytes. Generated plan.json always records it; declaring it in an input spec pins the source identity."
+              },
+              "width": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Expected source width in pixels."
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Expected source height in pixels."
+              },
+              "anchor": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "bottom_center",
+                      "center",
+                      "custom"
+                    ]
+                  },
+                  "x": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "description": "Stable reference point of the sprite in normalized canvas coordinates. 'custom' requires x and y; the named types forbid them. Default: bottom_center.",
+                "if": {
+                  "properties": {
+                    "type": {
+                      "const": "custom"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "type",
+                    "x",
+                    "y"
+                  ]
+                },
+                "else": {
+                  "properties": {
+                    "type": {
+                      "enum": [
+                        "bottom_center",
+                        "center"
+                      ]
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "x"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "y"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              "position": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "x",
+                  "y"
+                ],
+                "properties": {
+                  "x": {
+                    "type": "number"
+                  },
+                  "y": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          },
+          "description": "Unique targets, array order back to front; uniqueness is checked semantically."
+        }
+      }
+    },
+    "single_frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "file",
+        "time_s",
+        "transforms",
+        "offset",
+        "events"
+      ],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
         "file": {
           "type": "string",
           "pattern": "^frames/frame_[0-9]{3,}\\.png$",
           "description": "Expected frame filename relative to the build directory."
         },
-        "time_s": { "type": "number", "minimum": 0 },
+        "time_s": {
+          "type": "number",
+          "minimum": 0
+        },
         "transforms": {
           "type": "array",
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["track_id", "target", "motion", "unit", "value"],
+            "required": [
+              "track_id",
+              "target",
+              "motion",
+              "unit",
+              "value"
+            ],
             "properties": {
-              "track_id": { "type": "string", "minLength": 1 },
-              "target": { "type": "string", "minLength": 1 },
-              "motion": {
-                "enum": ["translate_x", "translate_y", "rotate", "scale", "opacity"]
+              "track_id": {
+                "type": "string",
+                "minLength": 1
               },
-              "unit": { "enum": ["px", "deg", "ratio"] },
+              "target": {
+                "type": "string",
+                "minLength": 1
+              },
+              "motion": {
+                "enum": [
+                  "translate_x",
+                  "translate_y",
+                  "rotate",
+                  "scale",
+                  "opacity"
+                ]
+              },
+              "unit": {
+                "enum": [
+                  "px",
+                  "deg",
+                  "ratio"
+                ]
+              },
               "value": {
                 "type": "number",
                 "description": "Sampled delta. Effective scale/opacity is 1 + value."
@@ -130,18 +420,256 @@
         "offset": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["x", "y"],
+          "required": [
+            "x",
+            "y"
+          ],
           "properties": {
-            "x": { "type": "number", "description": "Aggregate whole-sprite translation in px (translate tracks targeting 'sprite' only); positive is rightward." },
-            "y": { "type": "number", "description": "Aggregate whole-sprite translation in px (translate tracks targeting 'sprite' only); positive is downward." }
+            "x": {
+              "type": "number",
+              "description": "Aggregate whole-sprite translation in px (translate tracks targeting 'sprite' only); positive is rightward."
+            },
+            "y": {
+              "type": "number",
+              "description": "Aggregate whole-sprite translation in px (translate tracks targeting 'sprite' only); positive is downward."
+            }
           }
         },
         "events": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 },
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
           "description": "Sorted ids of plan events active on this frame."
         }
       }
+    },
+    "layered_frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "index",
+        "file",
+        "time_s",
+        "transforms",
+        "offset",
+        "events",
+        "global_pose",
+        "layers"
+      ],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "file": {
+          "type": "string",
+          "pattern": "^frames/frame_[0-9]{3,}\\.png$",
+          "description": "Expected frame filename relative to the build directory."
+        },
+        "time_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "transforms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "track_id",
+              "target",
+              "motion",
+              "unit",
+              "value"
+            ],
+            "properties": {
+              "track_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "target": {
+                "type": "string",
+                "minLength": 1
+              },
+              "motion": {
+                "enum": [
+                  "translate_x",
+                  "translate_y",
+                  "rotate",
+                  "scale",
+                  "opacity"
+                ]
+              },
+              "unit": {
+                "enum": [
+                  "px",
+                  "deg",
+                  "ratio"
+                ]
+              },
+              "value": {
+                "type": "number",
+                "description": "Sampled delta. Effective scale/opacity is 1 + value."
+              }
+            }
+          }
+        },
+        "offset": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "x",
+            "y"
+          ],
+          "properties": {
+            "x": {
+              "type": "number",
+              "description": "Aggregate whole-sprite translation in px (translate tracks targeting 'sprite' only); positive is rightward."
+            },
+            "y": {
+              "type": "number",
+              "description": "Aggregate whole-sprite translation in px (translate tracks targeting 'sprite' only); positive is downward."
+            }
+          }
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Sorted ids of plan events active on this frame."
+        },
+        "global_pose": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "translation",
+            "rotate_deg",
+            "scale",
+            "opacity"
+          ],
+          "properties": {
+            "translation": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "x",
+                "y"
+              ],
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              }
+            },
+            "rotate_deg": {
+              "type": "number"
+            },
+            "scale": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "opacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "layers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "translation",
+              "rotate_deg",
+              "scale",
+              "opacity",
+              "target"
+            ],
+            "properties": {
+              "translation": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "x",
+                  "y"
+                ],
+                "properties": {
+                  "x": {
+                    "type": "number"
+                  },
+                  "y": {
+                    "type": "number"
+                  }
+                }
+              },
+              "rotate_deg": {
+                "type": "number"
+              },
+              "scale": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "opacity": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "target": {
+                "type": "string",
+                "minLength": 1,
+                "not": {
+                  "const": "sprite"
+                }
+              }
+            }
+          }
+        }
+      }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "frame_plan_version": {
+            "const": 2
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "source": {
+            "$ref": "#/$defs/layered_source"
+          },
+          "frames": {
+            "items": {
+              "$ref": "#/$defs/layered_frame"
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "source": {
+            "$ref": "#/$defs/single_source"
+          },
+          "frames": {
+            "items": {
+              "$ref": "#/$defs/single_frame"
+            }
+          }
+        }
+      }
+    }
+  ]
 }

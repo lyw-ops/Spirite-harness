@@ -1,0 +1,99 @@
+{
+  "legacy_builds_verified": [
+    "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m3-acceptance-final/single/build",
+    "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m3-acceptance-final/single/build-hold",
+    "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m3-acceptance-final/layered/build",
+    "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m3-acceptance-final/layered/build-hold"
+  ],
+  "identity": {
+    "runtime": "0.7.0",
+    "distribution": "0.7.0",
+    "module": "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/lib/python3.14/site-packages/sprite_harness/__init__.py",
+    "provider_distribution": "0.1.0"
+  },
+  "subprocess_calls": 103,
+  "harness_calls": 101,
+  "all_expected_exits_matched": true,
+  "exit_codes": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "strict_json": true,
+  "pythonpath_removed": true,
+  "cwd_outside_repository": true,
+  "source_hashes_unchanged": {
+    "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/animation.json": "46efaace62dd7e05afaebca82e7774877f4c5af03a84a48128a85a9abb1455aa",
+    "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/sprite.png": "2d90293f7c3f69b15077eca2d61a7a4893166a8cc8abe6c858b3b9e4767e24dc",
+    "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/animation.json": "09343fd302be9ed822329e70d2a6116f0a12a30a1381dc183c62d9fd6df16336",
+    "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/assets/body.png": "b2f28b4c590b70eb3527398208af462691e711a1ddc67f8435b5be52181b5d06",
+    "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/assets/hand.png": "bf5f98df05b17693158e0928edf861361e6525db847af2150a6a7c77971c775f",
+    "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/assets/head.png": "daa0a3f38aa2d78386a94d5d50052dc217876f38d203c1f8243b56e06c6d2750",
+    "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/animation.json": "0176e5fc53d2f2d423a28142e86f68f7b34263d8698df3c2f228fbdf2b9cbae4",
+    "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/generation.json": "c058da6d095bfaf4996dd0db8eb84b1c528062c2616c5cfef6948da93889b953",
+    "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/assets/body.png": "b2f28b4c590b70eb3527398208af462691e711a1ddc67f8435b5be52181b5d06",
+    "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/assets/hand.png": "bf5f98df05b17693158e0928edf861361e6525db847af2150a6a7c77971c775f",
+    "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/assets/head.png": "daa0a3f38aa2d78386a94d5d50052dc217876f38d203c1f8243b56e06c6d2750"
+  },
+  "pipelines": {
+    "single-full": {
+      "build": "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full",
+      "atlas": "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-full",
+      "frames": 12,
+      "mode": "full",
+      "backend": "deterministic"
+    },
+    "single-hold": {
+      "build": "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold",
+      "atlas": "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-hold",
+      "frames": 12,
+      "mode": "hold_first_frame",
+      "backend": "deterministic"
+    },
+    "layered-full": {
+      "build": "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full",
+      "atlas": "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-full",
+      "frames": 12,
+      "mode": "full",
+      "backend": "deterministic"
+    },
+    "layered-hold": {
+      "build": "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold",
+      "atlas": "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-hold",
+      "frames": 12,
+      "mode": "hold_first_frame",
+      "backend": "deterministic"
+    },
+    "generated-full": {
+      "build": "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full",
+      "atlas": "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-full",
+      "frames": 12,
+      "mode": "full",
+      "backend": "generated-input"
+    },
+    "generated-hold": {
+      "build": "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold",
+      "atlas": "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-hold",
+      "frames": 12,
+      "mode": "hold_first_frame",
+      "backend": "generated-input"
+    }
+  },
+  "multi_clip_order": [
+    "generated",
+    "single",
+    "layered"
+  ],
+  "fixed_grid": {
+    "columns": 8,
+    "rows": 11,
+    "cell_width": 192,
+    "cell_height": 208,
+    "used_cells": 36,
+    "empty_cells": 52
+  },
+  "provider_transport": "tested separately with real adapter and local HTTP service",
+  "provider_live": "NOT COMPLETED: no credential or authorization; no live call made"
+}

@@ -1,0 +1,18 @@
+Processing ./adapters/openai
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: sprite-openai-adapter
+  Building wheel for sprite-openai-adapter (pyproject.toml): started
+  Building wheel for sprite-openai-adapter (pyproject.toml): finished with status 'done'
+  Created wheel for sprite-openai-adapter: filename=sprite_openai_adapter-0.1.0-py3-none-any.whl size=5044 sha256=e401faec5e493a49613dc1d458f8eec473abf9e4c9474592cda681d3566fb692
+  Stored in directory: /private/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/pip-ephem-wheel-cache-j2u5oa5v/wheels/5a/5b/94/a118f6e674f48d3518a77643026dfd8226d23679d8433f89c1
+Successfully built sprite-openai-adapter
+Installing collected packages: sprite-openai-adapter
+  Attempting uninstall: sprite-openai-adapter
+    Found existing installation: sprite-openai-adapter 0.1.0
+    Uninstalling sprite-openai-adapter-0.1.0:
+      Successfully uninstalled sprite-openai-adapter-0.1.0
+Successfully installed sprite-openai-adapter-0.1.0
+
+[notice] A new release of pip is available: 26.1.1 -> 26.2.1
+[notice] To update, run: /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/python -m pip install --upgrade pip

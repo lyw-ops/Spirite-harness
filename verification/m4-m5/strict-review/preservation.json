@@ -1,0 +1,22 @@
+{
+  "baseline_head": "b27c6d9de84a6f3a982b9ebd76e742b43f93e68e",
+  "all_baseline_files_present": true,
+  "original_test_files": 12,
+  "original_test_hashes_unchanged": true,
+  "missing": [],
+  "changed_original_tests": [],
+  "original_test_sha256": {
+    "tests/test_layered_safety.py": "733e5de3c56691ea63bbca185913c81d8297160828ec4a9f577bf40f657bce32",
+    "tests/test_layers.py": "a3c1c50571eb3aa064f8a438cf1516f96738d16753d522b8cba87f2beb7ff38b",
+    "tests/conftest.py": "30cd15fa2cd10e236e24e13c6e758c7c55e62fd37d38c9777ffdd60bcdfeb86b",
+    "tests/test_build.py": "cc66bb1211b7cca19581e23472261fdb68098f91d266260f3f041e775e6bbeaf",
+    "tests/test_cli.py": "e7a12fcf8b40170cf8791a17f2d119b69c0451e94220bc09cc9073d3c1c8fdb5",
+    "tests/test_hardening.py": "cd5023c2e0b8be0be592688988bb6a59dd0648740779d697935d958abe1ecc56",
+    "tests/test_plan.py": "1a5f0ea1f3bee5523d527110f3e0b3500a9690fa79d711ba7cdae409013a1d6a",
+    "tests/test_render.py": "7dd9b75331e00bda36babd67ed81622767343ef5f996b21fe7d2cd2b429848b4",
+    "tests/test_render_safety.py": "b713a4d76e1410c32b3e0be843711302a5b7aeac2990b9920880227cb309bb03",
+    "tests/test_schemas.py": "1979efeed83eac4a29f5fbb196abd7bd0bd852ddbf0a24ff99fb9dca62bb1554",
+    "tests/test_spec.py": "f521446c416c8909605ff2201845cac4b74aeb71823909ea0be65e06772257e6",
+    "tests/test_validator.py": "185808d717ede519a775059e5a21b095099266596a7a316cee9b14d94054f895"
+  }
+}

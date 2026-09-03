@@ -29,12 +29,11 @@ def _round(value: float) -> float:
     return 0.0 if rounded == 0 else rounded
 
 
-def sample_offsets(plan: AnimationPlan) -> list[tuple[float, float]]:
-    """Aggregate whole-sprite pixel offset (x right, y down) per frame.
+def sample_offsets(plan: AnimationPlan, target: str = SPRITE_TARGET) -> list[tuple[float, float]]:
+    """Aggregate one target's translation (x right, y down) per frame.
 
-    Only translate tracks targeting :data:`~sprite_harness.plan.SPRITE_TARGET`
-    contribute; target-local motion (a hand, a head) never shifts the
-    whole-sprite bounding-box expectation.
+    The default is the global sprite offset. Explicit local target sampling
+    never changes that offset; translation sums raw samples then rounds once.
     """
 
     offsets: list[tuple[float, float]] = []
@@ -42,7 +41,7 @@ def sample_offsets(plan: AnimationPlan) -> list[tuple[float, float]]:
         dx = 0.0
         dy = 0.0
         for track in plan.tracks:
-            if track.target != SPRITE_TARGET or track.motion not in (
+            if track.target != target or track.motion not in (
                 "translate_x",
                 "translate_y",
             ):
@@ -81,7 +80,7 @@ def normalize_plan(
     width, height = (
         (plan.canvas_width, plan.canvas_height)
         if plan.canvas_width is not None
-        else (canvas if canvas is not None else (None, None))
+        else (canvas if canvas is not None else (plan.reference_width, plan.reference_height))
     )
     document: dict[str, Any] = {
         "plan_version": plan.version,
@@ -127,6 +126,21 @@ def normalize_plan(
     }
     if source is not None:
         document["source"] = dict(source)
+    elif plan.layered:
+        document["source"] = {
+            "reference_canvas": {"width": plan.reference_width, "height": plan.reference_height},
+            "layers": [
+                {
+                    "target": layer.target, "image": layer.source_image,
+                    "anchor": ({"type": layer.anchor_type, "x": layer.anchor_x, "y": layer.anchor_y}
+                               if layer.anchor_type == "custom" else {"type": layer.anchor_type}),
+                    "position": {"x": layer.position_x, "y": layer.position_y},
+                    **({"sha256": layer.source_sha256} if layer.source_sha256 is not None else {}),
+                    **({"width": layer.source_width} if layer.source_width is not None else {}),
+                    **({"height": layer.source_height} if layer.source_height is not None else {}),
+                } for layer in plan.layers
+            ],
+        }
     elif plan.source_image is not None:
         source_block: dict[str, Any] = {"image": plan.source_image}
         if plan.source_sha256 is not None:
@@ -170,6 +184,8 @@ def frame_plan_source(normalized_plan: dict[str, Any]) -> dict[str, Any] | None:
     source = normalized_plan.get("source")
     if not isinstance(source, dict):
         return None
+    if "layers" in source:
+        return source
     if not all(field in source for field in ("image", "sha256", "width", "height")):
         return None
     return {
@@ -227,9 +243,21 @@ def expand_plan(plan: AnimationPlan, normalized_plan: dict[str, Any]) -> dict[st
             }
         )
 
+    if plan.layered:
+        # Late import avoids a cycle: geometry also uses expansion rounding.
+        from .geometry import pose_document, sample_poses
+        global_poses = sample_poses(plan)
+        local_poses = [(layer.target, sample_poses(plan, layer.target)) for layer in plan.layers]
+        for index, frame in enumerate(frames):
+            frame["global_pose"] = pose_document(global_poses[index])
+            frame["layers"] = [
+                {"target": target, **pose_document(poses[index])}
+                for target, poses in local_poses
+            ]
+
     anchor_x, anchor_y = resolved_anchor(plan)
     return {
-        "frame_plan_version": FRAME_PLAN_VERSION,
+        "frame_plan_version": 2 if plan.layered else FRAME_PLAN_VERSION,
         "animation_id": plan.animation_id,
         "generated_by": f"sprite-harness {__version__}",
         "plan_digest": plan_digest(normalized_plan),

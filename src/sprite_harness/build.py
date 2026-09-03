@@ -22,7 +22,7 @@ import hashlib
 import json
 import os
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -30,11 +30,12 @@ from PIL import Image, UnidentifiedImageError
 
 from . import __version__
 from .expand import FRAME_PLAN_VERSION, expand_plan, normalize_plan, plan_digest
-from .geometry import expected_alpha_bbox, render_pose, sample_poses
+from .geometry import sample_poses
+from .layers import LayerScene, render_source_pose
 from .jsonio import dumps_strict
-from .plan import AnimationPlan, load_plan, resolved_anchor
+from .plan import AnimationPlan, Layer, load_plan, resolved_anchor
 from .plan_validator import validate_plan
-from .processing import ProcessingError
+from .processing import ProcessingError, ensure_safe_build_output
 from .qa import build_qa_report, qa_report_path, write_json_artifact
 from .spec import AnimationSpec, FrameSpec, SpecLoadError
 from .validator import ValidationIssue, ValidationResult
@@ -96,6 +97,12 @@ class BuildArtifacts:
         return self.build_dir / FRAMES_DIRNAME
 
     @property
+    def protected_paths(self) -> tuple[Path, ...]:
+        from .generation import generation_paths
+        return (*self.plan.protected_paths(), self.build_dir / FRAME_PLAN_FILENAME,
+                *generation_paths(self))
+
+    @property
     def animation_id(self) -> str:
         return str(self.frame_plan.get("animation_id", self.plan.animation_id))
 
@@ -105,7 +112,7 @@ class BuildArtifacts:
 
 
 def inspect_source(
-    source_path: Path, *, background: str
+    source_path: Path, *, background: str, require_png: bool = False
 ) -> tuple[dict[str, Any] | None, list[ValidationIssue]]:
     """Read-only inspection of the source sprite; never modifies the file."""
 
@@ -119,6 +126,7 @@ def inspect_source(
         with Image.open(source_path) as image:
             image.load()
             width, height = image.size
+            image_format = image.format
             has_alpha = image.mode in {"RGBA", "LA"} or (
                 image.mode == "P" and "transparency" in image.info
             )
@@ -132,7 +140,9 @@ def inspect_source(
             )
         )
         return None, issues
-    if background.casefold() == "transparent" and not has_alpha:
+    if require_png and image_format != "PNG":
+        issues.append(_issue("SOURCE_PNG_REQUIRED", "Layer sources must be PNG images.", path=str(source_path)))
+    if (require_png or background.casefold() == "transparent") and not has_alpha:
         issues.append(
             _issue(
                 "SOURCE_ALPHA_REQUIRED",
@@ -145,7 +155,7 @@ def inspect_source(
 
 
 def _compare_source_identity(
-    plan: AnimationPlan, source_stats: dict[str, Any], source_path: Path
+    plan: AnimationPlan | Layer, source_stats: dict[str, Any], source_path: Path
 ) -> list[ValidationIssue]:
     """Compare a plan's declared source identity against the inspected file."""
 
@@ -178,6 +188,22 @@ def _compare_source_identity(
     return issues
 
 
+def _inspect_layers(plan: AnimationPlan, *, require_identity: bool = False) -> tuple[list[dict], list[ValidationIssue]]:
+    stats_list = []
+    errors = []
+    for layer in plan.layers or ():
+        path = (plan.spec_dir / layer.source_image).resolve()
+        stats, issues = inspect_source(path, background=plan.background, require_png=True)
+        if require_identity and any(value is None for value in
+                (layer.source_sha256, layer.source_width, layer.source_height)):
+            issues.append(_issue("INVALID_SOURCE_IDENTITY", "Normalized layers require SHA-256 and dimensions."))
+        if stats is not None:
+            issues.extend(_compare_source_identity(layer, stats, path))
+        errors.extend(replace(issue, context={**issue.context, "target": layer.target}) for issue in issues)
+        stats_list.append(stats)
+    return stats_list, errors
+
+
 # ---------------------------------------------------------------------------
 # Build creation (the `plan` command)
 
@@ -193,6 +219,8 @@ def create_build(
     Returns a JSON-ready payload. Nothing is written when validation fails.
     """
 
+    if plan.layered and source_override is not None:
+        raise SpecLoadError("SOURCE_MODE_CONFLICT", "--source cannot be combined with source.layers.", path=plan.spec_path)
     result = validate_plan(plan)
     errors = list(result.errors)
     warnings = list(result.warnings)
@@ -205,6 +233,8 @@ def create_build(
         if source_stats is not None:
             errors.extend(_compare_source_identity(plan, source_stats, source_path))
 
+    layer_sources, layer_errors = _inspect_layers(plan)
+    errors.extend(layer_errors)
     canvas: tuple[int, int] | None = None
     if plan.canvas_width is not None and plan.canvas_height is not None:
         canvas = (plan.canvas_width, plan.canvas_height)
@@ -218,6 +248,8 @@ def create_build(
                     source=[source_stats["width"], source_stats["height"]],
                 )
             )
+    elif plan.layered:
+        canvas = (plan.reference_width, plan.reference_height)
     elif source_stats is not None:
         canvas = (source_stats["width"], source_stats["height"])
     else:
@@ -232,6 +264,8 @@ def create_build(
     if not combined.valid:
         return {"success": False, "animation_id": plan.animation_id, **combined.as_dict()}
 
+    if output_dir.expanduser().is_symlink():
+        raise ProcessingError("OUTPUT_OVERLAPS_SOURCE", "Build output must not be a symbolic link.")
     output = output_dir.expanduser().resolve()
     if output.is_file():
         raise ProcessingError(
@@ -240,6 +274,7 @@ def create_build(
     protected = {plan.spec_dir.resolve()}
     if source_path is not None:
         protected.add(source_path.parent)
+    protected.update((plan.spec_dir / layer.source_image).resolve().parent for layer in plan.layers or ())
     if output in protected:
         raise ProcessingError(
             "OUTPUT_OVERLAPS_SOURCE",
@@ -259,6 +294,18 @@ def create_build(
             "height": source_stats["height"],
         }
 
+    if plan.layered:
+        plan_source = normalize_plan(plan)["source"]
+        for layer, stats, declared in zip(plan_source["layers"], layer_sources, plan.layers):
+            layer.update(stats)
+            layer["image"] = os.path.relpath((plan.spec_dir / declared.source_image).resolve(), output)
+        # Check effective geometry with actual dimensions before writing artifacts.
+        bound = replace(plan, canvas_width=canvas[0], canvas_height=canvas[1], layers=tuple(
+            replace(layer, source_width=stats["width"], source_height=stats["height"])
+            for layer, stats in zip(plan.layers, layer_sources)))
+        bound_result = validate_plan(bound)
+        if not bound_result.valid:
+            return {"success": False, "animation_id": plan.animation_id, **bound_result.as_dict()}
     normalized = normalize_plan(plan, canvas=canvas, source=plan_source)
     frame_plan = expand_plan(plan, normalized)
 
@@ -281,6 +328,9 @@ def create_build(
     plan_path = output / PLAN_FILENAME
     frame_plan_path = output / FRAME_PLAN_FILENAME
     qa_path = qa_report_path(output, "plan")
+    inputs = (*plan.protected_paths(), *((source_path,) if source_path else ()))
+    for target in (plan_path, frame_plan_path, qa_path):
+        ensure_safe_build_output(inputs, target, output)
     write_json_artifact(plan_path, normalized)
     write_json_artifact(frame_plan_path, frame_plan)
     write_json_artifact(qa_path, qa_document)
@@ -344,7 +394,7 @@ def load_build(directory: str | Path) -> BuildArtifacts:
 
 
 def validate_build_inputs(
-    build: BuildArtifacts,
+    build: BuildArtifacts, *, include_generation: bool = True,
 ) -> tuple[ValidationResult, list[dict[str, Any]]]:
     """Validate everything rendering depends on: plan, source, frame plan.
 
@@ -362,16 +412,36 @@ def validate_build_inputs(
     warnings.extend(plan_result.warnings)
     checks.append({"id": "plan_semantics", "status": "pass" if plan_result.valid else "fail"})
 
+    try:
+        current = load_build(build.build_dir)
+        if (_canonical(current.normalized_plan) != _canonical(build.normalized_plan)
+                or _canonical(current.frame_plan) != _canonical(build.frame_plan)):
+            errors.append(_issue('INPUT_CHANGED', 'Loaded build descriptions differ from the current files.'))
+    except SpecLoadError as exc:
+        errors.append(_issue(exc.code, exc.message))
     source_status = _validate_source(build, errors)
     checks.append({"id": "source_identity", "status": source_status})
 
     consistent = _validate_frame_plan(build, errors, warnings)
     checks.append({"id": "frame_plan_consistency", "status": "pass" if consistent else "fail"})
 
+    if include_generation and not errors:
+        from .generation import load_generation
+        from .contracts import ContractViolation
+        marker = build.build_dir / '.generation-transaction'
+        if marker.exists() or marker.is_symlink():
+            errors.append(_issue('GENERATION_TRANSACTION_INCOMPLETE', 'Generation transaction requires recovery.'))
+        elif (build.build_dir / 'generation').exists() or (build.build_dir / 'generation').is_symlink():
+            try:
+                load_generation(build)
+                checks.append({'id': 'generation_inputs', 'status': 'pass'})
+            except (SpecLoadError, ProcessingError) as exc:
+                errors.append(_issue(exc.code, exc.message))
+                checks.append({'id': 'generation_inputs', 'status': 'fail'})
     return ValidationResult(errors=tuple(errors), warnings=tuple(warnings)), checks
 
 
-def validate_build(build: BuildArtifacts) -> tuple[ValidationResult, list[dict[str, Any]]]:
+def _validate_build(build: BuildArtifacts) -> tuple[ValidationResult, list[dict[str, Any]]]:
     transaction = build.build_dir / RENDER_TRANSACTION_DIRNAME
     if transaction.exists() or transaction.is_symlink():
         return ValidationResult(errors=(
@@ -385,6 +455,9 @@ def validate_build(build: BuildArtifacts) -> tuple[ValidationResult, list[dict[s
     errors = list(result.errors)
     warnings = list(result.warnings)
 
+    if not result.valid:
+        checks.append({"id": "frame_files", "status": "skipped"})
+        return result, checks
     manifest_path = build.build_dir / RENDER_MANIFEST_FILENAME
     if (build.frames_dir.exists() or build.frames_dir.is_symlink()
             or manifest_path.exists() or manifest_path.is_symlink()):
@@ -418,6 +491,10 @@ def _validate_source(build: BuildArtifacts, errors: list[ValidationIssue]) -> st
     """Re-inspect the source image and compare it with the digest-bound identity."""
 
     plan = build.plan
+    if plan.layered:
+        _, issues = _inspect_layers(plan, require_identity=True)
+        errors.extend(issues)
+        return "fail" if issues else "pass"
     if plan.source_image is None:
         return "skipped"
     before = len(errors)
@@ -465,13 +542,14 @@ def _validate_frame_plan(
         )
 
     version = frame_plan.get("frame_plan_version")
-    if "frame_plan_version" in frame_plan and version != FRAME_PLAN_VERSION:
+    expected_version = 2 if build.plan.layered else FRAME_PLAN_VERSION
+    if "frame_plan_version" in frame_plan and (type(version) is not int or version != expected_version):
         errors.append(
             _issue(
                 "UNSUPPORTED_FRAME_PLAN_VERSION",
                 "Frame plan version is not supported.",
                 actual=version,
-                supported=[FRAME_PLAN_VERSION],
+                supported=[expected_version],
             )
         )
         return False
@@ -605,6 +683,9 @@ def _validate_render_manifest(
         ))
         return "full", "fail"
     if not manifest_path.is_file():
+        if (build.build_dir / 'generation').exists():
+            errors.append(_issue('GENERATED_RENDER_MANIFEST_REQUIRED', 'Generated builds with frames require an explicit render manifest.'))
+            return 'full', 'fail'
         return "full", "skipped"
     before = len(errors)
     try:
@@ -629,7 +710,17 @@ def _validate_render_manifest(
         )
         return "full", "fail"
 
-    unknown = sorted(str(key) for key in set(manifest) - RENDER_MANIFEST_KEYS)
+    generated = type(manifest.get('render_version')) is int and manifest.get('render_version') == 2 and manifest.get('backend') == 'generated-input'
+    manifest_keys = RENDER_MANIFEST_KEYS | {'backend', 'generation'} if generated else RENDER_MANIFEST_KEYS
+    if generated:
+        from .generation import load_generation
+        from .contracts import require_equal
+        try:
+            _, binding = load_generation(build)
+            require_equal(manifest.get('generation'), binding, 'RENDER_GENERATION_STALE')
+        except (SpecLoadError, ProcessingError) as exc:
+            errors.append(_issue(exc.code, exc.message))
+    unknown = sorted(str(key) for key in set(manifest) - manifest_keys)
     if unknown:
         errors.append(
             _issue(
@@ -638,7 +729,7 @@ def _validate_render_manifest(
                 fields=unknown,
             )
         )
-    missing = sorted(RENDER_MANIFEST_KEYS - set(manifest))
+    missing = sorted(manifest_keys - set(manifest))
     if missing:
         errors.append(
             _issue(
@@ -654,7 +745,7 @@ def _validate_render_manifest(
             "MALFORMED_RENDER_MANIFEST", "render_version must be an integer, not a boolean or string.",
             actual=version,
         ))
-    elif "render_version" in manifest and version != RENDER_MANIFEST_VERSION:
+    elif "render_version" in manifest and version != RENDER_MANIFEST_VERSION and not generated:
         errors.append(
             _issue(
                 "UNSUPPORTED_RENDER_MANIFEST_VERSION",
@@ -734,13 +825,18 @@ def _validate_render_manifest(
     return mode, "pass" if len(errors) == before else "fail"
 
 
-def _load_source_rgba(plan: AnimationPlan) -> Image.Image | None:
+def _load_source_rgba(plan: AnimationPlan) -> Image.Image | LayerScene | None:
     """The trusted source sprite as RGBA, or None when it cannot be read.
 
     Read-only; identity errors are reported by the source_identity stage, so
     callers only need the pixels (for modeling expected geometry).
     """
 
+    if plan.layered:
+        try:
+            return LayerScene.load(plan)
+        except (UnidentifiedImageError, OSError, ValueError):
+            return None
     source_path = plan.resolved_source_path()
     if source_path is None or not source_path.is_file():
         return None
@@ -768,7 +864,7 @@ def _validate_frames(
             path=str(build.frames_dir),
         )], warnings
     plan = build.plan
-    frame_plan = build.frame_plan
+    frame_plan = expand_plan(plan, build.normalized_plan)
     canvas = frame_plan.get("canvas", {})
     expected_size = (
         (canvas.get("width"), canvas.get("height")) if isinstance(canvas, dict) else (None, None)
@@ -784,6 +880,12 @@ def _validate_frames(
                 "A built-in render manifest requires a readable bound source for pixel verification.",
             ))
         else:
+            manifest = json.loads((build.build_dir / RENDER_MANIFEST_FILENAME).read_text())
+            if manifest.get('backend') == 'generated-input':
+                from .generation import load_generation
+                from .layers import ReplacementScene
+                images, _ = load_generation(build)
+                pixel_source = ReplacementScene(pixel_source, images)
             pixel_poses = sample_poses(plan)
             if mode == "hold_first_frame" and pixel_poses:
                 pixel_poses = [pixel_poses[0]] * len(pixel_poses)
@@ -857,7 +959,7 @@ def _validate_frames(
             trusted_canvas = build.normalized_plan.get("canvas", {})
             trusted_size = (trusted_canvas.get("width"), trusted_canvas.get("height"))
             if all(type(dimension) is int and dimension > 0 for dimension in trusted_size):
-                expected_pixels = render_pose(
+                expected_pixels = render_source_pose(
                     pixel_source, pixel_poses[index], trusted_size, resolved_anchor(plan)
                 )
                 if rgba.size != expected_pixels.size or rgba.tobytes() != expected_pixels.tobytes():
@@ -926,7 +1028,7 @@ def _validate_frames(
                     )
                 )
 
-    _validate_geometry(build, mode, bboxes, errors, warnings)
+    _validate_geometry(build, mode, bboxes, errors, warnings, source_override=pixel_source)
     return errors, warnings
 
 
@@ -936,6 +1038,7 @@ def _validate_geometry(
     bboxes: list[tuple[float, float, int] | None],
     errors: list[ValidationIssue],
     warnings: list[ValidationIssue],
+    *, source_override=None,
 ) -> None:
     """Compare measured frame geometry against trusted expectations.
 
@@ -954,7 +1057,7 @@ def _validate_geometry(
     if len(poses) != len(bboxes):
         return  # Count mismatch is reported by frame-plan consistency.
 
-    source = _load_source_rgba(plan) if plan.source_image is not None else None
+    source = source_override if source_override is not None else (_load_source_rgba(plan) if plan.source_image is not None or plan.layered else None)
     if source is None:
         # No trusted pixels to model against. Pure translations keep the
         # relative offset check; rotate/scale/opacity cannot be verified
@@ -983,7 +1086,7 @@ def _validate_geometry(
         if box is None:
             continue
         center, bottom, index = box
-        expected = expected_alpha_bbox(source, pose, (width, height), anchor)
+        expected = render_source_pose(source, pose, (width, height), anchor).getchannel("A").getbbox()
         if expected is None:
             errors.append(
                 _issue(
@@ -1121,3 +1224,17 @@ def build_to_animation_spec(build: BuildArtifacts) -> AnimationSpec:
         spec_path=build.build_dir / FRAME_PLAN_FILENAME,
         animation_dir=build.build_dir,
     )
+
+
+def validate_build(build: BuildArtifacts) -> tuple[ValidationResult, list[dict[str, Any]]]:
+    from .transactions import snapshot, recheck
+    from .contracts import ContractViolation
+    paths = [*build.protected_paths, build.build_dir / 'render.json',
+             *(build.build_dir / f'frames/frame_{i:03d}.png' for i in range(build.plan.frame_count))]
+    try:
+        before = snapshot(paths)
+        result, checks = _validate_build(build)
+        recheck(before)
+        return result, checks
+    except ContractViolation as exc:
+        return ValidationResult(errors=(_issue(exc.code, exc.message),)), [{'id': 'input_stability', 'status': 'fail'}]

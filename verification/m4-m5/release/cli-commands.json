@@ -1,0 +1,1453 @@
+[
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/python",
+      "-c",
+      "import sprite_harness,importlib.metadata,json;print(json.dumps({\"runtime\":sprite_harness.__version__,\"distribution\":importlib.metadata.version(\"sprite-animation-harness\"),\"module\":sprite_harness.__file__,\"provider_distribution\":importlib.metadata.version(\"sprite-openai-adapter\")}))"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\"runtime\": \"0.7.0\", \"distribution\": \"0.7.0\", \"module\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/lib/python3.14/site-packages/sprite_harness/__init__.py\", \"provider_distribution\": \"0.1.0\"}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "--version"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "0.7.0\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/python",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/scripts/create_m4_m5_example.py",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "Wrote geometric placeholder layers and animation.json to /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered\nWrote geometric placeholder layers and animation.json to /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated\nOriginal geometric examples created: /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "plan",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/animation.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"single_geometry\",\n  \"artifacts\": {\n    \"frame_plan\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full/frame-plan.json\",\n    \"plan\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full/plan.json\",\n    \"qa_report\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full/qa/plan.qa.json\"\n  },\n  \"command\": \"plan\",\n  \"errors\": [],\n  \"event_count\": 0,\n  \"frame_count\": 12,\n  \"output_dir\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full\",\n  \"spec\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/animation.json\",\n  \"success\": true,\n  \"track_count\": 2,\n  \"valid\": true,\n  \"warnings\": [\n    {\n      \"canvas\": [\n        96,\n        112\n      ],\n      \"code\": \"CANVAS_SOURCE_MISMATCH\",\n      \"message\": \"Source image dimensions differ from the declared canvas; rendering will require anchor-based placement.\",\n      \"source\": [\n        64,\n        64\n      ]\n    }\n  ]\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "render",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"single_geometry\",\n  \"backend\": \"deterministic\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"render\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"frames_dir\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full/frames\",\n  \"mode\": \"full\",\n  \"render_manifest\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full/render.json\",\n  \"skipped_tracks\": [],\n  \"success\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full",
+      "--write-qa",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"single_geometry\",\n  \"backend\": \"deterministic\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"validate\",\n  \"errors\": [],\n  \"mode\": \"full\",\n  \"qa_report\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full/qa/frames.qa.json\",\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "preview",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"single_geometry\",\n  \"command\": \"preview\",\n  \"durations_ms\": [\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83\n  ],\n  \"format\": \"GIF\",\n  \"frame_count\": 12,\n  \"loop\": true,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full/preview.gif\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "contact-sheet",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"single_geometry\",\n  \"columns\": 4,\n  \"command\": \"contact-sheet\",\n  \"format\": \"PNG\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full/contact-sheet.png\",\n  \"rows\": 3,\n  \"success\": true,\n  \"thumb_size\": 192\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "report",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"anchor\": {\n    \"type\": \"bottom_center\",\n    \"x\": 0.5,\n    \"y\": 1.0\n  },\n  \"animation_id\": \"single_geometry\",\n  \"artifacts\": {\n    \"contact_sheet\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full/contact-sheet.png\"\n    },\n    \"frames\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full/frames\"\n    },\n    \"plan_qa\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full/qa/plan.qa.json\"\n    },\n    \"preview\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full/preview.gif\"\n    },\n    \"render_manifest\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full/render.json\"\n    }\n  },\n  \"backend\": \"deterministic\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-full\",\n  \"canvas\": {\n    \"background\": \"transparent\",\n    \"height\": 112,\n    \"width\": 96\n  },\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"report\",\n  \"frame_count\": 12,\n  \"layer_targets\": [],\n  \"mode\": \"full\",\n  \"playback\": {\n    \"fps\": 12.0,\n    \"frame_count\": 12,\n    \"loop\": true\n  },\n  \"source_mode\": \"single\",\n  \"validation\": {\n    \"errors\": [],\n    \"valid\": true,\n    \"warnings\": []\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/export-full.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-full/atlas.png\",\n  \"clip_count\": 1,\n  \"command\": \"export\",\n  \"config_digest\": \"sha256:1be1177bdea487d1480a2a082a9103ad0ede163d0f83a3ac70b2d06c0875469b\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-full\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate-export",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"single\",\n      \"mode\": \"full\"\n    }\n  ],\n  \"command\": \"validate-export\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-full\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "report",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"single\",\n      \"mode\": \"full\"\n    }\n  ],\n  \"command\": \"report\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-full\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/export-full.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-full",
+      "--overwrite",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-full/atlas.png\",\n  \"clip_count\": 1,\n  \"command\": \"export\",\n  \"config_digest\": \"sha256:1be1177bdea487d1480a2a082a9103ad0ede163d0f83a3ac70b2d06c0875469b\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-full\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "plan",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/animation.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"single_geometry\",\n  \"artifacts\": {\n    \"frame_plan\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold/frame-plan.json\",\n    \"plan\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold/plan.json\",\n    \"qa_report\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold/qa/plan.qa.json\"\n  },\n  \"command\": \"plan\",\n  \"errors\": [],\n  \"event_count\": 0,\n  \"frame_count\": 12,\n  \"output_dir\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold\",\n  \"spec\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/animation.json\",\n  \"success\": true,\n  \"track_count\": 2,\n  \"valid\": true,\n  \"warnings\": [\n    {\n      \"canvas\": [\n        96,\n        112\n      ],\n      \"code\": \"CANVAS_SOURCE_MISMATCH\",\n      \"message\": \"Source image dimensions differ from the declared canvas; rendering will require anchor-based placement.\",\n      \"source\": [\n        64,\n        64\n      ]\n    }\n  ]\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "render",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold",
+      "--reduced-motion",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"single_geometry\",\n  \"backend\": \"deterministic\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"render\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"frames_dir\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold/frames\",\n  \"mode\": \"hold_first_frame\",\n  \"render_manifest\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold/render.json\",\n  \"skipped_tracks\": [],\n  \"success\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold",
+      "--write-qa",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"single_geometry\",\n  \"backend\": \"deterministic\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"validate\",\n  \"errors\": [],\n  \"mode\": \"hold_first_frame\",\n  \"qa_report\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold/qa/frames.qa.json\",\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "preview",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"single_geometry\",\n  \"command\": \"preview\",\n  \"durations_ms\": [\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83\n  ],\n  \"format\": \"GIF\",\n  \"frame_count\": 12,\n  \"loop\": true,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold/preview.gif\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "contact-sheet",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"single_geometry\",\n  \"columns\": 4,\n  \"command\": \"contact-sheet\",\n  \"format\": \"PNG\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold/contact-sheet.png\",\n  \"rows\": 3,\n  \"success\": true,\n  \"thumb_size\": 192\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "report",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"anchor\": {\n    \"type\": \"bottom_center\",\n    \"x\": 0.5,\n    \"y\": 1.0\n  },\n  \"animation_id\": \"single_geometry\",\n  \"artifacts\": {\n    \"contact_sheet\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold/contact-sheet.png\"\n    },\n    \"frames\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold/frames\"\n    },\n    \"plan_qa\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold/qa/plan.qa.json\"\n    },\n    \"preview\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold/preview.gif\"\n    },\n    \"render_manifest\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold/render.json\"\n    }\n  },\n  \"backend\": \"deterministic\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/build-hold\",\n  \"canvas\": {\n    \"background\": \"transparent\",\n    \"height\": 112,\n    \"width\": 96\n  },\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"report\",\n  \"frame_count\": 12,\n  \"layer_targets\": [],\n  \"mode\": \"hold_first_frame\",\n  \"playback\": {\n    \"fps\": 12.0,\n    \"frame_count\": 12,\n    \"loop\": true\n  },\n  \"source_mode\": \"single\",\n  \"validation\": {\n    \"errors\": [],\n    \"valid\": true,\n    \"warnings\": []\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/export-hold.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-hold/atlas.png\",\n  \"clip_count\": 1,\n  \"command\": \"export\",\n  \"config_digest\": \"sha256:13e09b12ef17b845dfeb7362d343b809405544f7e5039971c8ab04483e914f42\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-hold\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate-export",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"single\",\n      \"mode\": \"hold_first_frame\"\n    }\n  ],\n  \"command\": \"validate-export\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-hold\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "report",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"single\",\n      \"mode\": \"hold_first_frame\"\n    }\n  ],\n  \"command\": \"report\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-hold\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/export-hold.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-hold",
+      "--overwrite",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-hold/atlas.png\",\n  \"clip_count\": 1,\n  \"command\": \"export\",\n  \"config_digest\": \"sha256:13e09b12ef17b845dfeb7362d343b809405544f7e5039971c8ab04483e914f42\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-hold\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "plan",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/animation.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"layered_placeholder\",\n  \"artifacts\": {\n    \"frame_plan\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full/frame-plan.json\",\n    \"plan\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full/plan.json\",\n    \"qa_report\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full/qa/plan.qa.json\"\n  },\n  \"command\": \"plan\",\n  \"errors\": [],\n  \"event_count\": 1,\n  \"frame_count\": 12,\n  \"output_dir\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full\",\n  \"spec\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/animation.json\",\n  \"success\": true,\n  \"track_count\": 4,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "render",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"layered_placeholder\",\n  \"backend\": \"deterministic\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"render\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"frames_dir\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full/frames\",\n  \"mode\": \"full\",\n  \"render_manifest\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full/render.json\",\n  \"skipped_tracks\": [],\n  \"success\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full",
+      "--write-qa",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"layered_placeholder\",\n  \"backend\": \"deterministic\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"validate\",\n  \"errors\": [],\n  \"mode\": \"full\",\n  \"qa_report\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full/qa/frames.qa.json\",\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "preview",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"layered_placeholder\",\n  \"command\": \"preview\",\n  \"durations_ms\": [\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83\n  ],\n  \"format\": \"GIF\",\n  \"frame_count\": 12,\n  \"loop\": true,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full/preview.gif\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "contact-sheet",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"layered_placeholder\",\n  \"columns\": 4,\n  \"command\": \"contact-sheet\",\n  \"format\": \"PNG\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full/contact-sheet.png\",\n  \"rows\": 3,\n  \"success\": true,\n  \"thumb_size\": 192\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "report",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"anchor\": {\n    \"type\": \"bottom_center\",\n    \"x\": 0.5,\n    \"y\": 1.0\n  },\n  \"animation_id\": \"layered_placeholder\",\n  \"artifacts\": {\n    \"contact_sheet\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full/contact-sheet.png\"\n    },\n    \"frames\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full/frames\"\n    },\n    \"plan_qa\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full/qa/plan.qa.json\"\n    },\n    \"preview\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full/preview.gif\"\n    },\n    \"render_manifest\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full/render.json\"\n    }\n  },\n  \"backend\": \"deterministic\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-full\",\n  \"canvas\": {\n    \"background\": \"transparent\",\n    \"height\": 80,\n    \"width\": 80\n  },\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"report\",\n  \"frame_count\": 12,\n  \"layer_targets\": [\n    \"body\",\n    \"head\",\n    \"hand\"\n  ],\n  \"mode\": \"full\",\n  \"playback\": {\n    \"fps\": 12.0,\n    \"frame_count\": 12,\n    \"loop\": true\n  },\n  \"source_mode\": \"layered\",\n  \"validation\": {\n    \"errors\": [],\n    \"valid\": true,\n    \"warnings\": []\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/export-full.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-full/atlas.png\",\n  \"clip_count\": 1,\n  \"command\": \"export\",\n  \"config_digest\": \"sha256:d84568c745e45aa1360e0b7387bd628a4a5eb8648e145f4b5b2b4391031fe184\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-full\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate-export",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"layered\",\n      \"mode\": \"full\"\n    }\n  ],\n  \"command\": \"validate-export\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-full\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "report",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"layered\",\n      \"mode\": \"full\"\n    }\n  ],\n  \"command\": \"report\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-full\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/export-full.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-full",
+      "--overwrite",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-full/atlas.png\",\n  \"clip_count\": 1,\n  \"command\": \"export\",\n  \"config_digest\": \"sha256:d84568c745e45aa1360e0b7387bd628a4a5eb8648e145f4b5b2b4391031fe184\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-full\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "plan",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/animation.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"layered_placeholder\",\n  \"artifacts\": {\n    \"frame_plan\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold/frame-plan.json\",\n    \"plan\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold/plan.json\",\n    \"qa_report\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold/qa/plan.qa.json\"\n  },\n  \"command\": \"plan\",\n  \"errors\": [],\n  \"event_count\": 1,\n  \"frame_count\": 12,\n  \"output_dir\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold\",\n  \"spec\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/animation.json\",\n  \"success\": true,\n  \"track_count\": 4,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "render",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold",
+      "--reduced-motion",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"layered_placeholder\",\n  \"backend\": \"deterministic\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"render\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"frames_dir\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold/frames\",\n  \"mode\": \"hold_first_frame\",\n  \"render_manifest\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold/render.json\",\n  \"skipped_tracks\": [],\n  \"success\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold",
+      "--write-qa",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"layered_placeholder\",\n  \"backend\": \"deterministic\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"validate\",\n  \"errors\": [],\n  \"mode\": \"hold_first_frame\",\n  \"qa_report\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold/qa/frames.qa.json\",\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "preview",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"layered_placeholder\",\n  \"command\": \"preview\",\n  \"durations_ms\": [\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83\n  ],\n  \"format\": \"GIF\",\n  \"frame_count\": 12,\n  \"loop\": true,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold/preview.gif\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "contact-sheet",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"layered_placeholder\",\n  \"columns\": 4,\n  \"command\": \"contact-sheet\",\n  \"format\": \"PNG\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold/contact-sheet.png\",\n  \"rows\": 3,\n  \"success\": true,\n  \"thumb_size\": 192\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "report",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"anchor\": {\n    \"type\": \"bottom_center\",\n    \"x\": 0.5,\n    \"y\": 1.0\n  },\n  \"animation_id\": \"layered_placeholder\",\n  \"artifacts\": {\n    \"contact_sheet\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold/contact-sheet.png\"\n    },\n    \"frames\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold/frames\"\n    },\n    \"plan_qa\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold/qa/plan.qa.json\"\n    },\n    \"preview\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold/preview.gif\"\n    },\n    \"render_manifest\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold/render.json\"\n    }\n  },\n  \"backend\": \"deterministic\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/build-hold\",\n  \"canvas\": {\n    \"background\": \"transparent\",\n    \"height\": 80,\n    \"width\": 80\n  },\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"report\",\n  \"frame_count\": 12,\n  \"layer_targets\": [\n    \"body\",\n    \"head\",\n    \"hand\"\n  ],\n  \"mode\": \"hold_first_frame\",\n  \"playback\": {\n    \"fps\": 12.0,\n    \"frame_count\": 12,\n    \"loop\": true\n  },\n  \"source_mode\": \"layered\",\n  \"validation\": {\n    \"errors\": [],\n    \"valid\": true,\n    \"warnings\": []\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/export-hold.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-hold/atlas.png\",\n  \"clip_count\": 1,\n  \"command\": \"export\",\n  \"config_digest\": \"sha256:52997ec7e0e56903602e0655850a4233cf6792e3c80c9896fcc909d17b472a1f\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-hold\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate-export",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"layered\",\n      \"mode\": \"hold_first_frame\"\n    }\n  ],\n  \"command\": \"validate-export\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-hold\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "report",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"layered\",\n      \"mode\": \"hold_first_frame\"\n    }\n  ],\n  \"command\": \"report\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-hold\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/export-hold.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-hold",
+      "--overwrite",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-hold/atlas.png\",\n  \"clip_count\": 1,\n  \"command\": \"export\",\n  \"config_digest\": \"sha256:52997ec7e0e56903602e0655850a4233cf6792e3c80c9896fcc909d17b472a1f\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-hold\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "plan",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/animation.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"generated_geometry\",\n  \"artifacts\": {\n    \"frame_plan\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/frame-plan.json\",\n    \"plan\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/plan.json\",\n    \"qa_report\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/qa/plan.qa.json\"\n  },\n  \"command\": \"plan\",\n  \"errors\": [],\n  \"event_count\": 1,\n  \"frame_count\": 12,\n  \"output_dir\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full\",\n  \"spec\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/animation.json\",\n  \"success\": true,\n  \"track_count\": 4,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "generate",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/generation.json",
+      "--adapter-argv",
+      "[\"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/python\", \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/scripts/offline_test_adapter.py\"]",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"accepted_count\": 2,\n  \"accepted_digest\": \"sha256:3bc0f64b86ce5a7ace1ebc27e8dede19b6f0f0bef6fa465229411ffa89d5e433\",\n  \"backend\": \"generated-input\",\n  \"command\": \"generate\",\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/generation\",\n  \"request_digest\": \"sha256:944a94736963e5527eeb37b32d3ff98bf0a279c2957c90992e5a4d7f2216365b\",\n  \"seed_supported\": true,\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "render",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full",
+      "--generated-input",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"generated_geometry\",\n  \"backend\": \"generated-input\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"generation_inputs\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"render\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"frames_dir\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/frames\",\n  \"mode\": \"full\",\n  \"render_manifest\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/render.json\",\n  \"skipped_tracks\": [],\n  \"success\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full",
+      "--write-qa",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"generated_geometry\",\n  \"backend\": \"generated-input\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"generation_inputs\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"validate\",\n  \"errors\": [],\n  \"mode\": \"full\",\n  \"qa_report\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/qa/frames.qa.json\",\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "preview",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"generated_geometry\",\n  \"command\": \"preview\",\n  \"durations_ms\": [\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83\n  ],\n  \"format\": \"GIF\",\n  \"frame_count\": 12,\n  \"loop\": true,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/preview.gif\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "contact-sheet",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"generated_geometry\",\n  \"columns\": 4,\n  \"command\": \"contact-sheet\",\n  \"format\": \"PNG\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/contact-sheet.png\",\n  \"rows\": 3,\n  \"success\": true,\n  \"thumb_size\": 192\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "report",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"anchor\": {\n    \"type\": \"bottom_center\",\n    \"x\": 0.5,\n    \"y\": 1.0\n  },\n  \"animation_id\": \"generated_geometry\",\n  \"artifacts\": {\n    \"contact_sheet\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/contact-sheet.png\"\n    },\n    \"frames\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/frames\"\n    },\n    \"plan_qa\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/qa/plan.qa.json\"\n    },\n    \"preview\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/preview.gif\"\n    },\n    \"render_manifest\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/render.json\"\n    }\n  },\n  \"backend\": \"generated-input\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full\",\n  \"canvas\": {\n    \"background\": \"transparent\",\n    \"height\": 80,\n    \"width\": 80\n  },\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"generation_inputs\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"report\",\n  \"frame_count\": 12,\n  \"layer_targets\": [\n    \"body\",\n    \"head\",\n    \"hand\"\n  ],\n  \"mode\": \"full\",\n  \"playback\": {\n    \"fps\": 12.0,\n    \"frame_count\": 12,\n    \"loop\": true\n  },\n  \"source_mode\": \"layered\",\n  \"validation\": {\n    \"errors\": [],\n    \"valid\": true,\n    \"warnings\": []\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/export-full.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-full/atlas.png\",\n  \"clip_count\": 1,\n  \"command\": \"export\",\n  \"config_digest\": \"sha256:d6626eef81000ebd993b469d21b0d225f958afc60bc874c7f1f7e2b5989cda96\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-full\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate-export",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"generated-input\",\n      \"id\": \"generated\",\n      \"mode\": \"full\"\n    }\n  ],\n  \"command\": \"validate-export\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-full\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "report",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"generated-input\",\n      \"id\": \"generated\",\n      \"mode\": \"full\"\n    }\n  ],\n  \"command\": \"report\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-full\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/export-full.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-full",
+      "--overwrite",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-full/atlas.png\",\n  \"clip_count\": 1,\n  \"command\": \"export\",\n  \"config_digest\": \"sha256:d6626eef81000ebd993b469d21b0d225f958afc60bc874c7f1f7e2b5989cda96\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-full\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "render",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full",
+      "--generated-input",
+      "--overwrite",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"generated_geometry\",\n  \"backend\": \"generated-input\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"generation_inputs\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"render\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"frames_dir\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/frames\",\n  \"mode\": \"full\",\n  \"render_manifest\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/render.json\",\n  \"skipped_tracks\": [],\n  \"success\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "plan",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/animation.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"generated_geometry\",\n  \"artifacts\": {\n    \"frame_plan\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold/frame-plan.json\",\n    \"plan\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold/plan.json\",\n    \"qa_report\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold/qa/plan.qa.json\"\n  },\n  \"command\": \"plan\",\n  \"errors\": [],\n  \"event_count\": 1,\n  \"frame_count\": 12,\n  \"output_dir\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold\",\n  \"spec\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/animation.json\",\n  \"success\": true,\n  \"track_count\": 4,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "generate",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/generation.json",
+      "--adapter-argv",
+      "[\"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/python\", \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/scripts/offline_test_adapter.py\"]",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"accepted_count\": 2,\n  \"accepted_digest\": \"sha256:3bc0f64b86ce5a7ace1ebc27e8dede19b6f0f0bef6fa465229411ffa89d5e433\",\n  \"backend\": \"generated-input\",\n  \"command\": \"generate\",\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold/generation\",\n  \"request_digest\": \"sha256:944a94736963e5527eeb37b32d3ff98bf0a279c2957c90992e5a4d7f2216365b\",\n  \"seed_supported\": true,\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "render",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold",
+      "--generated-input",
+      "--reduced-motion",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"generated_geometry\",\n  \"backend\": \"generated-input\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"generation_inputs\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"render\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"frames_dir\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold/frames\",\n  \"mode\": \"hold_first_frame\",\n  \"render_manifest\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold/render.json\",\n  \"skipped_tracks\": [],\n  \"success\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold",
+      "--write-qa",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"generated_geometry\",\n  \"backend\": \"generated-input\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"generation_inputs\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"validate\",\n  \"errors\": [],\n  \"mode\": \"hold_first_frame\",\n  \"qa_report\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold/qa/frames.qa.json\",\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "preview",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"generated_geometry\",\n  \"command\": \"preview\",\n  \"durations_ms\": [\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83,\n    83\n  ],\n  \"format\": \"GIF\",\n  \"frame_count\": 12,\n  \"loop\": true,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold/preview.gif\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "contact-sheet",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"generated_geometry\",\n  \"columns\": 4,\n  \"command\": \"contact-sheet\",\n  \"format\": \"PNG\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold/contact-sheet.png\",\n  \"rows\": 3,\n  \"success\": true,\n  \"thumb_size\": 192\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "report",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"anchor\": {\n    \"type\": \"bottom_center\",\n    \"x\": 0.5,\n    \"y\": 1.0\n  },\n  \"animation_id\": \"generated_geometry\",\n  \"artifacts\": {\n    \"contact_sheet\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold/contact-sheet.png\"\n    },\n    \"frames\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold/frames\"\n    },\n    \"plan_qa\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold/qa/plan.qa.json\"\n    },\n    \"preview\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold/preview.gif\"\n    },\n    \"render_manifest\": {\n      \"exists\": true,\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold/render.json\"\n    }\n  },\n  \"backend\": \"generated-input\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold\",\n  \"canvas\": {\n    \"background\": \"transparent\",\n    \"height\": 80,\n    \"width\": 80\n  },\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"generation_inputs\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"report\",\n  \"frame_count\": 12,\n  \"layer_targets\": [\n    \"body\",\n    \"head\",\n    \"hand\"\n  ],\n  \"mode\": \"hold_first_frame\",\n  \"playback\": {\n    \"fps\": 12.0,\n    \"frame_count\": 12,\n    \"loop\": true\n  },\n  \"source_mode\": \"layered\",\n  \"validation\": {\n    \"errors\": [],\n    \"valid\": true,\n    \"warnings\": []\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/export-hold.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-hold/atlas.png\",\n  \"clip_count\": 1,\n  \"command\": \"export\",\n  \"config_digest\": \"sha256:45bc0a78268419421e0aa4b36e135954043564fee0d862558050e144db9a585e\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-hold\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate-export",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"generated-input\",\n      \"id\": \"generated\",\n      \"mode\": \"hold_first_frame\"\n    }\n  ],\n  \"command\": \"validate-export\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-hold\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "report",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"generated-input\",\n      \"id\": \"generated\",\n      \"mode\": \"hold_first_frame\"\n    }\n  ],\n  \"command\": \"report\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-hold\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/export-hold.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-hold",
+      "--overwrite",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-hold/atlas.png\",\n  \"clip_count\": 1,\n  \"command\": \"export\",\n  \"config_digest\": \"sha256:45bc0a78268419421e0aa4b36e135954043564fee0d862558050e144db9a585e\",\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-hold\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "render",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold",
+      "--generated-input",
+      "--reduced-motion",
+      "--overwrite",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"generated_geometry\",\n  \"backend\": \"generated-input\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"generation_inputs\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"render\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"frames_dir\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold/frames\",\n  \"mode\": \"hold_first_frame\",\n  \"render_manifest\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-hold/render.json\",\n  \"skipped_tracks\": [],\n  \"success\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-full.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-full/atlas.png\",\n  \"clip_count\": 3,\n  \"command\": \"export\",\n  \"config_digest\": \"sha256:660ca85d290bc854cf00544b0f963bccbe8700804500b23d7d177bfd9446eb5c\",\n  \"frame_count\": 36,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-full\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate-export",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 3,\n  \"clips\": [\n    {\n      \"backend\": \"generated-input\",\n      \"id\": \"generated\",\n      \"mode\": \"full\"\n    },\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"single\",\n      \"mode\": \"full\"\n    },\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"layered\",\n      \"mode\": \"full\"\n    }\n  ],\n  \"command\": \"validate-export\",\n  \"errors\": [],\n  \"frame_count\": 36,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-full\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "report",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 3,\n  \"clips\": [\n    {\n      \"backend\": \"generated-input\",\n      \"id\": \"generated\",\n      \"mode\": \"full\"\n    },\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"single\",\n      \"mode\": \"full\"\n    },\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"layered\",\n      \"mode\": \"full\"\n    }\n  ],\n  \"command\": \"report\",\n  \"errors\": [],\n  \"frame_count\": 36,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-full\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-full.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-full",
+      "--overwrite",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-full/atlas.png\",\n  \"clip_count\": 3,\n  \"command\": \"export\",\n  \"config_digest\": \"sha256:660ca85d290bc854cf00544b0f963bccbe8700804500b23d7d177bfd9446eb5c\",\n  \"frame_count\": 36,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-full\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-hold.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-hold/atlas.png\",\n  \"clip_count\": 3,\n  \"command\": \"export\",\n  \"config_digest\": \"sha256:e64631d9fb1ffcb4a3d4a6d99054d53f28f67d27b059d934fec64c6f744b2167\",\n  \"frame_count\": 36,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-hold\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate-export",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 3,\n  \"clips\": [\n    {\n      \"backend\": \"generated-input\",\n      \"id\": \"generated\",\n      \"mode\": \"hold_first_frame\"\n    },\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"single\",\n      \"mode\": \"hold_first_frame\"\n    },\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"layered\",\n      \"mode\": \"hold_first_frame\"\n    }\n  ],\n  \"command\": \"validate-export\",\n  \"errors\": [],\n  \"frame_count\": 36,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-hold\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "report",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 3,\n  \"clips\": [\n    {\n      \"backend\": \"generated-input\",\n      \"id\": \"generated\",\n      \"mode\": \"hold_first_frame\"\n    },\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"single\",\n      \"mode\": \"hold_first_frame\"\n    },\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"layered\",\n      \"mode\": \"hold_first_frame\"\n    }\n  ],\n  \"command\": \"report\",\n  \"errors\": [],\n  \"frame_count\": 36,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-hold\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-hold.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-hold",
+      "--overwrite",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"atlas\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-hold/atlas.png\",\n  \"clip_count\": 3,\n  \"command\": \"export\",\n  \"config_digest\": \"sha256:e64631d9fb1ffcb4a3d4a6d99054d53f28f67d27b059d934fec64c6f744b2167\",\n  \"frame_count\": 36,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-atlas-hold\",\n  \"success\": true\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "Validation passed (generated-input, full).\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "preview",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "OK: /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/preview.gif\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "contact-sheet",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "OK: /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/contact-sheet.png\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "report",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "Animation: generated_geometry\nBuild: /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full\nFrames planned: 12\nBackend: generated-input; motion: full\nValidation: valid\n  frames: /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/frames (present)\n  render_manifest: /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/render.json (present)\n  preview: /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/preview.gif (present)\n  contact_sheet: /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/contact-sheet.png (present)\n  plan_qa: /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/qa/plan.qa.json (present)\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "render",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full",
+      "--generated-input",
+      "--overwrite"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "Rendered 12 frames (mode: full) -> /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/frames\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "generate",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/generation.json",
+      "--adapter-argv",
+      "[\"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/python\", \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/scripts/offline_test_adapter.py\"]",
+      "--overwrite"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "Accepted 2 source replacements -> /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full/generation (frames require render and validate).\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "plan",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/animation.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/human-plan"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "OK: /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/human-plan\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-full.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/human-atlas"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "OK: /Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/human-atlas\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate-export",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/human-atlas"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "Atlas validated: 36 frames, 3 clips.\n  generated: generated-input, full\n  single: deterministic, full\n  layered: deterministic, full\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/multi-full.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/human-atlas",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 4,
+    "actual_exit": 4,
+    "stdout": "{\n  \"command\": \"export\",\n  \"errors\": [\n    {\n      \"code\": \"OUTPUT_EXISTS\",\n      \"message\": \"Output exists; use --overwrite for declared artifacts.\"\n    }\n  ],\n  \"success\": false\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "render",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/missing",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 3,
+    "actual_exit": 3,
+    "stdout": "{\n  \"command\": \"render\",\n  \"errors\": [\n    {\n      \"code\": \"INPUT_NOT_FOUND\",\n      \"message\": \"Build directory has no frame-plan.json.\",\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/missing\"\n    }\n  ],\n  \"valid\": false\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/bad.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/bad-export",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 2,
+    "actual_exit": 2,
+    "stdout": "{\n  \"command\": \"export\",\n  \"errors\": [\n    {\n      \"code\": \"MALFORMED_SPEC\",\n      \"message\": \"Expected bounded, finite, unique-key JSON.\",\n      \"path\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/bad.json\"\n    }\n  ],\n  \"valid\": false\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "export",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/bad.json",
+      "--output",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/bad-export",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 1,
+    "actual_exit": 1,
+    "stdout": "{\n  \"command\": \"export\",\n  \"errors\": [\n    {\n      \"code\": \"EXPORT_CAPACITY_EXCEEDED\",\n      \"message\": \"Grid cannot contain the complete frame set.\"\n    }\n  ],\n  \"success\": false,\n  \"valid\": false\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 1,
+    "actual_exit": 1,
+    "stdout": "{\n  \"animation_id\": \"generated_geometry\",\n  \"backend\": \"unverified\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"generation_inputs\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"fail\"\n    }\n  ],\n  \"command\": \"validate\",\n  \"errors\": [\n    {\n      \"code\": \"FRAME_CONTENT_MISMATCH\",\n      \"frame\": \"frames/frame_002.png\",\n      \"index\": 2,\n      \"message\": \"Decoded RGBA pixels do not match the deterministic source transform.\"\n    }\n  ],\n  \"mode\": \"unverified\",\n  \"valid\": false,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate-export",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 1,
+    "actual_exit": 1,
+    "stdout": "{\n  \"command\": \"validate-export\",\n  \"errors\": [\n    {\n      \"code\": \"EXPORT_INPUT_INVALID\",\n      \"errors\": [\n        {\n          \"code\": \"FRAME_CONTENT_MISMATCH\",\n          \"frame\": \"frames/frame_002.png\",\n          \"index\": 2,\n          \"message\": \"Decoded RGBA pixels do not match the deterministic source transform.\"\n        }\n      ],\n      \"message\": \"An input build failed current validation.\"\n    }\n  ],\n  \"success\": false,\n  \"valid\": false\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"generated_geometry\",\n  \"backend\": \"generated-input\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"generation_inputs\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"validate\",\n  \"errors\": [],\n  \"mode\": \"full\",\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate-export",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"generated-input\",\n      \"id\": \"generated\",\n      \"mode\": \"full\"\n    }\n  ],\n  \"command\": \"validate-export\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-full\",\n  \"reencoded_frames\": [\n    {\n      \"clip\": \"generated\",\n      \"index\": 2\n    }\n  ],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "generate",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/build-full",
+      "--spec",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/provider-probe.json",
+      "--adapter-argv",
+      "[\"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-openai-adapter\"]",
+      "--overwrite",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 4,
+    "actual_exit": 4,
+    "stdout": "{\n  \"command\": \"generate\",\n  \"errors\": [\n    {\n      \"code\": \"ADAPTER_AUTH_REQUIRED\",\n      \"message\": \"Adapter failed; credentials and raw diagnostics are not logged. No automatic core retry.\"\n    }\n  ],\n  \"success\": false\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate-export",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"single\",\n      \"mode\": \"full\"\n    }\n  ],\n  \"command\": \"validate-export\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-full\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate-export",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"single\",\n      \"mode\": \"hold_first_frame\"\n    }\n  ],\n  \"command\": \"validate-export\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/single/atlas-hold\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate-export",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"layered\",\n      \"mode\": \"full\"\n    }\n  ],\n  \"command\": \"validate-export\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-full\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate-export",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"deterministic\",\n      \"id\": \"layered\",\n      \"mode\": \"hold_first_frame\"\n    }\n  ],\n  \"command\": \"validate-export\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/layered/atlas-hold\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate-export",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-full",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"generated-input\",\n      \"id\": \"generated\",\n      \"mode\": \"full\"\n    }\n  ],\n  \"command\": \"validate-export\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-full\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate-export",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"checks\": [\n    {\n      \"id\": \"input_validation\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"layout_recomputed\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_rgba_round_trip\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"transparent_unused_pixels\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"clip_count\": 1,\n  \"clips\": [\n    {\n      \"backend\": \"generated-input\",\n      \"id\": \"generated\",\n      \"mode\": \"hold_first_frame\"\n    }\n  ],\n  \"command\": \"validate-export\",\n  \"errors\": [],\n  \"frame_count\": 12,\n  \"output\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m4-m5-acceptance-release/generated/atlas-hold\",\n  \"reencoded_frames\": [],\n  \"success\": true,\n  \"valid\": true,\n  \"warnings\": []\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m3-acceptance-final/single/build",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"eating_loop\",\n  \"backend\": \"deterministic\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m3-acceptance-final/single/build\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"validate\",\n  \"errors\": [],\n  \"mode\": \"full\",\n  \"valid\": true,\n  \"warnings\": [\n    {\n      \"actual\": \"sprite-harness 0.5.0\",\n      \"code\": \"GENERATED_BY_MISMATCH\",\n      \"current\": \"sprite-harness 0.7.0\",\n      \"message\": \"Frame plan was generated by a different harness release.\"\n    },\n    {\n      \"actual\": \"sprite-harness 0.5.0\",\n      \"artifact\": \"render.json\",\n      \"code\": \"GENERATED_BY_MISMATCH\",\n      \"current\": \"sprite-harness 0.7.0\",\n      \"message\": \"Render manifest was generated by a different harness release.\"\n    }\n  ]\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m3-acceptance-final/single/build-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"eating_loop\",\n  \"backend\": \"deterministic\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m3-acceptance-final/single/build-hold\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"validate\",\n  \"errors\": [],\n  \"mode\": \"hold_first_frame\",\n  \"valid\": true,\n  \"warnings\": [\n    {\n      \"actual\": \"sprite-harness 0.5.0\",\n      \"code\": \"GENERATED_BY_MISMATCH\",\n      \"current\": \"sprite-harness 0.7.0\",\n      \"message\": \"Frame plan was generated by a different harness release.\"\n    },\n    {\n      \"actual\": \"sprite-harness 0.5.0\",\n      \"artifact\": \"render.json\",\n      \"code\": \"GENERATED_BY_MISMATCH\",\n      \"current\": \"sprite-harness 0.7.0\",\n      \"message\": \"Render manifest was generated by a different harness release.\"\n    }\n  ]\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m3-acceptance-final/layered/build",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"layered_placeholder\",\n  \"backend\": \"deterministic\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m3-acceptance-final/layered/build\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"validate\",\n  \"errors\": [],\n  \"mode\": \"full\",\n  \"valid\": true,\n  \"warnings\": [\n    {\n      \"actual\": \"sprite-harness 0.5.0\",\n      \"code\": \"GENERATED_BY_MISMATCH\",\n      \"current\": \"sprite-harness 0.7.0\",\n      \"message\": \"Frame plan was generated by a different harness release.\"\n    },\n    {\n      \"actual\": \"sprite-harness 0.5.0\",\n      \"artifact\": \"render.json\",\n      \"code\": \"GENERATED_BY_MISMATCH\",\n      \"current\": \"sprite-harness 0.7.0\",\n      \"message\": \"Render manifest was generated by a different harness release.\"\n    }\n  ]\n}\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/.venv/bin/sprite-harness",
+      "validate",
+      "/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m3-acceptance-final/layered/build-hold",
+      "--json"
+    ],
+    "cwd": "/var/folders/6l/9qg2d8995s55q_4r1pfg83940000gn/T/sprite-m4-m5-cli-bl9rr8di",
+    "expected_exit": 0,
+    "actual_exit": 0,
+    "stdout": "{\n  \"animation_id\": \"layered_placeholder\",\n  \"backend\": \"deterministic\",\n  \"build\": \"/Users/lyuyuwei/Documents/ChatGPT/Spirite harness/build/m3-acceptance-final/layered/build-hold\",\n  \"checks\": [\n    {\n      \"id\": \"plan_semantics\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"source_identity\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_plan_consistency\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"render_manifest\",\n      \"status\": \"pass\"\n    },\n    {\n      \"id\": \"frame_files\",\n      \"status\": \"pass\"\n    }\n  ],\n  \"command\": \"validate\",\n  \"errors\": [],\n  \"mode\": \"hold_first_frame\",\n  \"valid\": true,\n  \"warnings\": [\n    {\n      \"actual\": \"sprite-harness 0.5.0\",\n      \"code\": \"GENERATED_BY_MISMATCH\",\n      \"current\": \"sprite-harness 0.7.0\",\n      \"message\": \"Frame plan was generated by a different harness release.\"\n    },\n    {\n      \"actual\": \"sprite-harness 0.5.0\",\n      \"artifact\": \"render.json\",\n      \"code\": \"GENERATED_BY_MISMATCH\",\n      \"current\": \"sprite-harness 0.7.0\",\n      \"message\": \"Render manifest was generated by a different harness release.\"\n    }\n  ]\n}\n",
+    "stderr": ""
+  }
+]

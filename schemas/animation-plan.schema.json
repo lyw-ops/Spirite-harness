@@ -2,75 +2,146 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/lyw-ops/Spirite-harness/schemas/animation-plan.schema.json",
   "title": "Sprite Harness Animation Plan",
-  "description": "Version 1 declarative intermediate representation (动画计划) describing how a static source sprite becomes an animation. Character- and provider-neutral by design.",
+  "description": "V1 single-image and v2 explicit layered Animation Plans. See docs/layered-sprites.md.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["plan_version", "animation_id", "playback"],
+  "required": [
+    "plan_version",
+    "animation_id",
+    "playback"
+  ],
   "properties": {
-    "plan_version": { "const": 1 },
+    "plan_version": {
+      "type": "integer",
+      "enum": [
+        1,
+        2
+      ]
+    },
     "animation_id": {
       "type": "string",
       "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
       "description": "Filesystem-safe slug naming this animation."
     },
     "source": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["image"],
-      "properties": {
-        "image": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Source sprite path, resolved relative to the plan file. The source is immutable input and is never modified."
+      "oneOf": [
+        {
+          "$ref": "#/$defs/single_source"
         },
-        "sha256": {
-          "type": "string",
-          "pattern": "^sha256:[0-9a-f]{64}$",
-          "description": "Expected SHA-256 of the source bytes. Generated plan.json always records it; declaring it in an input spec pins the source identity."
-        },
-        "width": { "type": "integer", "minimum": 1, "description": "Expected source width in pixels." },
-        "height": { "type": "integer", "minimum": 1, "description": "Expected source height in pixels." }
-      },
-      "description": "Immutable source sprite plus its digest-bound identity. In a generated plan.json the path resolves relative to the build directory and the identity fields are always present; build validation re-inspects the file against them."
+        {
+          "$ref": "#/$defs/layered_source"
+        }
+      ]
     },
     "canvas": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["width", "height"],
+      "required": [
+        "width",
+        "height"
+      ],
       "properties": {
-        "width": { "type": "integer", "minimum": 1 },
-        "height": { "type": "integer", "minimum": 1 },
-        "background": { "type": "string", "minLength": 1, "default": "transparent" }
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "background": {
+          "type": "string",
+          "minLength": 1,
+          "default": "transparent"
+        }
       },
-      "description": "Output frame dimensions. When omitted, the source image dimensions are inherited; a plan with neither canvas nor source cannot be expanded."
+      "description": "Fixed output dimensions. Omitted: source size in v1, explicit reference_canvas size in v2. No implicit scaling."
     },
     "playback": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["fps", "frame_count", "loop"],
+      "required": [
+        "fps",
+        "frame_count",
+        "loop"
+      ],
       "properties": {
-        "fps": { "type": "number", "exclusiveMinimum": 0 },
-        "frame_count": { "type": "integer", "minimum": 1 },
-        "loop": { "type": "boolean" }
+        "fps": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "frame_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "loop": {
+          "type": "boolean"
+        }
       }
     },
     "anchor": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type"],
+      "required": [
+        "type"
+      ],
       "properties": {
-        "type": { "enum": ["bottom_center", "center", "custom"] },
-        "x": { "type": "number", "minimum": 0, "maximum": 1 },
-        "y": { "type": "number", "minimum": 0, "maximum": 1 }
+        "type": {
+          "enum": [
+            "bottom_center",
+            "center",
+            "custom"
+          ]
+        },
+        "x": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "y": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
       },
       "description": "Stable reference point of the sprite in normalized canvas coordinates. 'custom' requires x and y; the named types forbid them. Default: bottom_center.",
-      "if": { "properties": { "type": { "const": "custom" } } },
-      "then": { "required": ["type", "x", "y"] },
+      "if": {
+        "properties": {
+          "type": {
+            "const": "custom"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "type",
+          "x",
+          "y"
+        ]
+      },
       "else": {
         "properties": {
-          "type": { "enum": ["bottom_center", "center"] }
+          "type": {
+            "enum": [
+              "bottom_center",
+              "center"
+            ]
+          }
         },
-        "not": { "anyOf": [{ "required": ["x"] }, { "required": ["y"] }] }
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "x"
+              ]
+            },
+            {
+              "required": [
+                "y"
+              ]
+            }
+          ]
+        }
       }
     },
     "seed": {
@@ -97,20 +168,31 @@
     "reduced_motion": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["mode"],
+      "required": [
+        "mode"
+      ],
       "properties": {
-        "mode": { "enum": ["full", "hold_first_frame"] }
+        "mode": {
+          "enum": [
+            "full",
+            "hold_first_frame"
+          ]
+        }
       },
       "description": "How runtimes should honor an OS reduced-motion preference."
     },
     "tracks": {
       "type": "array",
-      "items": { "$ref": "#/$defs/track" },
-      "description": "Deterministic motion tracks. Targets are semantic labels; the harness does not guarantee that a flattened sprite can be decomposed into them."
+      "items": {
+        "$ref": "#/$defs/track"
+      },
+      "description": "Tracks address the whole sprite or explicit layer targets in v2; v1 local targets remain advisory."
     },
     "events": {
       "type": "array",
-      "items": { "$ref": "#/$defs/event" },
+      "items": {
+        "$ref": "#/$defs/event"
+      },
       "description": "Discrete per-frame annotations (e.g. blink) for renderers and runtimes."
     },
     "metadata": {
@@ -121,11 +203,19 @@
   "allOf": [
     {
       "if": {
-        "required": ["playback"],
+        "required": [
+          "playback"
+        ],
         "properties": {
           "playback": {
-            "required": ["loop"],
-            "properties": { "loop": { "const": true } }
+            "required": [
+              "loop"
+            ],
+            "properties": {
+              "loop": {
+                "const": true
+              }
+            }
           }
         }
       },
@@ -143,47 +233,312 @@
           }
         }
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "plan_version": {
+            "const": 2
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "source"
+        ],
+        "properties": {
+          "source": {
+            "$ref": "#/$defs/layered_source"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "source": {
+            "$ref": "#/$defs/single_source"
+          }
+        }
+      }
     }
   ],
   "$defs": {
     "track": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["track_id", "target", "motion", "amplitude", "unit"],
+      "required": [
+        "track_id",
+        "target",
+        "motion",
+        "amplitude",
+        "unit"
+      ],
       "properties": {
-        "track_id": { "type": "string", "minLength": 1 },
+        "track_id": {
+          "type": "string",
+          "minLength": 1
+        },
         "target": {
           "type": "string",
           "minLength": 1,
           "description": "The reserved label 'sprite' addresses the whole sprite: only translate tracks targeting 'sprite' contribute to the aggregate per-frame offset. Any other value ('head', 'hand_right', ...) is a semantic part label, advisory for layered renderers, and never moves the whole-sprite offset."
         },
-        "motion": { "enum": ["translate_x", "translate_y", "rotate", "scale", "opacity"] },
-        "amplitude": { "type": "number" },
+        "motion": {
+          "enum": [
+            "translate_x",
+            "translate_y",
+            "rotate",
+            "scale",
+            "opacity"
+          ]
+        },
+        "amplitude": {
+          "type": "number"
+        },
         "unit": {
-          "enum": ["px", "deg", "ratio"],
+          "enum": [
+            "px",
+            "deg",
+            "ratio"
+          ],
           "description": "Must match the motion: translate_* -> px, rotate -> deg, scale/opacity -> ratio."
         },
         "curve": {
-          "enum": ["sine", "triangle", "linear", "ease_in", "ease_out", "ease_in_out", "hold"],
+          "enum": [
+            "sine",
+            "triangle",
+            "linear",
+            "ease_in",
+            "ease_out",
+            "ease_in_out",
+            "hold"
+          ],
           "default": "sine",
           "description": "Periodic curves span [-1, 1]; easing curves are mirrored per cycle and span [0, 1]; 'hold' is constant zero."
         },
-        "cycles": { "type": "number", "exclusiveMinimum": 0, "default": 1 },
-        "phase": { "type": "number", "minimum": 0, "exclusiveMaximum": 1, "default": 0 }
+        "cycles": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 1
+        },
+        "phase": {
+          "type": "number",
+          "minimum": 0,
+          "exclusiveMaximum": 1,
+          "default": 0
+        }
       }
     },
     "event": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["event_id", "type", "frames"],
+      "required": [
+        "event_id",
+        "type",
+        "frames"
+      ],
       "properties": {
-        "event_id": { "type": "string", "minLength": 1 },
-        "type": { "type": "string", "minLength": 1 },
-        "target": { "type": "string", "minLength": 1 },
+        "event_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
         "frames": {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "integer", "minimum": 0 }
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "single_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "image"
+      ],
+      "properties": {
+        "image": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Source sprite path, resolved relative to the plan file. The source is immutable input and is never modified."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "description": "Expected SHA-256 of the source bytes. Generated plan.json always records it; declaring it in an input spec pins the source identity."
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Expected source width in pixels."
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Expected source height in pixels."
+        }
+      },
+      "description": "Immutable source sprite plus its digest-bound identity. In a generated plan.json the path resolves relative to the build directory and the identity fields are always present; build validation re-inspects the file against them."
+    },
+    "layered_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference_canvas",
+        "layers"
+      ],
+      "properties": {
+        "reference_canvas": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "width",
+            "height"
+          ],
+          "properties": {
+            "width": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "layers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "target",
+              "image",
+              "anchor",
+              "position"
+            ],
+            "properties": {
+              "target": {
+                "type": "string",
+                "minLength": 1,
+                "not": {
+                  "const": "sprite"
+                }
+              },
+              "image": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Source sprite path, resolved relative to the plan file. The source is immutable input and is never modified."
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "description": "Expected SHA-256 of the source bytes. Generated plan.json always records it; declaring it in an input spec pins the source identity."
+              },
+              "width": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Expected source width in pixels."
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Expected source height in pixels."
+              },
+              "anchor": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "bottom_center",
+                      "center",
+                      "custom"
+                    ]
+                  },
+                  "x": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "description": "Stable reference point of the sprite in normalized canvas coordinates. 'custom' requires x and y; the named types forbid them. Default: bottom_center.",
+                "if": {
+                  "properties": {
+                    "type": {
+                      "const": "custom"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "type",
+                    "x",
+                    "y"
+                  ]
+                },
+                "else": {
+                  "properties": {
+                    "type": {
+                      "enum": [
+                        "bottom_center",
+                        "center"
+                      ]
+                    }
+                  },
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "x"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "y"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              "position": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "x",
+                  "y"
+                ],
+                "properties": {
+                  "x": {
+                    "type": "number"
+                  },
+                  "y": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          },
+          "description": "Unique targets, array order back to front; uniqueness is checked semantically."
         }
       }
     }

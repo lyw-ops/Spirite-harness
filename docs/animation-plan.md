@@ -1,4 +1,4 @@
-# Animation Plan v1
+# Animation Plans v1 and v2
 
 The Animation Plan (动画计划) is the declarative intermediate representation
 between a static source sprite and rendered animation frames. It is
@@ -12,7 +12,8 @@ and when*, without prescribing how pixels are produced.
 A plan file may be JSON or YAML. `sprite-harness plan` normalizes it into a
 canonical `plan.json` and deterministically expands it into a
 [`frame-plan.json`](../schemas/frame-plan.schema.json) — one entry per frame
-with concrete sampled transform values. `sprite-harness render` (milestone 2,
+with concrete sampled transform values. V2 binds explicitly supplied PNG layers;
+[the layered contract](layered-sprites.md) defines its source and pose fields. `sprite-harness render` (milestones 2/3,
 see [`docs/renderer.md`](renderer.md)) turns those values into
 `build/frames/`.
 
@@ -26,14 +27,15 @@ sprite-harness validate build/ --write-qa
 
 | Field | Required | Meaning |
 | --- | --- | --- |
-| `plan_version` | yes | Const `1`. |
+| `plan_version` | yes | `1` for single-image / external plans; `2` for explicit layered plans. |
 | `animation_id` | yes | Filesystem-safe slug. |
 | `source.image` | no | Source sprite path, relative to the plan file; `--source` overrides it. The source is immutable input. |
 | `source.sha256`, `source.width`, `source.height` | no | Expected source identity. Generated `plan.json` always records them (with `image` rewritten to resolve from inside the build directory), binding the source into `plan_digest`; declaring them in an input spec pins the source. Build validation re-inspects the file against them. |
-| `canvas` | no | Output `width`/`height` and `background` (default `transparent`). Omitted canvas inherits the source dimensions; a plan with neither cannot expand (`CANVAS_UNRESOLVED`). |
+| `source.layers`, `source.reference_canvas` | v2 | Nonempty ordered PNG layers and explicit reference dimensions. Each layer requires target/image/anchor/position, may pin SHA-256/dimensions. Exclusive with source.image and --source; see [layered-sprites.md](layered-sprites.md). |
+| `canvas` | no | Output `width`/`height` and `background` (default `transparent`). Omitted canvas inherits source dimensions (v1) or reference dimensions (v2); a plan with neither cannot expand (`CANVAS_UNRESOLVED`). |
 | `playback` | yes | `fps` (> 0), `frame_count` (≥ 1), `loop`. |
 | `anchor` | no | `bottom_center` (default), `center`, or `custom` with normalized `x`/`y`. The anchor is the stable reference point (e.g. ground contact). |
-| `seed` | no | Deterministic seed reserved for stochastic stages (milestone 4). Deterministic stages never consume it. |
+| `seed` | no | Explicit generation seed (M4); required only for generation requests. Deterministic transforms never consume it. |
 | `constraints` | no | `max_displacement_px` (per-axis offset budget from the base pose) and `max_frame_delta_px` (per-axis change between consecutive frames, including the loop seam). |
 | `reduced_motion.mode` | no | `full` (default) or `hold_first_frame`; a directive for runtimes honoring OS reduced-motion preferences. |
 | `tracks` | no | Deterministic motion tracks (below). |
@@ -59,17 +61,19 @@ A track applies one motion to one semantic target:
 
 - `motion` / `unit` pairs: `translate_x`/`translate_y` → `px`, `rotate` →
   `deg`, `scale`/`opacity` → `ratio` (effective value is `1 + sampled value`).
-  Across multiple `sprite` tracks of one motion, rotate samples add and
+  Across multiple tracks for the same rendered target of one motion, rotate samples add and
   scale/opacity factors multiply; effective opacity is clamped into `[0, 1]`.
   A sprite scale factor reaching zero or below, a negative opacity factor, or
   a frame with effective opacity exactly zero is rejected at plan validation
   (`INVALID_EFFECTIVE_SCALE`, `INVALID_EFFECTIVE_OPACITY`,
   `FULLY_TRANSPARENT_FRAME`) — see [`docs/renderer.md`](renderer.md).
-- The reserved target `sprite` addresses the whole sprite. Every other
+- The reserved target `sprite` addresses the whole sprite. In single-image v1, every other
   `target` is an advisory semantic part label (`head`, `hand_right`, …); the
   harness does not claim an arbitrary flattened sprite can be decomposed into
   these parts, and renderers decide what they can honor. Labels stay
-  provider- and character-neutral.
+  provider- and character-neutral. In v2 every local target must bind a declared
+  PNG layer; unknown track/event targets fail `UNKNOWN_LAYER_TARGET`. Array
+  order is back to front. All local transforms are rendered and digest-bound.
 - The sampled value of a track at frame `i` of `n` is
   `amplitude × curve(u)` with `u = frac((i / period) × cycles + phase)`, where
   `period = n` for loops and `n − 1` otherwise.
@@ -86,8 +90,8 @@ A track applies one motion to one semantic target:
   whole-sprite pixel `offset` (x right, y down) that the validator checks
   against `constraints` and, once frames exist, against measured bounding
   boxes and the ground line. Target-local tracks are expanded per frame in
-  `transforms` but never move the aggregate offset — milestone 1 cannot verify
-  target-local pixels until a renderer/layer contract exists (milestone 3).
+  `transforms` but never move the aggregate offset — v1 skips them; v2 renders them in reference-canvas coordinates before
+  applying the global sprite pose once. Constraints remain global-only.
 
 ## Events
 
@@ -99,7 +103,8 @@ be continuous motion:
 ```
 
 `type` is a free string; frame indices must be in range and event ids unique.
-The expansion lists active event ids per frame.
+The expansion lists active event ids per frame. Event names do not trigger
+pixel actions in either mode.
 
 ## Determinism and integrity
 
@@ -176,3 +181,32 @@ for YAML metadata that cannot be represented as standard JSON.
 
 Exit codes follow the shared contract in
 [`docs/animation-spec.md`](animation-spec.md#exit-code-contract).
+
+## V2 additions and compatibility
+
+See [layered-sprites.md](layered-sprites.md) for the complete v2 source/pose
+schema, errors and coordinate contract. Local zero opacity and invisible layers
+are legal; negative opacity, nonpositive scale and non-finite effective chains
+are errors. V2 frame plans include every layer binding and ordered per-frame
+local poses plus the global pose. All sources are re-inspected and all sections
+are recomputed from the normalized plan. Built-in final RGBA is compared exactly.
+
+Single-image v1 artifacts keep their original structure and digest semantics;
+only invalid non-finite effective transform chains gain an explicit rejection.
+V1/frame-plan versions must be canonical integers. Render/QA/frame-manifest
+versions remain 1; only the layered plan/frame-plan use version 2.
+
+## M4/M5 compatibility (package 0.7.0)
+
+Plan and frame-plan versions remain v1 for single images and v2 for layers.
+Ordinary render continues writing render v1 with the same pixel algorithm.
+`render --generated-input` explicitly selects a validated frozen generation
+bundle and writes render v2, binding its request and accepted input digests.
+Replacement PNGs must preserve source dimensions and anchor space; all local
+composition, global transforms, clipping, displacement constraints and final
+pixel checks still apply. Hold freezes frame 0, including replacement selection.
+Generation/export QA use v2; existing plan/build/frame QA v1 remains readable.
+No event triggers generation. See [generation.md](generation.md),
+[adapters.md](adapters.md), [atlas.md](atlas.md) and
+[transactions.md](transactions.md). Export reads validated build frames in
+frame-plan order, including old v1/v2 and explicit generated-input builds.

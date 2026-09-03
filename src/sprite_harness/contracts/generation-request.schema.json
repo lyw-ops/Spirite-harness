@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lyw-ops/Spirite-harness/schemas/generation-request.schema.json",
+  "title": "Sprite Harness generation-request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "request_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "request_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$"
+    },
+    "plan_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ]
+    },
+    "seed": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "seed_policy": {
+          "enum": [
+            "required",
+            "allow_unsupported"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "model",
+        "parameters",
+        "seed_policy"
+      ]
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$"
+          },
+          "target": {
+            "type": "string",
+            "minLength": 1
+          },
+          "frames": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "minItems": 1,
+            "maxItems": 65536,
+            "uniqueItems": true
+          },
+          "instruction": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32000
+          },
+          "seed": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "source": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "width": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 16384
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 16384
+              },
+              "anchor": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "x": {
+                    "type": "number"
+                  },
+                  "y": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "x",
+                  "y"
+                ]
+              }
+            },
+            "required": [
+              "path",
+              "sha256",
+              "width",
+              "height",
+              "anchor"
+            ]
+          },
+          "output": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "width": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 16384
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 16384
+              },
+              "format": {
+                "type": "string",
+                "const": "PNG"
+              },
+              "alpha": {
+                "type": "string",
+                "const": "required"
+              }
+            },
+            "required": [
+              "width",
+              "height",
+              "format",
+              "alpha"
+            ]
+          },
+          "item_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "id",
+          "target",
+          "frames",
+          "instruction",
+          "seed",
+          "source",
+          "output",
+          "item_digest"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 65536
+    }
+  },
+  "required": [
+    "request_version",
+    "request_id",
+    "plan_digest",
+    "spec",
+    "seed",
+    "adapter",
+    "items"
+  ]
+}

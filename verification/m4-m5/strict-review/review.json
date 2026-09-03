@@ -1,0 +1,23 @@
+{
+  "head": "b27c6d9de84a6f3a982b9ebd76e742b43f93e68e",
+  "branch": "main",
+  "committed": false,
+  "pushed": false,
+  "fixed_findings": [
+    "P1: prepopulated stage copy destinations could overwrite source aliases.",
+    "P2: normalization and initial export-config read preceded input snapshots.",
+    "P2: undeclared stage entries and frozen bundle directories were not fully rejected."
+  ],
+  "regressions_added": 9,
+  "regressions_reproduced_before_fix": 9,
+  "pytest": "594 passed in 14.44s",
+  "subprocess_calls": 103,
+  "harness_calls": 101,
+  "source_sha256": {
+    "src/sprite_harness/generation.py": "8676845d0ea38cd085218bcd9fe8d5bbad8bea52838d1c66e295cff5d26d184e",
+    "src/sprite_harness/atlas.py": "bedafcd195afd31d67aae1bc5ee32d35356314e241fa0ccf884926df0cb80aae",
+    "tests/test_review_regressions.py": "9ee5f154e0e435fea488cd63dddbe9839b0a2fd444c3a2d5a3aa3ccc98135ee9"
+  },
+  "live_provider": "Not performed; no authorized live call.",
+  "git_status": " M HARNESS.md\n M README.md\n M docs/animation-plan.md\n M docs/architecture.md\n M docs/handoff.md\n M docs/renderer.md\n M docs/roadmap.md\n M pyproject.toml\n M schemas/animation-plan.schema.json\n M schemas/frame-plan.schema.json\n M schemas/qa.schema.json\n M schemas/render.schema.json\n M src/sprite_harness/__init__.py\n M src/sprite_harness/build.py\n M src/sprite_harness/cli.py\n M src/sprite_harness/expand.py\n M src/sprite_harness/geometry.py\n M src/sprite_harness/plan.py\n M src/sprite_harness/plan_validator.py\n M src/sprite_harness/processing.py\n M src/sprite_harness/qa.py\n M src/sprite_harness/render.py\n?? adapters/\n?? docs/adapters.md\n?? docs/atlas.md\n?? docs/generation.md\n?? docs/layered-sprites.md\n?? docs/transactions.md\n?? examples/generated-placeholder/\n?? examples/grid-atlas/\n?? examples/layered-placeholder/\n?? schemas/atlas.schema.json\n?? schemas/export-config.schema.json\n?? schemas/export-spec.schema.json\n?? schemas/generated-inputs.schema.json\n?? schemas/generation-request.schema.json\n?? schemas/generation-response.schema.json\n?? schemas/generation-spec.schema.json\n?? scripts/acceptance_m3.py\n?? scripts/acceptance_m4_m5.py\n?? scripts/create_layered_placeholder.py\n?? scripts/create_m4_m5_example.py\n?? scripts/live_provider_smoke.py\n?? scripts/offline_test_adapter.py\n?? scripts/verify_m4_m5.py\n?? src/sprite_harness/atlas.py\n?? src/sprite_harness/contracts.py\n?? src/sprite_harness/contracts/\n?? src/sprite_harness/generation.py\n?? src/sprite_harness/layers.py\n?? src/sprite_harness/transactions.py\n?? tests/test_atlas.py\n?? tests/test_generation.py\n?? tests/test_generation_export_safety.py\n?? tests/test_layered_safety.py\n?? tests/test_layers.py\n?? tests/test_new_contracts.py\n?? tests/test_provider_adapter.py\n?? tests/test_review_regressions.py\n?? verification/\n"
+}

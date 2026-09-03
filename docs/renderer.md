@@ -1,11 +1,14 @@
-# Deterministic transform renderer (milestone 2)
+# Deterministic transform renderer (milestones 2 and 3)
 
 `sprite-harness render` turns a validated build directory (one source sprite +
 `plan.json` + `frame-plan.json`) into the frame set the frame plan declares.
-Milestone 2 renders **whole-sprite transforms only**: translate, rotate,
+The single-image M2 path renders **whole-sprite transforms**: translate, rotate,
 uniform scale, and opacity applied to the entire source image. It uses Pillow
 and pure math — no model APIs, no image generation, no interpolation between
-frames, and no layered or per-part rendering.
+frames. M3 adds explicit layered PNG inputs: local transforms on a reference
+canvas, ordered alpha-over composition, then this same global transform once.
+See [layered-sprites.md](layered-sprites.md) for the authoritative layered
+contract, clipping, identity and version rules.
 
 ```bash
 sprite-harness render build/ [--reduced-motion] [--overwrite] [--json]
@@ -19,11 +22,11 @@ sprite-harness render build/ [--reduced-motion] [--overwrite] [--json]
 ## Inputs and pre-render validation
 
 Rendering consumes only artifacts of an existing build: `plan.json`,
-`frame-plan.json`, and the digest-bound source image. Before any pixel work,
+`frame-plan.json`, and all digest-bound source images (one PNG per layer in v2). Before any pixel work,
 `render` re-runs the full **input** validation — plan semantics, source
 identity (path, SHA-256, dimensions, alpha requirement), and the complete
 frame-plan recomputation against `plan_digest` — and refuses to render (exit 1)
-if anything fails. A tampered `frame-plan.json`, a replaced or resized source,
+if anything fails. A tampered `frame-plan.json`, any replaced or resized source,
 or an invalid plan can never be rendered.
 
 Input validation is deliberately separate from rendered-frame validation:
@@ -71,9 +74,10 @@ Validity of effective values is enforced at plan validation time (so both
   `FRAME_EMPTY`, so it is rejected up front).
 
 Opacity above `1` is **clamped to 1 silently**; the clamp is part of the
-defined transfer function (like CSS opacity), not an anomaly. These rules
-apply to `sprite`-target tracks; target-local tracks are advisory labels and
-are not value-checked pixel-wise in milestone 2.
+defined transfer function (like CSS opacity), not an anomaly. In v1 these rules apply to `sprite` tracks; local labels remain advisory.
+In v2 every rendered target is checked, with zero local opacity allowed. Raw
+products, sums and affine coefficients must stay finite before opacity clamping
+(`NONFINITE_EFFECTIVE_TRANSFORM`); scale underflow to zero is invalid.
 
 ## Anchor and placement
 
@@ -124,9 +128,9 @@ transform pushes past the canvas edge is clipped; the validator reports
 - Rendering is deterministic: the same build, mode, and environment (Python
   and Pillow versions) produce byte-identical PNGs. Frames carry no
   timestamps, no random metadata, and no absolute paths, and the renderer
-  never consumes `plan.seed` (reserved for stochastic stages, milestone 4).
+  never consumes `plan.seed` (used by explicit generation request derivation, milestone 4).
 
-## Target-local tracks are skipped, loudly
+## Single-image target-local tracks are skipped, loudly
 
 Tracks whose `target` is not `sprite` (e.g. `head`, `hand_right`) cannot be
 rendered from a flattened sprite. The renderer:
@@ -136,8 +140,8 @@ rendered from a flattened sprite. The renderer:
 - never folds them into the whole-sprite pose or the global offset;
 - never claims the motion was rendered.
 
-Layered per-target rendering is milestone 3 and is intentionally not
-approximated here.
+V2 layered plans instead bind each local target to an explicit PNG and render
+its local transforms. Unknown targets are errors; no layer is inferred.
 
 ## Reduced motion
 
@@ -146,7 +150,7 @@ a reduced-motion variant of the animation is. `render` renders the **full**
 variant by default; `--reduced-motion` renders the variant the plan declares:
 
 - mode `full`: the reduced variant is identical to the full render;
-- mode `hold_first_frame`: the pose of frame 0 is rendered once and written to
+- mode `hold_first_frame`: the complete frame-0 pose/composite is rendered once and written to
   **every** declared frame file — the frame count and `frames/frame_NNN.png`
   naming are preserved, and all frames are byte-identical.
 
@@ -167,7 +171,7 @@ A successful render writes `render.json`
 {
   "render_version": 1,
   "animation_id": "eating_loop",
-  "generated_by": "sprite-harness 0.4.0",
+  "generated_by": "sprite-harness 0.5.0",
   "plan_digest": "sha256:…",
   "mode": "full"
 }
@@ -252,7 +256,7 @@ fails the suite.
 
 ## Output safety and overwrite policy
 
-- The source image is read-only; rendering never modifies, renames, or deletes
+- All source images and the runtime layer description are read-only; rendering never modifies, renames, or deletes
   it (tests verify the source hash is unchanged by a render).
 - `.render-transaction/` is created exclusively as the writer lock, staging
   area, recovery directory, and fail-closed marker. A second writer is refused;
@@ -330,17 +334,33 @@ malformed specification, 3 missing input, 4 processing failure).
 | Warnings | — | `TARGET_TRACKS_SKIPPED` (render), `GEOMETRY_UNVERIFIED` (validate, no source to model against). |
 
 Pre-render input validation failures reuse the existing plan/build codes
-(`FRAME_PLAN_STALE`, `PLAN_DIGEST_MISMATCH`, `SOURCE_DIGEST_MISMATCH`, …) at
+(`FRAME_PLAN_STALE`, `PLAN_DIGEST_MISMATCH`, `SOURCE_DIGEST_MISMATCH`, …;
+layer-specific errors in [layered-sprites.md](layered-sprites.md)) at
 exit 1; a missing `plan.json`/`frame-plan.json` is exit 3; unreadable JSON is
 exit 2.
 
 ## Limitations (deliberate)
 
-- Whole-sprite transforms only. No layered sprites, no automatic
-  decomposition, no per-part motion — target-local tracks are skipped with a
-  warning (milestone 3 territory).
-- No AI-assisted generation, no provider SDKs, no interpolation/optical
-  flow/video output (milestone 4+ boundaries unchanged).
+- Layered motion requires explicitly provided PNGs. No automatic decomposition,
+  skeletons, parent-child joints, IK, meshes or complex masks. Single-image
+  target-local tracks still produce the skipped warning.
+- Optional source-space generation is explicit and outside the core; no provider
+  SDKs in the core, interpolation, optical flow or video output.
 - Only `transparent` backgrounds render.
 - Exact built-in pixel verification assumes the same rendering environment;
   geometry-only external validation does not prove artwork identity.
+
+## M4/M5 compatibility (package 0.7.0)
+
+Plan and frame-plan versions remain v1 for single images and v2 for layers.
+Ordinary render continues writing render v1 with the same pixel algorithm.
+`render --generated-input` explicitly selects a validated frozen generation
+bundle and writes render v2, binding its request and accepted input digests.
+Replacement PNGs must preserve source dimensions and anchor space; all local
+composition, global transforms, clipping, displacement constraints and final
+pixel checks still apply. Hold freezes frame 0, including replacement selection.
+Generation/export QA use v2; existing plan/build/frame QA v1 remains readable.
+No event triggers generation. See [generation.md](generation.md),
+[adapters.md](adapters.md), [atlas.md](atlas.md) and
+[transactions.md](transactions.md). Export reads validated build frames in
+frame-plan order, including old v1/v2 and explicit generated-input builds.
