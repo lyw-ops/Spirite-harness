@@ -1,10 +1,72 @@
 # Project handoff
 
-Last updated: 2026-09-03 — M4 + M5 engineering delivery, package **0.7.0**.
+Last updated: 2026-09-03 — first external consumer integration recorded;
+package remains **0.7.0** (no core change).
 
-The verification records below describe the pre-publication working tree.
-Their "no commit/push" statements are historical; publication was subsequently
-authorized after the strict review and complete offline acceptance passed.
+The M4/M5 verification records below describe the pre-publication working
+tree. Their "no commit/push" statements are historical; publication was
+subsequently authorized after the strict review and complete offline
+acceptance passed.
+
+## First consumer integration: gensokyo-codex-pets (2026-09-03)
+
+Sprite Harness 0.7.0 is now consumed in production by
+[gensokyo-codex-pets](https://github.com/lyw-ops/gensokyo-codex-pets)
+(commit `c9d921b`, `docs/sprite-harness-integration.md` there) for the Reimu
+Eating Set: six real 596×596 flattened RGBA sprites, one single-image v1
+Animation Plan per state, driven end to end through the public CLI only —
+`plan → render → validate --write-qa → preview → contact-sheet → report`, all
+in `--json` mode from subprocesses with exit-code checks. **No harness core
+change was needed and none was made**; no character-specific logic entered the
+harness. This section records what the integration exercised and observed so
+future harness work does not re-derive it.
+
+What the consumer run confirmed in practice:
+
+- The identity/static path works as designed: `frame_count: 1` plans with no
+  tracks validate with only the expected `ZERO_MOTION` warning, and the
+  rendered frame is **byte-identical to the source** through the exact
+  integer-copy path — the consumer relies on this for its baseline frames.
+- Determinism held at the consumer boundary: repeated full builds (plan through
+  publish) produced byte-identical artifacts, letting the consumer treat
+  "rebuild is a no-op diff" as a repository check.
+- The flattened-vs-layered boundary is confirmed by measurement, not just
+  contract: a restrained whole-sprite `translate_y` (±2 px) experiment rendered
+  and validated cleanly, and per-frame alpha bounding boxes showed the ground
+  line (tatami bottom) moving by the full amplitude with the rest of the scene.
+  The consumer therefore shipped an identity baseline instead of fake motion —
+  exactly the outcome the `TARGET_TRACKS_SKIPPED` / no-decomposition contract
+  is meant to force.
+- `--json` outputs were machine-consumed throughout; stable exit codes and the
+  `errors`/`warnings` shapes were sufficient to gate publication (validation
+  failure or any unexpected warning blocks the consumer's publish step).
+
+Consumer-side observations (working as specified; recorded as API-ergonomics
+notes, not bugs):
+
+- Constraint values must be strictly positive (`INVALID_CONSTRAINT` for `0`),
+  so a deliberately static plan declares a minimal 1 px budget rather than 0.
+- Top-level JSON success flags differ by command: `plan` reports `success`,
+  `validate` reports `valid`. Consumers must read the right key per command;
+  a future (non-breaking) unification could add a shared field.
+- `CONTENT_TOUCHES_EDGE` fires for test fixtures whose opaque pixels reach the
+  canvas edge — correct behavior, worth remembering when writing tiny
+  generated test images (give them a transparent border).
+
+Next step for this consumer (drives future harness usage, not core changes):
+
+1. Explicit layered Reimu PNGs (body/head/eyes/mouth/hand/food/table/tatami)
+   are the consumer's next art milestone; the eating states then move to
+   **Animation Plan v2** inline `source.layers` with local tracks (breathing,
+   head bob, eating hand, blink, chew) — the M3 contract as shipped, no new
+   harness capability required. The consumer's spec/builder already pass
+   per-state plan overrides through, so v2 adoption is a data change there.
+2. After layered clips exist and Codex standard-row performances are designed,
+   the consumer plans to use the **M5 `export`** grid atlas for the Codex v2
+   sheet (its 8×11 / 192×208 target matches the generic fixed example). Food
+   tiers are not Codex rows; that mapping stays consumer-side.
+3. **M4 generation remains unused and unauthorized** in the consumer pipeline;
+   its builds are offline and deterministic by policy.
 
 ## Current delivery and remaining live step
 
