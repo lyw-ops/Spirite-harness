@@ -272,9 +272,10 @@
           "status": "passed",
           "evidence": [
             "docs/decisions/2026-09-19-reimu-tier3-native-static-slice.md",
-            "docs/decisions/2026-09-20-reimu-tier3-visual-approval.md"
+            "docs/decisions/2026-09-20-reimu-tier3-visual-approval.md",
+            "docs/decisions/2026-09-20-reimu-tier3-fresh-source-build.md"
           ],
-          "note": "Consumer tools, Swift behavior, native AppKit, package fallback, observer bridge, repository, JSON, runtime capture, formal-identity package validation, signature, and diff gates passed."
+          "note": "Consumer tools, fresh Swift source compilation, Swift behavior, native AppKit, package fallback, observer bridge, repository, JSON, runtime capture, formal-identity package validation, signature, and diff gates passed."
         },
         "visual": {
           "status": "approved",
@@ -306,7 +307,8 @@
       "kind": "animation-delivery",
       "depends_on": [
         "REIMU-TIER2-RUNTIME-001",
-        "REIMU-TIER3-RUNTIME-001"
+        "REIMU-TIER3-RUNTIME-001",
+        "REIMU-TIER4-RUNTIME-001"
       ],
       "required_gates": [
         "specification",
@@ -349,6 +351,130 @@
           "status": "unpublished",
           "evidence": [],
           "note": "The transition task is only a recorded backlog item; nothing has been authored, installed, committed, or published for it."
+        }
+      }
+    },
+    "REIMU-TIER4-INTAKE-001": {
+      "title": "Prepare and review the existing Tier4 ramen still",
+      "kind": "animation-delivery",
+      "depends_on": [],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier4-static-intake.md"
+          ],
+          "note": "Exact count four; immutable existing ramen/dumpling source; one-frame static hold."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier4-static-intake.md"
+          ],
+          "note": "Pinned source, plan, normal and reduced builds, previews and intake report exist under build/reimu-tier4-intake-20260920."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier4-static-intake.md"
+          ],
+          "note": "Both public CLI pipelines pass with expected ZERO_MOTION; decoded pixels equal the source; original digest unchanged."
+        },
+        "visual": {
+          "status": "approved",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier4-static-intake.md",
+            "docs/decisions/2026-09-20-reimu-tier4-visual-approval.md"
+          ],
+          "note": "The user approved the reviewed Tier 4 source and native presentation on 2026-09-20; the one-frame source remains a static hold, not a completed animation."
+        },
+        "consumer": {
+          "status": "not_required",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier4-static-intake.md"
+          ],
+          "note": "This task covers artwork intake only; native integration is tracked separately by REIMU-TIER4-RUNTIME-001."
+        },
+        "publication": {
+          "status": "not_required",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier4-static-intake.md"
+          ],
+          "note": "Local review candidate; no publication requested."
+        }
+      }
+    },
+    "REIMU-TIER4-RUNTIME-001": {
+      "title": "Connect observed count four to the existing native Tier4 still",
+      "kind": "consumer-vertical-slice",
+      "depends_on": [
+        "REIMU-TIER3-RUNTIME-001",
+        "REIMU-TIER4-INTAKE-001"
+      ],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual",
+        "consumer",
+        "publication"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier4-native-static-slice.md",
+            "docs/decisions/2026-09-20-reimu-tier4-visual-approval.md"
+          ],
+          "note": "Exact count four, immutable one-frame source, safe-boundary switching, immediate preemption, latest-count recovery, reduced motion, isolated fallback, and the post-approval packaging boundary are explicit."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier4-native-static-slice.md",
+            "docs/decisions/2026-09-20-reimu-tier4-visual-approval.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/aa820f07a1352f5e9291548f08187e408aada5bd"
+          ],
+          "note": "The published Consumer commit contains the independent resource package, native identity, loader, selector, targeted tests, and the visually approved production-eligible build gate."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier4-native-static-slice.md",
+            "docs/decisions/2026-09-20-reimu-tier4-visual-approval.md"
+          ],
+          "note": "Fresh Swift compilation, behavior, AppKit, resource isolation, fallback, observer, tool, repository, signature, archive, isolated runtime capture, and the updated manifest pin checks passed."
+        },
+        "visual": {
+          "status": "approved",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier4-native-static-slice.md",
+            "docs/decisions/2026-09-20-reimu-tier4-visual-approval.md"
+          ],
+          "note": "The user approved the reviewed native size, placement, support and crop, static hold, Tier 2/3/4 switching, immediate preemption, and latest-count recovery on 2026-09-20."
+        },
+        "consumer": {
+          "status": "verified",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier4-native-static-slice.md",
+            "docs/decisions/2026-09-20-reimu-tier4-visual-approval.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/aa820f07a1352f5e9291548f08187e408aada5bd"
+          ],
+          "note": "The published Consumer source selects Tier4 only for working plus exact count four, independently degrades a broken package, and accepts the approved manifest in preview or production identity."
+        },
+        "publication": {
+          "status": "published",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier4-publication.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/aa820f07a1352f5e9291548f08187e408aada5bd"
+          ],
+          "note": "The exact Consumer commit is verified on origin/main; no application installation, tag, or package release is implied."
         }
       }
     }

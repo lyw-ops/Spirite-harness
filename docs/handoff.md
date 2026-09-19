@@ -1,5 +1,66 @@
 # Project handoff
 
+## 2026-09-20 Tier 4 Consumer 源码已发布，未安装
+
+Consumer收口提交`aa820f07a1352f5e9291548f08187e408aada5bd`已推送至`origin/main`，
+并由`git ls-remote`核验远端`refs/heads/main`为同一SHA。提交包含已批准的独立
+`work_eating_task_4`身份、精确count=4选择、单一档位策略、安全循环边界、高优先级抢占、
+最新数量恢复、独立摘要校验/回退、资源包、测试与交接记录。
+
+Tier4 runtime账本的publication门据此关闭。没有安装应用、创建tag或发布安装包；一帧
+task_4仍是静态保持，不是多帧吃面动画。完整边界见
+`docs/decisions/2026-09-20-reimu-tier4-publication.md`。
+
+## 2026-09-20 Tier 4 原生静态切片已获视觉批准，正式打包门已解除
+
+用户查看`build/reimu-tier4-runtime-v1/runtime-preview/review-sheet.png`、
+`runtime-review.gif`与`qa/native-size-review.png`后回复“可以”。本次批准绑定原图SHA-256
+`9f0b18946eca4c7c0d27a8dbbd5f966da615867913d8e91c8454dd629de0b238`和已展示的原生大小、
+摆放、支撑/裁切、单帧静态保持、Tier2/3/4切换、`needs_input`立即抢占及最新count=2恢复。
+这不构成多帧吃面动画、额外过渡、安装或发布批准。
+
+Consumer资源manifest只更新批准说明，当前SHA-256为
+`c187f8d4390d4f082001c599dab6d2dbd8e699662c9a42cbe84bed9cd3300221`，所有PNG与播放声明
+不变。`build.py --work-tier-4`不再强制preview，但本轮没有生成正式身份包，也没有安装、
+commit、push、tag或发布。账本中intake视觉门已完成；runtime下一未满足门是publication。
+完整边界见`docs/decisions/2026-09-20-reimu-tier4-visual-approval.md`。
+
+## 2026-09-20 Tier 4 原生静态垂直切片技术预览完成，等待视觉确认
+
+Consumer当前未提交工作区新增`work_eating_task_4`与独立静态资源包，只在真实
+`working + activeTaskCount == 4`时选择；5及以上仍封顶Tier5 fallback。Tier2切入等待
+现有1.6秒安全循环边界，Tier3/4静帧可立即离开；failure、needs_input、点击、拖动、暂停
+仍立即抢占，恢复读取最新数量。Tier4资源缺失、摘要或manifest不匹配只降级Tier4。
+
+现有596×596 RGBA源、运行时base和唯一125ms帧逐字节相同，SHA-256为
+`9f0b18946eca4c7c0d27a8dbbd5f966da615867913d8e91c8454dd629de0b238`。没有重绘、分割、
+缩放或整场摇动；这仍是静态保持，不是吃面动画完成。
+
+独立1.11/build13预览位于`build/reimu-tier4-runtime-v1/`。MacOSX26.5.sdk全新源码编译、
+严格签名与全新ZIP解包验证通过；181项行为、35项原生AppKit、125项Consumer工具、14项
+bridge、31项状态、Tier2/3/4各4项加载回退、表情3项、站姿5项及仓库门禁通过。隔离截图
+覆盖Tier2/3/4、needs_input抢占与最新count=2恢复，5次Tier4捕获相同。160pt原生测量中
+Tier4与已批准Tier3支撑余量同为2.5pt，Tier4约117.5×148.5pt、Tier3约120.5×147pt；
+Tier2更宽的既有跨档差异在同尺度图中保留。技术与Consumer接入已验证，用户视觉确认仍待完成；
+`--work-tier-4`强制preview。没有安装、commit、push、tag或发布。详见
+`docs/decisions/2026-09-20-reimu-tier4-native-static-slice.md`。
+
+## 2026-09-20 Tier 3 正式包已补齐全新源码编译回执
+
+已关闭下方Tier 3视觉批准与consumer发布记录中的本机Swift工具链缺口。默认macOS 27.0 SDK的
+Swift接口由`swiftlang-6.4.0.31.4`生成，与当前编译器`6.4.0.34.1`补丁号不匹配；同一套
+Command Line Tools内的macOS 26.5 SDK可被当前编译器正常导入。使用该SDK、`/private/tmp`
+隔离模块缓存和已发布consumer commit `6a1318257d9bedc2b9a937304ea4b434ca874409`，已在
+非preview模式全新编译1.10/build 12，无需安装或改动系统工具链。
+
+新可执行文件SHA-256为`c4e59cc9311fd25e836f3d7c4bf55c3d2eefc66ad44d6cb09476c75a6f7d0ae0`；
+正式本地ZIP `build/reimu-tier3-runtime-v1/release/灵梦桌宠-1.10-build12.zip` SHA-256为
+`97c4708052e3aff9fe2a93e314446aeed0e16cbe9ee589f10c34450cac00a6d8`。全新解包通过严格
+深层签名、正式身份及素材自检；172项Swift行为、31项状态契约、表情3项、站姿5项、Tier 2/3
+各4项加载与隔离回退检查通过。旧复用二进制包保留在`release/legacy/`用于审计。没有安装、tag或
+GitHub release；task_3仍是已批准静帧，跨档过渡和完整多帧动作仍属于独立后续工作。完整命令边界与
+摘要见`docs/decisions/2026-09-20-reimu-tier3-fresh-source-build.md`。
+
 ## 2026-09-19 0.8.0 keyframe/pulse 与项目工作流完成本地收口
 
 本条覆盖下方“技术门 pending”的早期状态。0.8.0 keyframe tracks、离散 pulse 曲线、schema/parser/
@@ -2328,3 +2389,12 @@ No app install, runtime publication, commit or push. Existing dirty work preserv
 该图已逐字节保存为Harness `build/sleep-table-selected-v1/selected.png`，选择与摘要见selection.json。
 此选择覆盖此前“首轮未采纳”的判断；上移眼睛的sleep-table-static-v2不采用。保留选定图的眼口位置。
 静态姿态基准已选定，动画/原生摆放仍未验收，正式App未改，无commit/push。
+
+
+## 2026-09-20 Tier4 静态底稿准备
+
+已固定现有拉面＋饺子底稿，普通/减少动态模式均通过公共 Harness 流程，
+逐像素与原稿相等，160px 可读且无裁切。当前仍为单帧，未制作吃面动态。
+产物：`build/reimu-tier4-intake-20260920/`；记录：
+`docs/decisions/2026-09-20-reimu-tier4-static-intake.md`。
+本轮静态候选待用户反馈，下一步范围待选择；未接原生 Tier4、未安装或发布。

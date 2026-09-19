@@ -16,7 +16,7 @@ is supplementary and never the only status signal.
 ## Current summary
 
 <!-- BEGIN GENERATED SUMMARY -->
-**4 complete** · **1 implementation** · **1 specification**
+**6 complete** · **1 implementation** · **1 specification**
 <!-- END GENERATED SUMMARY -->
 
 ## Task register
@@ -29,6 +29,8 @@ is supplementary and never the only status signal.
 | [`REIMU-ACTIONS-001`](STATUS.md#reimu-actions-001) | **implementation** | implementation |
 | [`REIMU-TIER2-RUNTIME-001`](STATUS.md#reimu-tier2-runtime-001) | **complete** | — |
 | [`REIMU-TIER3-RUNTIME-001`](STATUS.md#reimu-tier3-runtime-001) | **complete** | — |
+| [`REIMU-TIER4-INTAKE-001`](STATUS.md#reimu-tier4-intake-001) | **complete** | — |
+| [`REIMU-TIER4-RUNTIME-001`](STATUS.md#reimu-tier4-runtime-001) | **complete** | — |
 | [`REIMU-WORK-TRANSITIONS-001`](STATUS.md#reimu-work-transitions-001) | **specification** | specification |
 <!-- END GENERATED TASKS -->
 
@@ -45,16 +47,21 @@ flowchart LR
     N_REIMU_ACTIONS_001["◐ REIMU-ACTIONS-001<br/>Produce the six-tier work-eating, idle onigiri, and grabbed-drag action set<br/>stage: implementation"]
     N_REIMU_TIER2_RUNTIME_001["✓ REIMU-TIER2-RUNTIME-001<br/>Connect observed count two to the approved native task_2 loop<br/>stage: complete"]
     N_REIMU_TIER3_RUNTIME_001["✓ REIMU-TIER3-RUNTIME-001<br/>Connect observed count three to the existing native task_3 still<br/>stage: complete"]
+    N_REIMU_TIER4_INTAKE_001["✓ REIMU-TIER4-INTAKE-001<br/>Prepare and review the existing Tier4 ramen still<br/>stage: complete"]
+    N_REIMU_TIER4_RUNTIME_001["✓ REIMU-TIER4-RUNTIME-001<br/>Connect observed count four to the existing native Tier4 still<br/>stage: complete"]
     N_REIMU_WORK_TRANSITIONS_001["◐ REIMU-WORK-TRANSITIONS-001<br/>Author transitions around native workload eating<br/>stage: specification"]
     N_HARNESS_KEYFRAMES_001 --> N_REIMU_ACTIONS_001
     N_REIMU_ACTIONS_001 --> N_REIMU_TIER2_RUNTIME_001
     N_REIMU_TIER2_RUNTIME_001 --> N_REIMU_TIER3_RUNTIME_001
+    N_REIMU_TIER3_RUNTIME_001 --> N_REIMU_TIER4_RUNTIME_001
+    N_REIMU_TIER4_INTAKE_001 --> N_REIMU_TIER4_RUNTIME_001
     N_REIMU_TIER2_RUNTIME_001 --> N_REIMU_WORK_TRANSITIONS_001
     N_REIMU_TIER3_RUNTIME_001 --> N_REIMU_WORK_TRANSITIONS_001
+    N_REIMU_TIER4_RUNTIME_001 --> N_REIMU_WORK_TRANSITIONS_001
     classDef complete fill:#dbeafe,stroke:#1d4ed8,color:#172554;
     classDef active fill:#ffedd5,stroke:#c2410c,color:#431407;
     classDef blocked fill:#fee2e2,stroke:#b91c1c,color:#450a0a;
-    class N_HARNESS_KEYFRAMES_001,N_HARNESS_WORKFLOW_001,N_REIMU_TIER2_RUNTIME_001,N_REIMU_TIER3_RUNTIME_001 complete;
+    class N_HARNESS_KEYFRAMES_001,N_HARNESS_WORKFLOW_001,N_REIMU_TIER2_RUNTIME_001,N_REIMU_TIER3_RUNTIME_001,N_REIMU_TIER4_INTAKE_001,N_REIMU_TIER4_RUNTIME_001 complete;
     class N_REIMU_ACTIONS_001,N_REIMU_WORK_TRANSITIONS_001 active;
 ```
 <!-- END GENERATED TREE -->
