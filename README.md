@@ -54,7 +54,9 @@ and deterministically expands it into a per-frame transform table
 `render` applies the frame plan's whole-sprite transforms (translate, rotate,
 uniform scale, opacity) to the bound source sprite — semantics in
 [`docs/renderer.md`](docs/renderer.md). Milestone 3 adds explicit PNG layers, local transforms,
-ordered composition and exact composite pixel validation. Package **0.7.0**.
+ordered composition and exact composite pixel validation. Package **0.8.0** adds
+keyframe tracks (an explicit piecewise timeline with per-segment interpolation,
+exclusive with curve tracks) and the discrete `pulse` curve.
 See [the layered contract](docs/layered-sprites.md). M4 adds optional explicit source-space generation; M5 adds deterministic grid
 atlases with offline pixel round-trip validation. See
 [`docs/roadmap.md`](docs/roadmap.md).
@@ -133,6 +135,10 @@ or a build directory produced by `plan`.
 - [`docs/animation-spec.md`](docs/animation-spec.md) — frame manifest v1 and
   exit codes
 - [`docs/architecture.md`](docs/architecture.md) — module layout
+- [`docs/workflow.md`](docs/workflow.md) — task ledger, evidence gates,
+  aggregate verification, visual/consumer/publication boundaries
+- [`workflow/README.md`](workflow/README.md) — generated project status and
+  dependency view
 - [`docs/roadmap.md`](docs/roadmap.md) — milestones 1–5
 - [`docs/handoff.md`](docs/handoff.md) — cross-session project handoff
 

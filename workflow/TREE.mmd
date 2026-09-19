@@ -1,0 +1,9 @@
+flowchart LR
+    N_HARNESS_KEYFRAMES_001["◐ HARNESS-KEYFRAMES-001<br/>Release keyframe tracks and the discrete pulse curve<br/>stage: publication"]
+    N_HARNESS_WORKFLOW_001["◐ HARNESS-WORKFLOW-001<br/>Adopt the evidence-bound Sprite Harness workflow<br/>stage: publication"]
+    N_REIMU_ACTIONS_001["◐ REIMU-ACTIONS-001<br/>Produce the six-tier work-eating, idle onigiri, and grabbed-drag action set<br/>stage: implementation"]
+    N_HARNESS_KEYFRAMES_001 --> N_REIMU_ACTIONS_001
+    classDef complete fill:#dbeafe,stroke:#1d4ed8,color:#172554;
+    classDef active fill:#ffedd5,stroke:#c2410c,color:#431407;
+    classDef blocked fill:#fee2e2,stroke:#b91c1c,color:#450a0a;
+    class N_HARNESS_KEYFRAMES_001,N_HARNESS_WORKFLOW_001,N_REIMU_ACTIONS_001 active;

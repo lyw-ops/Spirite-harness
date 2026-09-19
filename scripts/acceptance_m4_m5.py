@@ -1,4 +1,4 @@
-"""Installed 0.7.0 CLI acceptance outside the repository; full logs, no live API."""
+"""Installed current-version CLI acceptance outside the repository; full logs, no live API."""
 import argparse
 import hashlib
 import json
@@ -7,6 +7,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import tomllib
 
 from PIL import Image, PngImagePlugin
 
@@ -30,6 +31,7 @@ def tree(path):return {p.relative_to(path).as_posix():sha(p) for p in path.rglob
 
 def main(output):
     repo=Path(__file__).resolve().parents[1];output=output.resolve()
+    expected_version=tomllib.loads((repo/'pyproject.toml').read_text())['project']['version']
     if output.exists():raise SystemExit('Choose a fresh output directory.')
     cli=Path(sys.executable).parent/'sprite-harness'
     provider=Path(sys.executable).parent/'sprite-openai-adapter'
@@ -45,8 +47,8 @@ def main(output):
             return strict(proc.stdout) if as_json else proc.stdout.strip()
         def command(*argv,expected=0):return run([cli,*argv,'--json'],expected,True)
         identity=run([sys.executable,'-c','import sprite_harness,importlib.metadata,json;print(json.dumps({"runtime":sprite_harness.__version__,"distribution":importlib.metadata.version("sprite-animation-harness"),"module":sprite_harness.__file__,"provider_distribution":importlib.metadata.version("sprite-openai-adapter")}))'],as_json=True)
-        assert identity['runtime']==identity['distribution']=='0.7.0' and 'site-packages' in identity['module'],identity
-        assert run([cli,'--version'])=='0.7.0'
+        assert identity['runtime']==identity['distribution']==expected_version and 'site-packages' in identity['module'],identity
+        assert run([cli,'--version'])==expected_version
         run([sys.executable,repo/'scripts/create_m4_m5_example.py',output])
         sources=[p for kind in ['single','layered','generated'] for p in (output/kind).rglob('*') if p.is_file()]
         originals={str(p):sha(p) for p in sources}

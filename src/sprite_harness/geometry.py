@@ -24,7 +24,7 @@ from dataclasses import dataclass
 
 from PIL import Image
 
-from .curves import sample_track_value
+from .curves import sample_track
 from .expand import _round as round_value
 from .expand import sample_offsets
 from .plan import SPRITE_TARGET, AnimationPlan, Track
@@ -65,17 +65,7 @@ def _target_tracks(plan: AnimationPlan, motion: str, target: str = SPRITE_TARGET
 def _sample(track: Track, index: int, plan: AnimationPlan) -> float:
     """One track sample, rounded exactly like the frame-plan values."""
 
-    return round_value(
-        sample_track_value(
-            track.curve,
-            track.amplitude,
-            index,
-            plan.frame_count,
-            loop=plan.loop,
-            cycles=track.cycles,
-            phase=track.phase,
-        )
-    )
+    return round_value(sample_track(track, index, plan.frame_count, loop=plan.loop))
 
 
 def sample_poses(plan: AnimationPlan, target: str = SPRITE_TARGET, *, clamp_opacity: bool = True) -> list[FramePose]:

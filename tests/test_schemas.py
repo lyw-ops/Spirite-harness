@@ -32,6 +32,91 @@ def test_example_plan_conforms_to_animation_plan_schema():
     jsonschema.validate(document, load_schema("animation-plan.schema.json"))
 
 
+def test_animation_plan_schema_accepts_pulse_duty_cycle():
+    document = json.loads(
+        (REPO_ROOT / "examples" / "reimu-eating" / "eating-loop.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    document["tracks"][0]["curve"] = "pulse"
+    document["tracks"][0]["duty_cycle"] = 0.25
+    jsonschema.validate(document, load_schema("animation-plan.schema.json"))
+
+
+@pytest.mark.parametrize(
+    ("curve", "duty_cycle"),
+    [("sine", 0.25), ("pulse", 0)],
+)
+def test_animation_plan_schema_rejects_invalid_duty_cycle_use(curve, duty_cycle):
+    document = json.loads(
+        (REPO_ROOT / "examples" / "reimu-eating" / "eating-loop.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    document["tracks"][0]["curve"] = curve
+    document["tracks"][0]["duty_cycle"] = duty_cycle
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(document, load_schema("animation-plan.schema.json"))
+
+
+def example_plan_document():
+    return json.loads(
+        (REPO_ROOT / "examples" / "reimu-eating" / "eating-loop.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+
+def keyframe_track_document():
+    return {
+        "track_id": "food_approach",
+        "target": "held_food",
+        "motion": "translate_y",
+        "unit": "px",
+        "keyframes": [
+            {"at": 0, "value": -5, "interpolation": "ease_in_out"},
+            {"at": 0.28, "value": -14, "interpolation": "ease_in"},
+            {"at": 0.52, "value": -7, "interpolation": "hold"},
+        ],
+    }
+
+
+def test_animation_plan_schema_accepts_keyframe_track():
+    document = example_plan_document()
+    document["tracks"][0] = keyframe_track_document()
+    jsonschema.validate(document, load_schema("animation-plan.schema.json"))
+
+
+def test_animation_plan_schema_accepts_non_loop_final_keyframe_at_one():
+    document = example_plan_document()
+    document["playback"]["loop"] = False
+    track = keyframe_track_document()
+    track["keyframes"][-1]["at"] = 1
+    document["tracks"][0] = track
+    jsonschema.validate(document, load_schema("animation-plan.schema.json"))
+
+
+@pytest.mark.parametrize("mutate", [
+    lambda track, document: track.__setitem__("amplitude", 1),
+    lambda track, document: track.__setitem__("curve", "sine"),
+    lambda track, document: track.__setitem__("keyframes", []),
+    lambda track, document: track.__delitem__("keyframes"),
+    lambda track, document: track["keyframes"][0].__setitem__("at", 0.1),
+    lambda track, document: track["keyframes"][-1].__setitem__("at", 1.5),
+    lambda track, document: track["keyframes"][-1].__setitem__("at", 1),
+    lambda track, document: track["keyframes"][0].__setitem__("interpolation", "cubic"),
+    lambda track, document: track["keyframes"][0].__setitem__("ease", "x"),
+    lambda track, document: track["keyframes"][0].__delitem__("value"),
+])
+def test_animation_plan_schema_rejects_invalid_keyframe_tracks(mutate):
+    document = example_plan_document()
+    track = keyframe_track_document()
+    mutate(track, document)
+    document["tracks"][0] = track
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(document, load_schema("animation-plan.schema.json"))
+
+
 def test_example_manifest_conforms_to_animation_schema():
     document = yaml.safe_load(
         (REPO_ROOT / "examples" / "reimu-eating-task2" / "animation.yaml").read_text(

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-from .curves import SUPPORTED_CURVES
+from .curves import KEYFRAME_INTERPOLATIONS, SUPPORTED_CURVES
 from .expand import sample_offsets
 from .geometry import effective_value_issues
 from .plan import ANCHOR_TYPES, REDUCED_MOTION_MODES, SUPPORTED_MOTIONS, AnimationPlan, Layer
@@ -217,6 +217,10 @@ def _validate_tracks(plan: AnimationPlan, errors: list[ValidationIssue]) -> bool
                 )
             )
             found_error = True
+        if track.keyframes is not None:
+            if _validate_keyframes(track, plan.loop, errors):
+                found_error = True
+            continue
         if track.curve not in SUPPORTED_CURVES:
             errors.append(
                 _issue(
@@ -249,14 +253,14 @@ def _validate_tracks(plan: AnimationPlan, errors: list[ValidationIssue]) -> bool
             )
             found_error = True
         elif plan.loop and track.cycles != int(track.cycles):
-            # Loop-cycle continuity contract: a looping animation returns to
-            # frame 0, so every track must complete whole cycles or the curve
-            # value jumps at the loop seam.
+            # Loop-cycle periodicity contract: a looping animation returns to
+            # frame 0, so every track must complete whole cycles. Pulse may
+            # contain an intentional internal step but still wraps exactly.
             errors.append(
                 _issue(
                     "NON_INTEGRAL_LOOP_CYCLES",
                     "Looping playback requires a positive integer cycle count "
-                    "so the curve is continuous across the loop seam.",
+                    "so the curve returns to its frame-0 value at the next cycle boundary.",
                     track_id=track.track_id,
                     actual=track.cycles,
                 )
@@ -269,6 +273,114 @@ def _validate_tracks(plan: AnimationPlan, errors: list[ValidationIssue]) -> bool
                     "Track phase must be at least 0 and below 1.",
                     track_id=track.track_id,
                     actual=track.phase,
+                )
+            )
+            found_error = True
+        if track.curve == "pulse":
+            duty_cycle = 0.5 if track.duty_cycle is None else track.duty_cycle
+            if not is_finite_number(duty_cycle) or not 0 < duty_cycle <= 1:
+                errors.append(
+                    _issue(
+                        "INVALID_DUTY_CYCLE",
+                        "Pulse duty_cycle must be finite, above zero, and at most one.",
+                        track_id=track.track_id,
+                        actual=duty_cycle,
+                    )
+                )
+                found_error = True
+        elif track.duty_cycle is not None:
+            errors.append(
+                _issue(
+                    "DUTY_CYCLE_REQUIRES_PULSE",
+                    "Track duty_cycle is only valid with the pulse curve.",
+                    track_id=track.track_id,
+                    curve=track.curve,
+                )
+            )
+            found_error = True
+    return found_error
+
+
+def _validate_keyframes(track, loop: bool, errors: list[ValidationIssue]) -> bool:
+    """Value checks of one keyframe track's timeline.
+
+    Times must be finite, start at exactly 0, and increase strictly; looping
+    playback reserves time 1 for the wrap back to the first keyframe, while a
+    non-looping track may place its final keyframe exactly at 1.
+    """
+
+    if not track.keyframes:
+        errors.append(
+            _issue(
+                "INSUFFICIENT_KEYFRAMES",
+                "A keyframe track requires at least one keyframe.",
+                track_id=track.track_id,
+            )
+        )
+        return True
+    found_error = False
+    previous_at: float | None = None
+    for index, keyframe in enumerate(track.keyframes):
+        inside_range = (
+            is_finite_number(keyframe.at)
+            and keyframe.at >= 0
+            and (keyframe.at < 1 if loop else keyframe.at <= 1)
+        )
+        if not inside_range:
+            errors.append(
+                _issue(
+                    "INVALID_KEYFRAME_TIME",
+                    "Keyframe times must be finite and at least 0; looping "
+                    "playback requires times below 1, non-looping at most 1.",
+                    track_id=track.track_id,
+                    index=index,
+                    actual=keyframe.at,
+                )
+            )
+            found_error = True
+        elif index == 0 and keyframe.at != 0:
+            errors.append(
+                _issue(
+                    "INVALID_KEYFRAME_TIME",
+                    "The first keyframe must be at time 0.",
+                    track_id=track.track_id,
+                    index=index,
+                    actual=keyframe.at,
+                )
+            )
+            found_error = True
+        elif previous_at is not None and keyframe.at <= previous_at:
+            errors.append(
+                _issue(
+                    "INVALID_KEYFRAME_TIME",
+                    "Keyframe times must be strictly increasing.",
+                    track_id=track.track_id,
+                    index=index,
+                    actual=keyframe.at,
+                )
+            )
+            found_error = True
+        previous_at = keyframe.at
+        if not is_finite_number(keyframe.value):
+            errors.append(
+                _issue(
+                    "INVALID_KEYFRAME_VALUE",
+                    "Keyframe values must be finite numbers.",
+                    track_id=track.track_id,
+                    index=index,
+                    actual=keyframe.value,
+                )
+            )
+            found_error = True
+        if keyframe.interpolation not in KEYFRAME_INTERPOLATIONS:
+            errors.append(
+                _issue(
+                    "UNSUPPORTED_INTERPOLATION",
+                    "Keyframe interpolation is not supported.",
+                    track_id=track.track_id,
+                    index=index,
+                    actual=keyframe.interpolation,
+                    supported=list(KEYFRAME_INTERPOLATIONS),
                 )
             )
             found_error = True

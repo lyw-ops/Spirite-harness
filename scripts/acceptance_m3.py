@@ -11,6 +11,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import tomllib
 
 from PIL import Image
 
@@ -27,6 +28,7 @@ def hashes(build):
 
 def main(output):
     repo=Path(__file__).resolve().parents[1]
+    expected_version=tomllib.loads((repo/'pyproject.toml').read_text())['project']['version']
     output=output.resolve()
     if output.exists():
         raise SystemExit(f'Refusing existing acceptance directory: {output}')
@@ -51,9 +53,9 @@ def main(output):
 
         identity=run([sys.executable,'-c',
             'import sprite_harness, importlib.metadata, json; print(json.dumps({"version":sprite_harness.__version__, "distribution":importlib.metadata.version("sprite-animation-harness"), "path":sprite_harness.__file__}))'],as_json=True)
-        assert identity['version']==identity['distribution']=='0.5.0',identity
+        assert identity['version']==identity['distribution']==expected_version,identity
         assert 'site-packages' in identity['path'],identity
-        assert run([cli,'--version'])=='0.5.0'
+        assert run([cli,'--version'])==expected_version
 
         layered=output/'layered'
         single=output/'single'

@@ -68,6 +68,17 @@ valid; global opacity zero is `FULLY_TRANSPARENT_FRAME`. Non-finite composed
 values, placement or inverse coefficients fail as `NONFINITE_EFFECTIVE_TRANSFORM`;
 scale product underflow to zero is `INVALID_EFFECTIVE_SCALE`.
 
+The `pulse` curve provides deterministic discrete layer variants. Its sample
+is `+1` for `duty_cycle` of each cycle and `-1` otherwise. Two local opacity
+tracks using the same pulse with amplitudes `-1` and `+1` are exact binary
+complements after clamping; no frame contains a partial cross-fade.
+
+Keyframed opacity gives the same guarantee with arbitrary per-phase timing:
+`hold` segments keep a layer's effective factor at exactly `0` (value `-1`)
+or `1` (value `0`) between keyframes and step exactly on a keyframe, so
+mutually exclusive variant layers (mouth shapes, eye states) switch
+discretely across any number of phases without a cross-fade frame.
+
 Both stages use the M2 exact integer-translation copy path (tolerance 1e-9)
 or explicit Pillow premultiplied RGBA bilinear affine sampling. Opacity uses
 `floor(alpha * opacity + 0.5)`. Alpha-over uses Pillow's 8-bit rounding:

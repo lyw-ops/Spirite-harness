@@ -168,9 +168,18 @@ build/
   Input modes are exclusive; `--source` with layers is rejected. Plan/frame-plan
   v1 remain supported; v2 is required for layers. Render/QA/frame-manifest v1
   stay unchanged. No automatic decomposition is claimed.
-- Looping playback (`playback.loop: true`) requires every track to declare a
-  positive integer `cycles` so all curves are continuous across the loop seam;
-  non-looping playback may use positive fractional cycles.
+- A track is either a curve track (`amplitude` scaled by a whole-cycle curve)
+  or a keyframe track (an explicit piecewise `keyframes` timeline in
+  normalized loop time with per-segment interpolation); the two field sets are
+  strictly exclusive, and both kinds bind one motion to one target with the
+  same composition semantics.
+- Looping playback (`playback.loop: true`) requires every curve track to
+  declare a positive integer `cycles` so every curve returns to its frame-0
+  value at the next cycle boundary; the discrete `pulse` curve may contain an
+  intentional step inside the loop. Non-looping playback may use positive
+  fractional cycles. A looping keyframe track closes the seam instead by
+  interpolating from its last keyframe back to the first keyframe's value
+  exactly at time 1.
 - Resolve frame paths inside their animation/build directory; reject traversal
   outside it.
 - The explicit `seed` is used only by generation request derivation (milestone 4);
@@ -190,6 +199,13 @@ placeholders or ship as specification-only.
 
 ## 6. Change workflow
 
+Project status is governed by the evidence-bound workflow in
+[`docs/workflow.md`](docs/workflow.md). `workflow/tasks.json` is the canonical
+task ledger; `workflow/README.md`, `workflow/STATUS.md`, and
+`workflow/TREE.mmd` are generated views. A local engineering receipt, visual
+approval, consumer integration, installation, and remote publication are
+separate claims and must never satisfy one another implicitly.
+
 1. Inspect the repository and working tree before editing.
 2. When a data or CLI contract changes, update the JSON Schema, the docs, the
    parser, the validator, and the tests in the same change.
@@ -200,12 +216,18 @@ placeholders or ship as specification-only.
 6. Record important decisions, verification, limitations, and next work in
    `docs/handoff.md`.
 
+Run `python workflow/update.py --check` to verify the generated project view
+and `python scripts/verify.py` for the aggregate local acceptance receipt.
+Before publication, regenerate the progress view from staged canonical records
+with `python workflow/update.py --index`; see the workflow document for the
+full staged-snapshot procedure.
+
 Keep dependencies small: Python 3.11+, Pillow, PyYAML for the core; pytest and
 jsonschema for development. No ffmpeg, no GUI frameworks.
 
 ## 7. Optional generation and atlas export
 
-Package 0.7.0 implements M4's explicit external generation and M5's grid
+Package 0.8.0 implements M4's explicit external generation and M5's grid
 export. Read [generation.md](docs/generation.md), [adapters.md](docs/adapters.md),
 [atlas.md](docs/atlas.md), and [transactions.md](docs/transactions.md).
 

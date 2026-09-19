@@ -36,17 +36,33 @@ SUPPORTED_MOTIONS = {
     "opacity": "ratio",
 }
 
+# Fields exclusive to curve tracks; a track declaring `keyframes` must not
+# use any of them (TRACK_MODE_CONFLICT).
+CURVE_TRACK_FIELDS = ("amplitude", "curve", "cycles", "phase", "duty_cycle")
+
+
+@dataclass(frozen=True)
+class Keyframe:
+    """One point of a keyframe track: normalized time, direct value, and the
+    interpolation shaping the segment to the next keyframe."""
+
+    at: float
+    value: float
+    interpolation: str = "linear"
+
 
 @dataclass(frozen=True)
 class Track:
     track_id: str
     target: str
     motion: str
-    amplitude: float
+    amplitude: float | None
     unit: str
     curve: str = "sine"
     cycles: float = 1.0
     phase: float = 0.0
+    duty_cycle: float | None = None
+    keyframes: tuple[Keyframe, ...] | None = None
 
 
 @dataclass(frozen=True)
@@ -205,26 +221,75 @@ def _boolean(value: Any, field: str, path: Path) -> bool:
     return value
 
 
+def _load_keyframe(raw: Any, position: int, field: str, path: Path) -> Keyframe:
+    keyframe_field = f"{field}.keyframes[{position}]"
+    keyframe = _mapping(raw, keyframe_field, path)
+    _reject_unknown(keyframe, {"at", "value", "interpolation"}, keyframe_field, path)
+    return Keyframe(
+        at=_number(
+            _required(keyframe, "at", path, parent=keyframe_field), f"{keyframe_field}.at", path
+        ),
+        value=_number(
+            _required(keyframe, "value", path, parent=keyframe_field),
+            f"{keyframe_field}.value",
+            path,
+        ),
+        interpolation=_string(
+            keyframe.get("interpolation", "linear"), f"{keyframe_field}.interpolation", path
+        ),
+    )
+
+
 def _load_track(raw: Any, index: int, path: Path) -> Track:
     field = f"tracks[{index}]"
     track = _mapping(raw, field, path)
     _reject_unknown(
         track,
-        {"track_id", "target", "motion", "amplitude", "unit", "curve", "cycles", "phase"},
+        {"track_id", "target", "motion", "amplitude", "unit", "curve", "cycles", "phase",
+         "duty_cycle", "keyframes"},
         field,
         path,
     )
-    return Track(
+    common = dict(
         track_id=_string(_required(track, "track_id", path, parent=field), f"{field}.track_id", path),
         target=_string(_required(track, "target", path, parent=field), f"{field}.target", path),
         motion=_string(_required(track, "motion", path, parent=field), f"{field}.motion", path),
+        unit=_string(_required(track, "unit", path, parent=field), f"{field}.unit", path),
+    )
+    if "keyframes" in track:
+        conflicting = sorted(name for name in CURVE_TRACK_FIELDS if name in track)
+        if conflicting:
+            raise SpecLoadError(
+                "TRACK_MODE_CONFLICT",
+                f"Field '{field}' mixes keyframes with curve-track fields: "
+                f"{', '.join(conflicting)}.",
+                path=path,
+                details={"field": field, "properties": conflicting},
+            )
+        if not isinstance(track["keyframes"], list):
+            raise SpecLoadError(
+                "MALFORMED_SPEC", f"Field '{field}.keyframes' must be an array.", path=path
+            )
+        return Track(
+            **common,
+            amplitude=None,
+            keyframes=tuple(
+                _load_keyframe(raw_keyframe, position, field, path)
+                for position, raw_keyframe in enumerate(track["keyframes"])
+            ),
+        )
+    return Track(
+        **common,
         amplitude=_number(
             _required(track, "amplitude", path, parent=field), f"{field}.amplitude", path
         ),
-        unit=_string(_required(track, "unit", path, parent=field), f"{field}.unit", path),
         curve=_string(track.get("curve", "sine"), f"{field}.curve", path),
         cycles=_number(track.get("cycles", 1), f"{field}.cycles", path),
         phase=_number(track.get("phase", 0), f"{field}.phase", path),
+        duty_cycle=(
+            _number(track["duty_cycle"], f"{field}.duty_cycle", path)
+            if "duty_cycle" in track else None
+        ),
     )
 
 

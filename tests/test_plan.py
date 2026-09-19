@@ -4,9 +4,14 @@ from pathlib import Path
 
 import pytest
 
-from sprite_harness.curves import cycle_position, sample_curve
+from sprite_harness.curves import (
+    cycle_position,
+    keyframe_position,
+    sample_curve,
+    sample_keyframes,
+)
 from sprite_harness.expand import expand_plan, normalize_plan, plan_digest, sample_offsets
-from sprite_harness.plan import load_plan
+from sprite_harness.plan import Keyframe, Track, load_plan
 from sprite_harness.plan_validator import validate_plan
 from sprite_harness.spec import SpecLoadError
 
@@ -60,6 +65,13 @@ def test_easing_curves_are_mirrored_and_loop_continuous():
         assert sample_curve(curve, 0.25) == pytest.approx(sample_curve(curve, 0.75))
 
 
+def test_pulse_curve_uses_declared_duty_cycle():
+    assert sample_curve("pulse", 0.0, duty_cycle=0.25) == 1.0
+    assert sample_curve("pulse", 0.249999, duty_cycle=0.25) == 1.0
+    assert sample_curve("pulse", 0.25, duty_cycle=0.25) == -1.0
+    assert sample_curve("pulse", 0.999999, duty_cycle=0.25) == -1.0
+
+
 def test_loop_cycle_position_wraps_exactly():
     positions = [cycle_position(i, 8, loop=True, cycles=1, phase=0) for i in range(8)]
     assert positions[0] == 0.0
@@ -73,6 +85,85 @@ def test_non_loop_reaches_cycle_end_on_final_frame():
     # every supported curve evaluates identically at u=0 and u=1.
     assert cycle_position(7, 8, loop=False, cycles=1, phase=0) == pytest.approx(0.0, abs=1e-9)
     assert cycle_position(4, 9, loop=False, cycles=1, phase=0) == pytest.approx(0.5)
+
+
+# ---------------------------------------------------------------------------
+# Keyframe sampling
+
+
+def keyframes(*points):
+    return tuple(Keyframe(at=at, value=value, interpolation=interpolation)
+                 for at, value, interpolation in points)
+
+
+def test_keyframe_position_mappings():
+    assert [keyframe_position(i, 8, loop=True) for i in range(8)] == [i / 8 for i in range(8)]
+    # The frame after the last is the seam: time 1 wraps to exactly 0.
+    assert keyframe_position(8, 8, loop=True) == 0.0
+    assert keyframe_position(4, 5, loop=False) == 1.0
+    assert keyframe_position(0, 1, loop=False) == 0.0
+
+
+def test_keyframes_are_hit_exactly():
+    timeline = keyframes((0.0, -5.0, "ease_in_out"), (0.25, -14.0, "ease_in"),
+                         (0.5, -16.0, "ease_out"), (0.75, -7.0, "linear"))
+    for loop in (True, False):
+        for keyframe in timeline:
+            assert sample_keyframes(timeline, keyframe.at, loop=loop) == keyframe.value
+
+
+@pytest.mark.parametrize(("interpolation", "expected"), [
+    ("linear", 5.0),
+    ("ease_in", 2.5),
+    ("ease_out", 7.5),
+    ("ease_in_out", 5.0),
+    ("hold", 0.0),
+])
+def test_each_interpolation_shape_mid_segment(interpolation, expected):
+    timeline = keyframes((0.0, 0.0, interpolation), (0.5, 10.0, "hold"))
+    assert sample_keyframes(timeline, 0.25, loop=False) == pytest.approx(expected)
+
+
+def test_ease_in_and_out_quarter_points():
+    timeline = keyframes((0.0, 0.0, "ease_in"), (1.0, 1.0, "hold"))
+    assert sample_keyframes(timeline, 0.25, loop=False) == pytest.approx(0.0625)
+    timeline = keyframes((0.0, 0.0, "ease_out"), (1.0, 1.0, "hold"))
+    assert sample_keyframes(timeline, 0.25, loop=False) == pytest.approx(0.4375)
+
+
+def test_hold_keeps_value_and_steps_exactly_on_the_next_keyframe():
+    timeline = keyframes((0.0, 3.0, "hold"), (0.5, -2.0, "linear"))
+    assert sample_keyframes(timeline, 0.0, loop=False) == 3.0
+    assert sample_keyframes(timeline, 0.499999, loop=False) == 3.0
+    assert sample_keyframes(timeline, 0.5, loop=False) == -2.0
+
+
+def test_loop_wrap_segment_returns_to_the_first_value_at_the_seam():
+    timeline = keyframes((0.0, 0.0, "linear"), (0.5, 10.0, "linear"))
+    # Wrap segment interpolates from the last keyframe back to the first value.
+    assert sample_keyframes(timeline, 0.75, loop=True) == pytest.approx(5.0)
+    assert sample_keyframes(timeline, 0.999999, loop=True) == pytest.approx(0.0, abs=1e-4)
+    # Frame 0 of the next repetition (time 1 wraps to 0) is the first value.
+    assert sample_keyframes(timeline, keyframe_position(8, 8, loop=True), loop=True) == 0.0
+
+
+def test_loop_hold_last_segment_steps_exactly_at_the_seam():
+    timeline = keyframes((0.0, 1.0, "hold"), (0.5, -1.0, "hold"))
+    assert sample_keyframes(timeline, 0.999999, loop=True) == -1.0
+    assert sample_keyframes(timeline, 0.0, loop=True) == 1.0
+
+
+def test_non_loop_tail_holds_the_last_value():
+    timeline = keyframes((0.0, 0.0, "linear"), (0.5, 10.0, "ease_in_out"))
+    assert sample_keyframes(timeline, 0.75, loop=False) == 10.0
+    assert sample_keyframes(timeline, 1.0, loop=False) == 10.0
+
+
+def test_single_keyframe_is_a_constant_track():
+    timeline = keyframes((0.0, -0.5, "linear"))
+    for loop in (True, False):
+        for u in (0.0, 0.3, 0.999999, 1.0 if not loop else 0.5):
+            assert sample_keyframes(timeline, u, loop=loop) == -0.5
 
 
 # ---------------------------------------------------------------------------
@@ -210,6 +301,231 @@ def test_phase_range(tmp_path):
         ],
     )
     assert "INVALID_PHASE" in error_codes(path)
+
+
+@pytest.mark.parametrize("duty_cycle", [0, -0.1, 1.1, float("inf")])
+def test_pulse_duty_cycle_range(tmp_path, duty_cycle):
+    path = make_plan(
+        tmp_path,
+        tracks=[{
+            "track_id": "blink",
+            "target": "body",
+            "motion": "opacity",
+            "amplitude": 1,
+            "unit": "ratio",
+            "curve": "pulse",
+            "duty_cycle": duty_cycle,
+        }],
+    )
+    assert "INVALID_DUTY_CYCLE" in error_codes(path)
+
+
+def test_duty_cycle_requires_pulse_curve(tmp_path):
+    path = make_plan(
+        tmp_path,
+        tracks=[{
+            "track_id": "bad_duty",
+            "target": "body",
+            "motion": "opacity",
+            "amplitude": -0.5,
+            "unit": "ratio",
+            "curve": "sine",
+            "duty_cycle": 0.25,
+        }],
+    )
+    assert "DUTY_CYCLE_REQUIRES_PULSE" in error_codes(path)
+
+
+def test_pulse_default_is_normalized_and_roundtrips(tmp_path):
+    path = make_plan(
+        tmp_path,
+        tracks=[{
+            "track_id": "blink",
+            "target": "body",
+            "motion": "opacity",
+            "amplitude": 1,
+            "unit": "ratio",
+            "curve": "pulse",
+        }],
+    )
+    normalized = normalize_plan(load_plan(path))
+    assert normalized["tracks"][0]["duty_cycle"] == 0.5
+    normalized_path = tmp_path / "normalized.json"
+    normalized_path.write_text(json.dumps(normalized))
+    reloaded = load_plan(normalized_path)
+    assert normalize_plan(reloaded) == normalized
+
+
+def test_track_positional_field_order_is_stable():
+    # Regression: the historical positional order (track_id, target, motion,
+    # amplitude, unit) is API for existing constructors and must not shift
+    # when keyframe fields are added behind it.
+    track = Track("bob", "sprite", "translate_y", 2.0, "px")
+    assert track.amplitude == 2.0
+    assert track.unit == "px"
+    assert track.curve == "sine"
+    assert track.cycles == 1.0
+    assert track.phase == 0.0
+    assert track.duty_cycle is None
+    assert track.keyframes is None
+
+
+def keyframe_track(track_keyframes, **overrides):
+    data = {
+        "track_id": "kf",
+        "target": "sprite",
+        "motion": "translate_y",
+        "unit": "px",
+        "keyframes": track_keyframes,
+    }
+    data.update(overrides)
+    return data
+
+
+@pytest.mark.parametrize("legacy_field", [
+    {"amplitude": 1},
+    {"curve": "sine"},
+    {"cycles": 2},
+    {"phase": 0.5},
+    {"duty_cycle": 0.5},
+])
+def test_keyframes_reject_curve_track_fields(tmp_path, legacy_field):
+    path = make_plan(tmp_path, tracks=[keyframe_track([{"at": 0, "value": 0}], **legacy_field)])
+    with pytest.raises(SpecLoadError) as info:
+        load_plan(path)
+    assert info.value.code == "TRACK_MODE_CONFLICT"
+
+
+@pytest.mark.parametrize("track_keyframes", [
+    "not-an-array",
+    [{"at": 0, "value": 0, "easing": "linear"}],
+    [{"at": 0}],
+    [{"value": 0}],
+    [{"at": "0", "value": 0}],
+    [{"at": 0, "value": 0, "interpolation": 3}],
+])
+def test_malformed_keyframes_rejected_at_load(tmp_path, track_keyframes):
+    path = make_plan(tmp_path, tracks=[keyframe_track(track_keyframes)])
+    with pytest.raises(SpecLoadError) as info:
+        load_plan(path)
+    assert info.value.code == "MALFORMED_SPEC"
+
+
+def test_empty_keyframes_rejected(tmp_path):
+    path = make_plan(tmp_path, tracks=[keyframe_track([])])
+    assert "INSUFFICIENT_KEYFRAMES" in error_codes(path)
+
+
+@pytest.mark.parametrize("track_keyframes", [
+    [{"at": 0.1, "value": 0}],
+    [{"at": 0, "value": 0}, {"at": 0.5, "value": 1}, {"at": 0.5, "value": 2}],
+    [{"at": 0, "value": 0}, {"at": 0.5, "value": 1}, {"at": 0.25, "value": 2}],
+    [{"at": 0, "value": 0}, {"at": -0.5, "value": 1}],
+    [{"at": 0, "value": 0}, {"at": 1.0, "value": 1}],
+    [{"at": 0, "value": 0}, {"at": 1.5, "value": 1}],
+    [{"at": 0, "value": 0}, {"at": float("inf"), "value": 1}],
+])
+def test_invalid_keyframe_times(tmp_path, track_keyframes):
+    path = make_plan(tmp_path, tracks=[keyframe_track(track_keyframes)])
+    assert "INVALID_KEYFRAME_TIME" in error_codes(path)
+
+
+def test_non_loop_allows_final_keyframe_at_time_one(tmp_path):
+    path = make_plan(
+        tmp_path,
+        playback={"fps": 8, "frame_count": 8, "loop": False},
+        tracks=[keyframe_track([
+            {"at": 0, "value": 0},
+            {"at": 1, "value": -3, "interpolation": "ease_out"},
+        ])],
+    )
+    assert error_codes(path) == set()
+
+
+def test_invalid_keyframe_value(tmp_path):
+    path = make_plan(tmp_path, tracks=[keyframe_track([{"at": 0, "value": float("nan")}])])
+    assert "INVALID_KEYFRAME_VALUE" in error_codes(path)
+
+
+def test_unsupported_interpolation(tmp_path):
+    path = make_plan(
+        tmp_path,
+        tracks=[keyframe_track([{"at": 0, "value": 0, "interpolation": "cubic"}])],
+    )
+    assert "UNSUPPORTED_INTERPOLATION" in error_codes(path)
+
+
+def test_keyframe_track_unit_mismatch(tmp_path):
+    path = make_plan(tmp_path, tracks=[keyframe_track([{"at": 0, "value": 0}], unit="deg")])
+    assert "UNIT_MISMATCH" in error_codes(path)
+
+
+def test_keyframed_sprite_translation_enforces_displacement(tmp_path):
+    path = make_plan(
+        tmp_path,
+        tracks=[keyframe_track([{"at": 0, "value": 0}, {"at": 0.5, "value": -16}])],
+    )
+    assert "DISPLACEMENT_EXCEEDED" in error_codes(path)
+
+
+@pytest.mark.parametrize(("motion", "value", "code"), [
+    ("opacity", -1.5, "INVALID_EFFECTIVE_OPACITY"),
+    ("opacity", -1, "FULLY_TRANSPARENT_FRAME"),
+    ("scale", -1, "INVALID_EFFECTIVE_SCALE"),
+])
+def test_keyframed_effective_value_rules(tmp_path, motion, value, code):
+    path = make_plan(
+        tmp_path,
+        tracks=[keyframe_track(
+            [
+                {"at": 0, "value": 0, "interpolation": "hold"},
+                {"at": 0.5, "value": value, "interpolation": "hold"},
+            ],
+            motion=motion,
+            unit="ratio",
+        )],
+    )
+    assert code in error_codes(path)
+
+
+def test_keyframe_track_expansion_hits_and_interpolates_exactly(tmp_path):
+    path = make_plan(
+        tmp_path,
+        tracks=[keyframe_track([
+            {"at": 0, "value": 0, "interpolation": "linear"},
+            {"at": 0.5, "value": -4, "interpolation": "linear"},
+        ])],
+    )
+    plan = load_plan(path)
+    result = validate_plan(plan)
+    assert result.valid, [error.as_dict() for error in result.errors]
+    frame_plan = expand_plan(plan, normalize_plan(plan))
+    values = [frame["transforms"][0]["value"] for frame in frame_plan["frames"]]
+    # Linear ramp to the keyframe at mid-loop, wrap segment back to frame 0.
+    assert values == [0.0, -1.0, -2.0, -3.0, -4.0, -3.0, -2.0, -1.0]
+    assert [frame["offset"]["y"] for frame in frame_plan["frames"]] == values
+
+
+def test_keyframe_track_normalization_roundtrips_and_is_deterministic(tmp_path):
+    path = make_plan(
+        tmp_path,
+        constraints={},
+        tracks=[keyframe_track([
+            {"at": 0, "value": -5},
+            {"at": 0.25, "value": -14, "interpolation": "ease_in"},
+            {"at": 0.5, "value": -7, "interpolation": "hold"},
+        ])],
+    )
+    plan = load_plan(path)
+    normalized = normalize_plan(plan)
+    track_document = normalized["tracks"][0]
+    assert set(track_document) == {"track_id", "target", "motion", "unit", "keyframes"}
+    assert track_document["keyframes"][0]["interpolation"] == "linear"
+    normalized_path = tmp_path / "normalized.json"
+    normalized_path.write_text(json.dumps(normalized))
+    reloaded = load_plan(normalized_path)
+    assert normalize_plan(reloaded) == normalized
+    assert plan_digest(normalize_plan(reloaded)) == plan_digest(normalized)
 
 
 def test_displacement_constraint_enforced(tmp_path):

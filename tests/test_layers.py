@@ -308,6 +308,122 @@ def test_local_opacity_product(tmp_path,capsys):
     assert_valid(build,capsys)
 
 
+def test_pulse_opacity_tracks_are_exact_binary_layer_complements(tmp_path, capsys):
+    sources = []
+    for name, color in [("open", RED), ("closed", BLUE)]:
+        path = tmp_path / f"{name}.png"
+        Image.new("RGBA", (2, 2), color).save(path)
+        sources.append(layer(name, path))
+    shared = {
+        "motion": "opacity",
+        "unit": "ratio",
+        "curve": "pulse",
+        "cycles": 1,
+        "phase": 0.5,
+        "duty_cycle": 0.25,
+    }
+    build = build_layers(tmp_path, capsys, sources, tracks=[
+        {"track_id": "open_binary", "target": "open", "amplitude": -1, **shared},
+        {"track_id": "closed_binary", "target": "closed", "amplitude": 1, **shared},
+    ])
+    assert render(build) == 0
+    parsed(capsys)
+    expected = [RED, RED, BLUE, RED]
+    for index, color in enumerate(expected):
+        assert set(read_pixels(build, index).values()) == {color}
+    frame_plan = json.loads((build / "frame-plan.json").read_text())
+    assert [frame["layers"][0]["opacity"] for frame in frame_plan["frames"]] == [1, 1, 0, 1]
+    assert [frame["layers"][1]["opacity"] for frame in frame_plan["frames"]] == [0, 0, 1, 0]
+    assert_valid(build, capsys)
+
+
+def test_keyframed_opacity_switches_layer_variants_without_crossfade(tmp_path, capsys):
+    sources = []
+    for name, color in [("open", RED), ("closed", BLUE)]:
+        path = tmp_path / f"{name}.png"
+        Image.new("RGBA", (2, 2), color).save(path)
+        sources.append(layer(name, path))
+
+    def visibility(track_id, target, points):
+        return {
+            "track_id": track_id, "target": target, "motion": "opacity", "unit": "ratio",
+            "keyframes": [
+                {"at": at, "value": value, "interpolation": "hold"} for at, value in points
+            ],
+        }
+
+    build = build_layers(
+        tmp_path, capsys, sources,
+        playback={"fps": 8, "frame_count": 8, "loop": True},
+        tracks=[
+            visibility("open_visible", "open", [(0, 0), (0.25, -1), (0.5, 0)]),
+            visibility("closed_visible", "closed", [(0, -1), (0.25, 0), (0.5, -1)]),
+        ],
+    )
+    assert render(build) == 0
+    parsed(capsys)
+    expected = [RED, RED, BLUE, BLUE, RED, RED, RED, RED]
+    for index, color in enumerate(expected):
+        assert set(read_pixels(build, index).values()) == {color}
+    frame_plan = json.loads((build / "frame-plan.json").read_text())
+    assert [frame["layers"][0]["opacity"] for frame in frame_plan["frames"]] == [1, 1, 0, 0, 1, 1, 1, 1]
+    assert [frame["layers"][1]["opacity"] for frame in frame_plan["frames"]] == [0, 0, 1, 1, 0, 0, 0, 0]
+    assert_valid(build, capsys)
+
+
+def test_keyframed_local_translate_moves_layer_per_segment(tmp_path, capsys):
+    build = build_layers(tmp_path, capsys, tracks=[{
+        "track_id": "front_x", "target": "front", "motion": "translate_x", "unit": "px",
+        "keyframes": [
+            {"at": 0, "value": 0, "interpolation": "linear"},
+            {"at": 0.5, "value": 2, "interpolation": "linear"},
+        ],
+    }])
+    assert render(build) == 0
+    parsed(capsys)
+    frame_plan = json.loads((build / "frame-plan.json").read_text())
+    assert [f["layers"][1]["translation"]["x"] for f in frame_plan["frames"]] == [0, 1, 2, 1]
+    base_blue = {pos for pos, color in read_pixels(build, 0).items() if color == BLUE}
+    moved_blue = {pos for pos, color in read_pixels(build, 2).items() if color == BLUE}
+    assert {(x - 2, y) for x, y in moved_blue} == base_blue
+    assert_valid(build, capsys)
+
+
+def test_keyframed_global_rotate_and_local_scale_render_and_validate(tmp_path, capsys):
+    build = build_layers(tmp_path, capsys, tracks=[
+        {"track_id": "spin", "target": "sprite", "motion": "rotate", "unit": "deg",
+         "keyframes": [{"at": 0, "value": 0},
+                       {"at": 0.5, "value": 10, "interpolation": "ease_in_out"}]},
+        {"track_id": "grow", "target": "front", "motion": "scale", "unit": "ratio",
+         "keyframes": [{"at": 0, "value": 0},
+                       {"at": 0.5, "value": 0.5, "interpolation": "ease_out"}]},
+    ])
+    assert render(build) == 0
+    parsed(capsys)
+    frame_plan = json.loads((build / "frame-plan.json").read_text())
+    assert frame_plan["frames"][2]["global_pose"]["rotate_deg"] == 10
+    assert frame_plan["frames"][2]["layers"][1]["scale"] == 1.5
+    assert_valid(build, capsys)
+
+
+def test_keyframe_track_unknown_target_rejected(tmp_path, capsys):
+    run_bad_spec(tmp_path, capsys, lambda d: d.__setitem__("tracks", [{
+        "track_id": "kf", "target": "missing", "motion": "translate_x", "unit": "px",
+        "keyframes": [{"at": 0, "value": 0}],
+    }]), "UNKNOWN_LAYER_TARGET")
+
+
+def test_keyframe_curve_field_mixing_is_cli_and_schema_rejected(tmp_path, capsys):
+    run_bad_spec(tmp_path, capsys, lambda d: d.__setitem__("tracks", [{
+        "track_id": "kf", "target": "front", "motion": "translate_x", "unit": "px",
+        "amplitude": 1, "keyframes": [{"at": 0, "value": 0}],
+    }]), "TRACK_MODE_CONFLICT", 2)
+    document = json.loads((tmp_path / "spec" / "animation.json").read_text())
+    schema = json.loads((REPO_ROOT / "schemas" / "animation-plan.schema.json").read_text())
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(document, schema)
+
+
 @pytest.mark.parametrize('invisibility', ['opacity','clipping','occlusion','source'])
 def test_invisible_layer_is_legal(tmp_path,capsys,invisibility):
     path,doc=write_spec(tmp_path)

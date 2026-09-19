@@ -36,7 +36,7 @@ source frames + animation.yaml (frame-manifest layer)
 | --- | --- |
 | `plan.py` | Locate and parse Animation Plans (JSON/YAML) into typed immutable data |
 | `plan_validator.py` | Value-level plan checks: versions, anchors, tracks, events, displacement budgets |
-| `curves.py` | Deterministic curve sampling (periodic and mirrored easing curves) |
+| `curves.py` | Deterministic track sampling: periodic, mirrored easing, and discrete pulse curves plus piecewise keyframe timelines |
 | `expand.py` | Plan normalization, content digest, and expansion into the frame plan |
 | `build.py` | Build-directory creation, loading, validation (full frame-plan recomputation, source identity re-inspection, transaction/manifest gates, mode-aware geometry and built-in RGBA verification), manifest adapter |
 | `geometry.py` | Global and target-local pose sampling, finite effective-value checks, (rotate sums, scale/opacity factor products) and the documented anchor-affine transform shared by renderer and validator |

@@ -226,7 +226,17 @@
               "properties": {
                 "cycles": {
                   "multipleOf": 1,
-                  "description": "Looping playback requires a positive integer cycle count so every curve is continuous across the loop seam (NON_INTEGRAL_LOOP_CYCLES)."
+                  "description": "Looping playback requires a positive integer cycle count so every curve returns to its frame-0 value at the next cycle boundary (NON_INTEGRAL_LOOP_CYCLES)."
+                },
+                "keyframes": {
+                  "items": {
+                    "properties": {
+                      "at": {
+                        "exclusiveMaximum": 1,
+                        "description": "Looping playback reserves time 1 for the wrap back to the first keyframe; every keyframe time stays below 1 (INVALID_KEYFRAME_TIME)."
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -263,6 +273,17 @@
   ],
   "$defs": {
     "track": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/curve_track"
+        },
+        {
+          "$ref": "#/$defs/keyframe_track"
+        }
+      ],
+      "description": "Either a curve track (amplitude scaled by a cycle curve) or a keyframe track (explicit piecewise timeline). The field sets are mutually exclusive; the loader rejects mixing with TRACK_MODE_CONFLICT."
+    },
+    "curve_track": {
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -310,10 +331,11 @@
             "ease_in",
             "ease_out",
             "ease_in_out",
+            "pulse",
             "hold"
           ],
           "default": "sine",
-          "description": "Periodic curves span [-1, 1]; easing curves are mirrored per cycle and span [0, 1]; 'hold' is constant zero."
+          "description": "Periodic curves span [-1, 1]; easing curves are mirrored per cycle and span [0, 1]; pulse is +1 during duty_cycle and -1 otherwise; 'hold' is constant zero."
         },
         "cycles": {
           "type": "number",
@@ -325,6 +347,129 @@
           "minimum": 0,
           "exclusiveMaximum": 1,
           "default": 0
+        },
+        "duty_cycle": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "default": 0.5,
+          "description": "Active fraction of each pulse cycle. Valid only when curve is pulse."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "curve": {
+                "const": "pulse"
+              }
+            },
+            "required": [
+              "curve"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "duty_cycle"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "keyframe_track": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "track_id",
+        "target",
+        "motion",
+        "unit",
+        "keyframes"
+      ],
+      "properties": {
+        "track_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The reserved label 'sprite' addresses the whole sprite: only translate tracks targeting 'sprite' contribute to the aggregate per-frame offset. Any other value ('head', 'hand_right', ...) is a semantic part label, advisory for layered renderers, and never moves the whole-sprite offset."
+        },
+        "motion": {
+          "enum": [
+            "translate_x",
+            "translate_y",
+            "rotate",
+            "scale",
+            "opacity"
+          ]
+        },
+        "unit": {
+          "enum": [
+            "px",
+            "deg",
+            "ratio"
+          ],
+          "description": "Must match the motion: translate_* -> px, rotate -> deg, scale/opacity -> ratio."
+        },
+        "keyframes": {
+          "type": "array",
+          "minItems": 1,
+          "prefixItems": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/keyframe"
+                },
+                {
+                  "properties": {
+                    "at": {
+                      "const": 0,
+                      "description": "The first keyframe must be at time 0 (INVALID_KEYFRAME_TIME)."
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "items": {
+            "$ref": "#/$defs/keyframe"
+          },
+          "description": "Piecewise timeline in normalized loop time: strictly increasing 'at' values starting at exactly 0 (strict ordering is checked semantically, INVALID_KEYFRAME_TIME). A looping track keeps every 'at' below 1 and interpolates from the last keyframe back to the first keyframe's value at time 1; a non-looping track may end exactly at 1 and otherwise holds its last value."
+        }
+      }
+    },
+    "keyframe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "at",
+        "value"
+      ],
+      "properties": {
+        "at": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Normalized loop time of this keyframe, independent of FPS and frame count."
+        },
+        "value": {
+          "type": "number",
+          "description": "Direct sampled track value at this time, in the motion's composition semantics: px offset, degrees, or the ratio whose effective factor is 1 + value for scale/opacity."
+        },
+        "interpolation": {
+          "enum": [
+            "linear",
+            "ease_in",
+            "ease_out",
+            "ease_in_out",
+            "hold"
+          ],
+          "default": "linear",
+          "description": "Shape of the segment from this keyframe to the next (or, for a looping track's last keyframe, of the wrap segment back to the first value). 'hold' keeps this value and steps exactly on the next keyframe."
         }
       }
     },

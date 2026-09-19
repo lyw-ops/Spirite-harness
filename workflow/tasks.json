@@ -1,0 +1,175 @@
+{
+  "version": 1,
+  "updated": "2026-09-19",
+  "policy": {
+    "gate_order": [
+      "specification",
+      "implementation",
+      "technical",
+      "visual",
+      "consumer",
+      "publication"
+    ],
+    "rule": "A task is complete only when every required gate has its own successful evidence. Local verification never implies visual approval, consumer integration, installation, or remote publication."
+  },
+  "tasks": {
+    "HARNESS-WORKFLOW-001": {
+      "title": "Adopt the evidence-bound Sprite Harness workflow",
+      "kind": "infrastructure",
+      "depends_on": [],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "publication"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/workflow.md",
+            "HARNESS.md"
+          ],
+          "note": "The canonical lifecycle, evidence boundaries, and publication protocol are documented."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "workflow/update.py",
+            "scripts/verify.py",
+            "tests/test_workflow.py"
+          ],
+          "note": "The task ledger, generated views, aggregate verifier, and regression tests exist."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-09-19-0.8.0-workflow-closure.md"
+          ],
+          "note": "The aggregate workflow, pytest, compile, diff, and layered CLI smoke gates passed on the closure source."
+        },
+        "visual": {
+          "status": "not_required",
+          "evidence": [],
+          "note": "Workflow infrastructure has no artwork approval gate."
+        },
+        "consumer": {
+          "status": "not_required",
+          "evidence": [],
+          "note": "This infrastructure does not itself change a consumer runtime."
+        },
+        "publication": {
+          "status": "unpublished",
+          "evidence": [],
+          "note": "Commit and push remain separate, explicit maintainer actions."
+        }
+      }
+    },
+    "HARNESS-KEYFRAMES-001": {
+      "title": "Release keyframe tracks and the discrete pulse curve",
+      "kind": "core-capability",
+      "depends_on": [],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "consumer",
+        "publication"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/animation-plan.md",
+            "schemas/animation-plan.schema.json"
+          ],
+          "note": "Keyframe and pulse semantics are described in the current working tree."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "src/sprite_harness/curves.py",
+            "src/sprite_harness/expand.py",
+            "tests/test_plan.py"
+          ],
+          "note": "The implementation is present, but this ledger does not turn uncommitted source into a release."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-09-19-0.8.0-workflow-closure.md"
+          ],
+          "note": "Current-version M3 and M4/M5 acceptance plus the aggregate Harness verification passed."
+        },
+        "visual": {
+          "status": "not_required",
+          "evidence": [],
+          "note": "The generic core feature has no character-art approval gate."
+        },
+        "consumer": {
+          "status": "verified",
+          "evidence": [
+            "docs/decisions/2026-09-19-0.8.0-workflow-closure.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/tree/d7394914fe2bffc5cec03d49c54d2d7285d56cd5"
+          ],
+          "note": "All 125 consumer tests passed with the 0.8.0 CLI explicitly pinned; no Harness integration test was skipped."
+        },
+        "publication": {
+          "status": "unpublished",
+          "evidence": [],
+          "note": "No commit, push, tag, or package release is inferred from local implementation."
+        }
+      }
+    },
+    "REIMU-ACTIONS-001": {
+      "title": "Produce the six-tier work-eating, idle onigiri, and grabbed-drag action set",
+      "kind": "animation-delivery",
+      "depends_on": [
+        "HARNESS-KEYFRAMES-001"
+      ],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual",
+        "consumer",
+        "publication"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "https://github.com/lyw-ops/gensokyo-codex-pets/blob/d7394914fe2bffc5cec03d49c54d2d7285d56cd5/docs/reimu-action-system.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/blob/d7394914fe2bffc5cec03d49c54d2d7285d56cd5/pets/reimu/metadata/actions.json"
+          ],
+          "note": "The behavior contract is pinned to the published consumer commit instead of an ambiguous moving branch."
+        },
+        "implementation": {
+          "status": "in_progress",
+          "evidence": [],
+          "note": "Existing task_2 work is partial coverage; the six tiers and independent grabbed pose are not a finished set."
+        },
+        "technical": {
+          "status": "pending",
+          "evidence": [],
+          "note": "Each authored set needs deterministic plan/render/validate and reduced-motion evidence."
+        },
+        "visual": {
+          "status": "pending",
+          "evidence": [],
+          "note": "Technical QA cannot approve expression, silhouette, scale, timing, or transition quality."
+        },
+        "consumer": {
+          "status": "pending",
+          "evidence": [],
+          "note": "Native runtime state selection, interruption, landing, and tier switching remain separately verifiable."
+        },
+        "publication": {
+          "status": "unpublished",
+          "evidence": [],
+          "note": "The design commit is published; the complete action delivery is not."
+        }
+      }
+    }
+  }
+}

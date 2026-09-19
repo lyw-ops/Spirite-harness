@@ -44,20 +44,13 @@ sprite-harness validate build/ --write-qa
 
 ## Tracks
 
-A track applies one motion to one semantic target:
+A track applies one motion to one semantic target. It comes in exactly one of
+two kinds: a **curve track** (an `amplitude` scaled by a whole-cycle curve) or
+a **keyframe track** (an explicit piecewise timeline). The field sets are
+mutually exclusive: `keyframes` never appears together with `amplitude`,
+`curve`, `cycles`, `phase`, or `duty_cycle` (`TRACK_MODE_CONFLICT`, exit 2).
 
-```json
-{
-  "track_id": "breathing",
-  "target": "sprite",
-  "motion": "translate_y",
-  "amplitude": 1.5,
-  "unit": "px",
-  "curve": "sine",
-  "cycles": 1,
-  "phase": 0.75
-}
-```
+Both kinds share the target and composition rules:
 
 - `motion` / `unit` pairs: `translate_x`/`translate_y` → `px`, `rotate` →
   `deg`, `scale`/`opacity` → `ratio` (effective value is `1 + sampled value`).
@@ -74,18 +67,110 @@ A track applies one motion to one semantic target:
   provider- and character-neutral. In v2 every local target must bind a declared
   PNG layer; unknown track/event targets fail `UNKNOWN_LAYER_TARGET`. Array
   order is back to front. All local transforms are rendered and digest-bound.
+
+### Curve tracks
+
+```json
+{
+  "track_id": "breathing",
+  "target": "sprite",
+  "motion": "translate_y",
+  "amplitude": 1.5,
+  "unit": "px",
+  "curve": "sine",
+  "cycles": 1,
+  "phase": 0.75
+}
+```
+
 - The sampled value of a track at frame `i` of `n` is
   `amplitude × curve(u)` with `u = frac((i / period) × cycles + phase)`, where
   `period = n` for loops and `n − 1` otherwise.
 - Curves: `sine` and `triangle` are periodic in `[-1, 1]` and start at 0.
   `linear`, `ease_in`, `ease_out`, `ease_in_out` are mirrored (ping-pong)
-  inside each cycle in `[0, 1]`. `hold` is constant 0.
+  inside each cycle in `[0, 1]`. `pulse` is a discrete periodic curve: it is
+  `+1` while `u < duty_cycle` and `-1` for the rest of the cycle;
+  `duty_cycle` defaults to `0.5`, must be in `(0, 1]`, and is invalid on other
+  curves. `hold` is constant 0.
+- A pulse gives complementary binary opacity without cross-fading: bind two
+  layers to the same pulse and use amplitude `-1` on the normally visible
+  layer and `+1` on the pulse-visible layer. Their effective opacity factors
+  are exactly `0`/`2` before the documented `[0,1]` clamp, so exactly one
+  layer is visible at every sampled frame.
 - Loop continuity: when `playback.loop` is true, every track's `cycles` must
   be a positive integer (`NON_INTEGRAL_LOOP_CYCLES` otherwise). Whole cycles
-  make the sampled sequence exactly periodic, so every curve — periodic or
-  mirrored easing, at any phase — returns to its frame-0 value without a
-  position jump at the loop seam. Non-looping animations may use positive
-  fractional cycles.
+  make the sampled sequence exactly periodic, so every curve returns to its
+  frame-0 value at the next cycle boundary. `pulse` deliberately contains a
+  discrete edge; place it away from the loop seam unless that edge is the
+  intended transition. Non-looping animations may use positive fractional
+  cycles.
+
+### Keyframe tracks
+
+Multi-phase motion with per-phase durations and shapes (approach, hold, snap
+back, settle) replaces the curve fields with an explicit piecewise timeline:
+
+```json
+{
+  "track_id": "food_approach",
+  "target": "held_food",
+  "motion": "translate_y",
+  "unit": "px",
+  "keyframes": [
+    {"at": 0.0,  "value": -5,  "interpolation": "ease_in_out"},
+    {"at": 0.28, "value": -14, "interpolation": "ease_in"},
+    {"at": 0.4,  "value": -16, "interpolation": "ease_out"},
+    {"at": 0.52, "value": -7,  "interpolation": "hold"},
+    {"at": 0.82, "value": -7,  "interpolation": "ease_in_out"}
+  ]
+}
+```
+
+- `at` is normalized loop time, independent of FPS and frame count. Frame `i`
+  of `n` samples time `u = i / n` for loops (positions stay in `[0, 1)`; time
+  1 is the seam and belongs to the next repetition's frame 0) and
+  `u = i / (n − 1)` otherwise (the final frame samples exactly 1).
+- A track needs at least one keyframe (`INSUFFICIENT_KEYFRAMES`; a single
+  keyframe is a constant). Times must be finite, the first must be exactly 0,
+  and they must increase strictly; looping playback requires every `at` below
+  1, non-looping playback allows the final keyframe exactly at 1
+  (`INVALID_KEYFRAME_TIME`). Values must be finite
+  (`INVALID_KEYFRAME_VALUE`).
+- `value` is the direct sampled track value at that time — no amplitude is
+  involved. It uses the same composition semantics as curve-track samples: a
+  pixel offset for `translate_*`, degrees for `rotate`, and for
+  `scale`/`opacity` the ratio whose effective factor is `1 + value`, with all
+  existing effective-value rules (`INVALID_EFFECTIVE_SCALE`,
+  `INVALID_EFFECTIVE_OPACITY`, `FULLY_TRANSPARENT_FRAME`) unchanged.
+- Each keyframe's `interpolation` shapes the segment to the *next* keyframe:
+  `linear`, `ease_in` (`t²`), `ease_out` (`1 − (1 − t)²`), `ease_in_out`
+  (smoothstep `t²(3 − 2t)`), or `hold`. `hold` keeps the keyframe's value for
+  the whole segment and steps exactly on the next keyframe's `at` — discrete
+  switches never produce partially interpolated frames. The default is
+  `linear`; anything else is `UNSUPPORTED_INTERPOLATION`.
+- Sampling exactly at a keyframe's `at` returns its `value` exactly; between
+  keyframes the segment interpolates `value₀ + (value₁ − value₀) ×
+  ease(t)` with `t = (u − at₀) / (at₁ − at₀)`. Every sampled value is then
+  rounded to six decimals exactly like curve-track samples.
+- **Loop closure:** when `playback.loop` is true the timeline's final segment
+  runs from the last keyframe back to the *first keyframe's value*, reaching
+  it exactly at time 1 — which is the same instant as time 0 of the next
+  repetition — shaped by the last keyframe's `interpolation`. Continuous
+  shapes therefore close the seam without a jump; a `hold` last segment keeps
+  the last value through the seam and steps to the first value exactly on
+  frame 0. Keyframe tracks declare no `cycles`, and the integer-cycles loop
+  rule does not apply to them; the wrap segment is their loop-continuity
+  contract.
+- **Non-looping tail:** when the last keyframe sits before time 1 the value
+  holds from that keyframe to the final frame; the last keyframe's
+  `interpolation` only takes effect in looping playback.
+- Keyframed `opacity` with `hold` segments and values `-1`/`0` gives exact
+  `0`/`1` factors — mutually exclusive layered variants (mouth shapes, eye
+  states) switch discretely with no cross-fade frame, with arbitrary
+  per-phase timing.
+
+### Offsets and constraints
+
 - Only translate tracks targeting `sprite` are aggregated per frame into the
   whole-sprite pixel `offset` (x right, y down) that the validator checks
   against `constraints` and, once frames exist, against measured bounding
@@ -140,7 +225,10 @@ Plan-stage codes: `UNSUPPORTED_PLAN_VERSION`, `INVALID_ANIMATION_ID`,
 `INVALID_SEED`, `INVALID_CONSTRAINT`, `UNSUPPORTED_REDUCED_MOTION`,
 `INVALID_SOURCE_IDENTITY`, `DUPLICATE_TRACK_ID`, `UNSUPPORTED_MOTION`,
 `UNIT_MISMATCH`, `UNSUPPORTED_CURVE`, `INVALID_AMPLITUDE`, `INVALID_CYCLES`,
-`NON_INTEGRAL_LOOP_CYCLES`, `INVALID_PHASE`, `DUPLICATE_EVENT_ID`,
+`NON_INTEGRAL_LOOP_CYCLES`, `INVALID_PHASE`, `INVALID_DUTY_CYCLE`,
+`DUTY_CYCLE_REQUIRES_PULSE`, `INSUFFICIENT_KEYFRAMES`,
+`INVALID_KEYFRAME_TIME`, `INVALID_KEYFRAME_VALUE`,
+`UNSUPPORTED_INTERPOLATION`, `DUPLICATE_EVENT_ID`,
 `EVENT_FRAME_OUT_OF_RANGE`, `DISPLACEMENT_EXCEEDED`, `FRAME_DELTA_EXCEEDED`,
 `SOURCE_NOT_FOUND`, `SOURCE_INVALID_IMAGE`, `SOURCE_ALPHA_REQUIRED`,
 `SOURCE_DIGEST_MISMATCH`, `SOURCE_DIMENSION_MISMATCH`, `CANVAS_UNRESOLVED`,
@@ -177,7 +265,8 @@ Render-stage codes (exit 4, `sprite-harness render`):
 Warning: `TARGET_TRACKS_SKIPPED`.
 
 Loading errors (exit 2) additionally include `METADATA_NOT_JSON_COMPATIBLE`
-for YAML metadata that cannot be represented as standard JSON.
+for YAML metadata that cannot be represented as standard JSON, and
+`TRACK_MODE_CONFLICT` for a track mixing `keyframes` with curve-track fields.
 
 Exit codes follow the shared contract in
 [`docs/animation-spec.md`](animation-spec.md#exit-code-contract).

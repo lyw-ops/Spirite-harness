@@ -14,9 +14,9 @@ import hashlib
 from typing import Any
 
 from . import __version__
-from .curves import sample_track_value
+from .curves import sample_track
 from .jsonio import dumps_strict
-from .plan import SPRITE_TARGET, AnimationPlan, resolved_anchor
+from .plan import SPRITE_TARGET, AnimationPlan, Track, resolved_anchor
 
 
 FRAME_PLAN_VERSION = 1
@@ -46,21 +46,52 @@ def sample_offsets(plan: AnimationPlan, target: str = SPRITE_TARGET) -> list[tup
                 "translate_y",
             ):
                 continue
-            value = sample_track_value(
-                track.curve,
-                track.amplitude,
-                index,
-                plan.frame_count,
-                loop=plan.loop,
-                cycles=track.cycles,
-                phase=track.phase,
-            )
+            value = sample_track(track, index, plan.frame_count, loop=plan.loop)
             if track.motion == "translate_x":
                 dx += value
             else:
                 dy += value
         offsets.append((_round(dx), _round(dy)))
     return offsets
+
+
+def _normalized_track(track: Track) -> dict[str, Any]:
+    """Canonical fully-defaulted track document for ``plan.json``.
+
+    Curve tracks keep their historical field order and gain an explicit
+    ``duty_cycle`` only for ``pulse``; keyframe tracks serialize their exact
+    timeline with every ``interpolation`` made explicit.
+    """
+
+    if track.keyframes is not None:
+        return {
+            "track_id": track.track_id,
+            "target": track.target,
+            "motion": track.motion,
+            "unit": track.unit,
+            "keyframes": [
+                {
+                    "at": keyframe.at,
+                    "value": keyframe.value,
+                    "interpolation": keyframe.interpolation,
+                }
+                for keyframe in track.keyframes
+            ],
+        }
+    return {
+        "track_id": track.track_id,
+        "target": track.target,
+        "motion": track.motion,
+        "amplitude": track.amplitude,
+        "unit": track.unit,
+        "curve": track.curve,
+        "cycles": track.cycles,
+        "phase": track.phase,
+        **(
+            {"duty_cycle": track.duty_cycle if track.duty_cycle is not None else 0.5}
+            if track.curve == "pulse" else {}
+        ),
+    }
 
 
 def normalize_plan(
@@ -101,19 +132,7 @@ def normalize_plan(
             else {"type": plan.anchor_type}
         ),
         "reduced_motion": {"mode": plan.reduced_motion},
-        "tracks": [
-            {
-                "track_id": track.track_id,
-                "target": track.target,
-                "motion": track.motion,
-                "amplitude": track.amplitude,
-                "unit": track.unit,
-                "curve": track.curve,
-                "cycles": track.cycles,
-                "phase": track.phase,
-            }
-            for track in plan.tracks
-        ],
+        "tracks": [_normalized_track(track) for track in plan.tracks],
         "events": [
             {
                 "event_id": event.event_id,
@@ -218,17 +237,7 @@ def expand_plan(plan: AnimationPlan, normalized_plan: dict[str, Any]) -> dict[st
                 "target": track.target,
                 "motion": track.motion,
                 "unit": track.unit,
-                "value": _round(
-                    sample_track_value(
-                        track.curve,
-                        track.amplitude,
-                        index,
-                        plan.frame_count,
-                        loop=plan.loop,
-                        cycles=track.cycles,
-                        phase=track.phase,
-                    )
-                ),
+                "value": _round(sample_track(track, index, plan.frame_count, loop=plan.loop)),
             }
             for track in plan.tracks
         ]

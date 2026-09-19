@@ -1,4 +1,4 @@
-"""Reproducible full engineering gates with exact command/output records.
+"""Reproducible current-version engineering gates with exact command/output records.
 
 Run with the repository venv. Local loopback HTTP test permission is required;
 there are no live provider requests, package downloads, commits or pushes.
