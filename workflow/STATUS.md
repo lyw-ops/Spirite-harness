@@ -2,34 +2,37 @@
 
 > Generated from `workflow/tasks.json`; do not edit by hand.
 
-Ledger date: **2026-09-19**.
+Ledger date: **2026-09-20**.
 
 A gate records one claim only. In particular, `technical: passed` never supplies visual, consumer, installation, or publication evidence.
 
 | Task | Kind | Derived stage | Required gates | Dependencies |
 | --- | --- | --- | --- | --- |
-| `HARNESS-KEYFRAMES-001` · Release keyframe tracks and the discrete pulse curve | core-capability | **publication** | specification, implementation, technical, consumer, publication | — |
-| `HARNESS-WORKFLOW-001` · Adopt the evidence-bound Sprite Harness workflow | infrastructure | **publication** | specification, implementation, technical, publication | — |
+| `HARNESS-KEYFRAMES-001` · Release keyframe tracks and the discrete pulse curve | core-capability | **complete** | specification, implementation, technical, consumer, publication | — |
+| `HARNESS-WORKFLOW-001` · Adopt the evidence-bound Sprite Harness workflow | infrastructure | **complete** | specification, implementation, technical, publication | — |
 | `REIMU-ACTIONS-001` · Produce the six-tier work-eating, idle onigiri, and grabbed-drag action set | animation-delivery | **implementation** | specification, implementation, technical, visual, consumer, publication | `HARNESS-KEYFRAMES-001` |
+| `REIMU-TIER2-RUNTIME-001` · Connect observed count two to the approved native task_2 loop | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-ACTIONS-001` |
+| `REIMU-TIER3-RUNTIME-001` · Connect observed count three to the existing native task_3 still | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER2-RUNTIME-001` |
+| `REIMU-WORK-TRANSITIONS-001` · Author transitions around native workload eating | animation-delivery | **specification** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER2-RUNTIME-001`, `REIMU-TIER3-RUNTIME-001` |
 
 <a id="harness-keyframes-001"></a>
 ## `HARNESS-KEYFRAMES-001` · Release keyframe tracks and the discrete pulse curve
 
-Derived stage: **publication**.
+Derived stage: **complete**.
 
 | Gate | Required | Status | Evidence | Boundary note |
 | --- | --- | --- | --- | --- |
 | specification | yes | `ready` | [animation-plan.md](../docs/animation-plan.md), [animation-plan.schema.json](../schemas/animation-plan.schema.json) | Keyframe and pulse semantics are described in the current working tree. |
-| implementation | yes | `ready` | [curves.py](../src/sprite_harness/curves.py), [expand.py](../src/sprite_harness/expand.py), [test_plan.py](../tests/test_plan.py) | The implementation is present, but this ledger does not turn uncommitted source into a release. |
+| implementation | yes | `ready` | [curves.py](../src/sprite_harness/curves.py), [expand.py](../src/sprite_harness/expand.py), [test_plan.py](../tests/test_plan.py) | The keyframe and pulse implementation is published in the exact Harness commit named by the publication gate. |
 | technical | yes | `passed` | [2026-09-19-0.8.0-workflow-closure.md](../docs/decisions/2026-09-19-0.8.0-workflow-closure.md) | Current-version M3 and M4/M5 acceptance plus the aggregate Harness verification passed. |
 | visual | no | `not_required` | — | The generic core feature has no character-art approval gate. |
 | consumer | yes | `verified` | [2026-09-19-0.8.0-workflow-closure.md](../docs/decisions/2026-09-19-0.8.0-workflow-closure.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/tree/d7394914fe2bffc5cec03d49c54d2d7285d56cd5) | All 125 consumer tests passed with the 0.8.0 CLI explicitly pinned; no Harness integration test was skipped. |
-| publication | yes | `unpublished` | — | No commit, push, tag, or package release is inferred from local implementation. |
+| publication | yes | `published` | [remote](https://github.com/lyw-ops/Spirite-harness/commit/7679b98ea34958115ed7456aac8a0589a01bdd21) | The maintainer-authorized push was verified at origin/main; no tag or package release is implied. |
 
 <a id="harness-workflow-001"></a>
 ## `HARNESS-WORKFLOW-001` · Adopt the evidence-bound Sprite Harness workflow
 
-Derived stage: **publication**.
+Derived stage: **complete**.
 
 | Gate | Required | Status | Evidence | Boundary note |
 | --- | --- | --- | --- | --- |
@@ -38,7 +41,7 @@ Derived stage: **publication**.
 | technical | yes | `passed` | [2026-09-19-0.8.0-workflow-closure.md](../docs/decisions/2026-09-19-0.8.0-workflow-closure.md) | The aggregate workflow, pytest, compile, diff, and layered CLI smoke gates passed on the closure source. |
 | visual | no | `not_required` | — | Workflow infrastructure has no artwork approval gate. |
 | consumer | no | `not_required` | — | This infrastructure does not itself change a consumer runtime. |
-| publication | yes | `unpublished` | — | Commit and push remain separate, explicit maintainer actions. |
+| publication | yes | `published` | [remote](https://github.com/lyw-ops/Spirite-harness/commit/7679b98ea34958115ed7456aac8a0589a01bdd21) | The maintainer authorized publication; origin/main was independently verified at the exact workflow commit. |
 
 <a id="reimu-actions-001"></a>
 ## `REIMU-ACTIONS-001` · Produce the six-tier work-eating, idle onigiri, and grabbed-drag action set
@@ -53,3 +56,45 @@ Derived stage: **implementation**.
 | visual | yes | `pending` | — | Technical QA cannot approve expression, silhouette, scale, timing, or transition quality. |
 | consumer | yes | `pending` | — | Native runtime state selection, interruption, landing, and tier switching remain separately verifiable. |
 | publication | yes | `unpublished` | — | The design commit is published; the complete action delivery is not. |
+
+<a id="reimu-tier2-runtime-001"></a>
+## `REIMU-TIER2-RUNTIME-001` · Connect observed count two to the approved native task_2 loop
+
+Derived stage: **complete**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-09-19-reimu-tier2-native-vertical-slice.md](../docs/decisions/2026-09-19-reimu-tier2-native-vertical-slice.md) | The count-truth boundary, tier-2-only identity, honest fallbacks, loop-boundary switching, preemption, and reduced-motion rules are explicit. |
+| implementation | yes | `ready` | [2026-09-19-reimu-tier2-native-vertical-slice.md](../docs/decisions/2026-09-19-reimu-tier2-native-vertical-slice.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/6a1318257d9bedc2b9a937304ea4b434ca874409) | The published consumer commit contains the observer-to-behavior data path, exact package loader, selector, and regression tests. |
+| technical | yes | `passed` | [2026-09-19-reimu-tier2-native-vertical-slice.md](../docs/decisions/2026-09-19-reimu-tier2-native-vertical-slice.md) | Harness 0.8.0 integration, Swift behavior, native loader, AppKit self-test, repository, JSON, runtime, and diff gates passed. |
+| visual | yes | `approved` | [2026-09-19-reimu-tier2-native-vertical-slice.md](../docs/decisions/2026-09-19-reimu-tier2-native-vertical-slice.md) | The user approved the current native tier-2 loop preview; unbuilt transition animations are tracked as a separate future task. |
+| consumer | yes | `verified` | [2026-09-19-reimu-tier2-native-vertical-slice.md](../docs/decisions/2026-09-19-reimu-tier2-native-vertical-slice.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/6a1318257d9bedc2b9a937304ea4b434ca874409) | The consumer preserves the observed count and selects exact task_2 only for working plus count two; unavailable tiers remain honest fallbacks. |
+| publication | yes | `published` | [2026-09-20-reimu-tier2-tier3-publication.md](../docs/decisions/2026-09-20-reimu-tier2-tier3-publication.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/6a1318257d9bedc2b9a937304ea4b434ca874409) | The exact consumer commit is verified on origin/main; preview packages remain local and no app installation, tag, or package release is implied. |
+
+<a id="reimu-tier3-runtime-001"></a>
+## `REIMU-TIER3-RUNTIME-001` · Connect observed count three to the existing native task_3 still
+
+Derived stage: **complete**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-09-19-reimu-tier3-native-static-slice.md](../docs/decisions/2026-09-19-reimu-tier3-native-static-slice.md) | Count-three identity, immutable one-frame source, honest static semantics, switching, preemption, reduced motion, and isolated fallback are explicit. |
+| implementation | yes | `ready` | [2026-09-19-reimu-tier3-native-static-slice.md](../docs/decisions/2026-09-19-reimu-tier3-native-static-slice.md), [2026-09-20-reimu-tier3-visual-approval.md](../docs/decisions/2026-09-20-reimu-tier3-visual-approval.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/6a1318257d9bedc2b9a937304ea4b434ca874409) | The published consumer commit contains the exact static package, selector, loader, regression tests, and a production-eligible build path after visual approval. |
+| technical | yes | `passed` | [2026-09-19-reimu-tier3-native-static-slice.md](../docs/decisions/2026-09-19-reimu-tier3-native-static-slice.md), [2026-09-20-reimu-tier3-visual-approval.md](../docs/decisions/2026-09-20-reimu-tier3-visual-approval.md) | Consumer tools, Swift behavior, native AppKit, package fallback, observer bridge, repository, JSON, runtime capture, formal-identity package validation, signature, and diff gates passed. |
+| visual | yes | `approved` | [2026-09-20-reimu-tier3-visual-approval.md](../docs/decisions/2026-09-20-reimu-tier3-visual-approval.md) | The user approved the reviewed native tier-3 size, pose, static hold, and demonstrated switching on 2026-09-20; this still is not a completed multi-frame animation. |
+| consumer | yes | `verified` | [2026-09-19-reimu-tier3-native-static-slice.md](../docs/decisions/2026-09-19-reimu-tier3-native-static-slice.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/6a1318257d9bedc2b9a937304ea4b434ca874409) | The consumer selects exact task_3 only for working plus count three, preserves tier-2 behavior, and degrades a broken tier-3 package independently. |
+| publication | yes | `published` | [2026-09-20-reimu-tier2-tier3-publication.md](../docs/decisions/2026-09-20-reimu-tier2-tier3-publication.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/6a1318257d9bedc2b9a937304ea4b434ca874409) | The exact consumer commit is verified on origin/main; the formal-identity ZIP remains local and no app installation, tag, or package release is implied. |
+
+<a id="reimu-work-transitions-001"></a>
+## `REIMU-WORK-TRANSITIONS-001` · Author transitions around native workload eating
+
+Derived stage: **specification**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `pending` | [2026-09-19-reimu-tier2-native-vertical-slice.md](../docs/decisions/2026-09-19-reimu-tier2-native-vertical-slice.md), [2026-09-19-reimu-tier3-native-static-slice.md](../docs/decisions/2026-09-19-reimu-tier3-native-static-slice.md) | Candidate scope is entry, exit, future cross-tier changes, and post-transient recovery; exact clips, timing, and art direction are not yet frozen. |
+| implementation | yes | `pending` | — | No transition artwork, manifest, or runtime transition node has been implemented. |
+| technical | yes | `pending` | — | Transition continuity, interruption, reduced-motion, source-integrity, and fallback tests remain future work. |
+| visual | yes | `pending` | — | Future transition timing and pose continuity require a separate native visual review. |
+| consumer | yes | `pending` | — | Future transitions must preserve immediate high-priority preemption and restore only the latest observed tier. |
+| publication | yes | `unpublished` | — | The transition task is only a recorded backlog item; nothing has been authored, installed, committed, or published for it. |

@@ -26,6 +26,9 @@ def test_generated_views_are_current():
 
 def test_first_unsatisfied_required_gate_drives_stage():
     task = deepcopy(load_tasks()["tasks"]["HARNESS-WORKFLOW-001"])
+    task["gates"]["publication"] = {
+        "status": "unpublished", "evidence": [], "note": "unpublished"
+    }
     assert update.overall(task) == "publication"
     task["gates"]["technical"] = {"status": "pending", "evidence": [], "note": "pending"}
     assert update.overall(task) == "technical validation"
