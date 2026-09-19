@@ -15,7 +15,9 @@ A gate records one claim only. In particular, `technical: passed` never supplies
 | `REIMU-TIER3-RUNTIME-001` · Connect observed count three to the existing native task_3 still | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER2-RUNTIME-001` |
 | `REIMU-TIER4-INTAKE-001` · Prepare and review the existing Tier4 ramen still | animation-delivery | **complete** | specification, implementation, technical, visual | — |
 | `REIMU-TIER4-RUNTIME-001` · Connect observed count four to the existing native Tier4 still | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER3-RUNTIME-001`, `REIMU-TIER4-INTAKE-001` |
-| `REIMU-WORK-TRANSITIONS-001` · Author transitions around native workload eating | animation-delivery | **specification** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER2-RUNTIME-001`, `REIMU-TIER3-RUNTIME-001`, `REIMU-TIER4-RUNTIME-001` |
+| `REIMU-TIER5-INTAKE-001` · Prepare and review the existing Tier5 meal still | animation-delivery | **complete** | specification, implementation, technical, visual | — |
+| `REIMU-TIER5-RUNTIME-001` · Connect five or more observed tasks to the existing native Tier5 still | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER4-RUNTIME-001`, `REIMU-TIER5-INTAKE-001` |
+| `REIMU-WORK-TRANSITIONS-001` · Author transitions around native workload eating | animation-delivery | **specification** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER2-RUNTIME-001`, `REIMU-TIER3-RUNTIME-001`, `REIMU-TIER4-RUNTIME-001`, `REIMU-TIER5-RUNTIME-001` |
 
 <a id="harness-keyframes-001"></a>
 ## `HARNESS-KEYFRAMES-001` · Release keyframe tracks and the discrete pulse curve
@@ -114,6 +116,34 @@ Derived stage: **complete**.
 | visual | yes | `approved` | [2026-09-20-reimu-tier4-native-static-slice.md](../docs/decisions/2026-09-20-reimu-tier4-native-static-slice.md), [2026-09-20-reimu-tier4-visual-approval.md](../docs/decisions/2026-09-20-reimu-tier4-visual-approval.md) | The user approved the reviewed native size, placement, support and crop, static hold, Tier 2/3/4 switching, immediate preemption, and latest-count recovery on 2026-09-20. |
 | consumer | yes | `verified` | [2026-09-20-reimu-tier4-native-static-slice.md](../docs/decisions/2026-09-20-reimu-tier4-native-static-slice.md), [2026-09-20-reimu-tier4-visual-approval.md](../docs/decisions/2026-09-20-reimu-tier4-visual-approval.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/aa820f07a1352f5e9291548f08187e408aada5bd) | The published Consumer source selects Tier4 only for working plus exact count four, independently degrades a broken package, and accepts the approved manifest in preview or production identity. |
 | publication | yes | `published` | [2026-09-20-reimu-tier4-publication.md](../docs/decisions/2026-09-20-reimu-tier4-publication.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/aa820f07a1352f5e9291548f08187e408aada5bd) | The exact Consumer commit is verified on origin/main; no application installation, tag, or package release is implied. |
+
+<a id="reimu-tier5-intake-001"></a>
+## `REIMU-TIER5-INTAKE-001` · Prepare and review the existing Tier5 meal still
+
+Derived stage: **complete**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-09-20-reimu-tier5-static-intake.md](../docs/decisions/2026-09-20-reimu-tier5-static-intake.md) | Five or more active tasks; immutable existing meal source; one-frame static hold. |
+| implementation | yes | `ready` | [2026-09-20-reimu-tier5-static-intake.md](../docs/decisions/2026-09-20-reimu-tier5-static-intake.md) | Pinned source, plan, normal and reduced builds, previews, and intake report exist under build/reimu-tier5-intake-20260920. |
+| technical | yes | `passed` | [2026-09-20-reimu-tier5-static-intake.md](../docs/decisions/2026-09-20-reimu-tier5-static-intake.md) | Both public CLI pipelines pass with expected ZERO_MOTION; decoded pixels equal the source in normal and reduced motion; the original digest is unchanged. |
+| visual | yes | `approved` | [2026-09-20-reimu-tier5-static-intake.md](../docs/decisions/2026-09-20-reimu-tier5-static-intake.md), [2026-09-20-reimu-tier5-native-static-slice.md](../docs/decisions/2026-09-20-reimu-tier5-native-static-slice.md), [2026-09-20-reimu-tier5-visual-approval.md](../docs/decisions/2026-09-20-reimu-tier5-visual-approval.md) | The user approved the reviewed Tier5 source and native presentation on 2026-09-20; the one-frame source remains a static hold, not a completed animation. |
+| consumer | no | `not_required` | [2026-09-20-reimu-tier5-static-intake.md](../docs/decisions/2026-09-20-reimu-tier5-static-intake.md) | This task covers artwork intake only; native integration is tracked separately by REIMU-TIER5-RUNTIME-001. |
+| publication | no | `not_required` | [2026-09-20-reimu-tier5-static-intake.md](../docs/decisions/2026-09-20-reimu-tier5-static-intake.md) | Local review candidate; no publication requested. |
+
+<a id="reimu-tier5-runtime-001"></a>
+## `REIMU-TIER5-RUNTIME-001` · Connect five or more observed tasks to the existing native Tier5 still
+
+Derived stage: **complete**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-09-20-reimu-tier5-native-static-slice.md](../docs/decisions/2026-09-20-reimu-tier5-native-static-slice.md), [2026-09-20-reimu-tier5-visual-approval.md](../docs/decisions/2026-09-20-reimu-tier5-visual-approval.md) | The single capped tier policy, immutable one-frame source, safe-boundary switching, immediate preemption, latest-count recovery, reduced motion, isolated fallback, and visual approval boundary are explicit. |
+| implementation | yes | `ready` | [2026-09-20-reimu-tier5-native-static-slice.md](../docs/decisions/2026-09-20-reimu-tier5-native-static-slice.md), [2026-09-20-reimu-tier5-visual-approval.md](../docs/decisions/2026-09-20-reimu-tier5-visual-approval.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/d2b6bef76d9b5330f5e56a7ee61fbe86c6cdf9ac) | The published Consumer commit contains the independent resource package, native identity, loader, selector, targeted tests, and the visually approved production-eligible build gate. |
+| technical | yes | `passed` | [2026-09-20-reimu-tier5-native-static-slice.md](../docs/decisions/2026-09-20-reimu-tier5-native-static-slice.md), [2026-09-20-reimu-tier5-visual-approval.md](../docs/decisions/2026-09-20-reimu-tier5-visual-approval.md) | Fresh Swift compilation, behavior, AppKit, resource isolation, fallback, observer, tool, repository, signature, archive, and isolated runtime capture checks passed. |
+| visual | yes | `approved` | [2026-09-20-reimu-tier5-native-static-slice.md](../docs/decisions/2026-09-20-reimu-tier5-native-static-slice.md), [2026-09-20-reimu-tier5-visual-approval.md](../docs/decisions/2026-09-20-reimu-tier5-visual-approval.md) | The user approved the reviewed native size, placement, support and crop, static hold, Tier2/3/4/5 switching, capped selection, immediate preemption, and latest-count recovery on 2026-09-20. |
+| consumer | yes | `verified` | [2026-09-20-reimu-tier5-native-static-slice.md](../docs/decisions/2026-09-20-reimu-tier5-native-static-slice.md), [2026-09-20-reimu-tier5-visual-approval.md](../docs/decisions/2026-09-20-reimu-tier5-visual-approval.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/d2b6bef76d9b5330f5e56a7ee61fbe86c6cdf9ac) | The published Consumer source selects Tier5 only through the single capped mapping while working, independently degrades a broken package, and accepts the approved manifest in preview or production identity. |
+| publication | yes | `published` | [2026-09-20-reimu-tier5-publication.md](../docs/decisions/2026-09-20-reimu-tier5-publication.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/d2b6bef76d9b5330f5e56a7ee61fbe86c6cdf9ac) | The exact Consumer commit is verified on origin/main; no application installation, tag, or package release is implied. |
 
 <a id="reimu-work-transitions-001"></a>
 ## `REIMU-WORK-TRANSITIONS-001` · Author transitions around native workload eating

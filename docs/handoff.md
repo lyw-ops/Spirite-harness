@@ -1,5 +1,51 @@
 # Project handoff
 
+## 2026-09-20 Tier5 Consumer 源码已发布，未安装
+
+Consumer收口提交`d2b6bef76d9b5330f5e56a7ee61fbe86c6cdf9ac`已推送至`origin/main`，
+并由`git ls-remote`核验远端`refs/heads/main`为同一SHA。提交包含已批准的独立
+`work_eating_task_5`身份、唯一封顶策略下的5及以上选择、安全循环边界、高优先级抢占、
+最新数量恢复、独立摘要校验/回退、资源包、测试与交接记录。
+
+Tier5 runtime账本的publication门据此关闭。没有安装应用、创建tag或发布安装包；一帧
+task_5仍是静态保持，不是多帧吃饭动画。完整边界见
+`docs/decisions/2026-09-20-reimu-tier5-publication.md`。
+
+## 2026-09-20 Tier5 原生静态切片已获视觉批准，正式打包门已解除
+
+用户查看`build/reimu-tier5-runtime-v1/runtime-preview/review-sheet.png`、
+`runtime-review.gif`与`qa/native-size-review.png`后回复“可以，收口后接着做”。本次批准绑定
+原图SHA-256 `ffd3752c4cdf333a88dc70e766dc4fbdf584662bb242365b3a3ff8a2860f8342`和已展示的
+原生大小、摆放、支撑/裁切、单帧静态保持、Tier2/3/4/5切换、5及以上封顶选择、
+`needs_input`立即抢占及最新count=4恢复。这不构成多帧吃饭动画、额外过渡或安装批准。
+
+Consumer资源manifest只更新批准说明，当前SHA-256为
+`0b48b3730b2b26e6043af5a229bd0033fc6b97615e1d67dc14a4897cc4fd9a3f`，所有PNG与播放声明
+不变。`build.py --work-tier-5`不再强制preview；批准后的preview与临时非preview门验证都
+完成全新源码编译并通过严格签名。没有安装、tag或安装包发布。完整边界见
+`docs/decisions/2026-09-20-reimu-tier5-visual-approval.md`。
+
+## 2026-09-20 Tier5 原生静态垂直切片技术预览完成，等待视觉确认
+
+Consumer当前未提交工作区新增独立`work_eating_task_5`身份和静态资源包。唯一
+`PetBehavior.foodTier(activeTaskCount:)`策略继续将5及以上封顶为Tier5；真实count=4仍选
+Tier4，没有复制第二处`>= 5`判断。Tier2动态循环切入Tier5等待1.6秒安全边界，Tier3/4/5
+静帧离开无额外等待；failure、needs_input、点击、拖动和暂停立即抢占，恢复读取最新任务数。
+Tier5资源缺失、manifest或摘要不匹配只降级Tier5，不影响其他档位、站立、手动吃饭或托腮。
+
+现有596×596 RGBA源、运行时base、唯一125ms帧及普通/减少动态Harness输出逐字节相同，
+SHA-256为`ffd3752c4cdf333a88dc70e766dc4fbdf584662bb242365b3a3ff8a2860f8342`。没有重绘、
+分割、缩放或整场摇动；这仍是静态保持，不是吃饭动画完成。
+
+独立1.12/build14预览位于`build/reimu-tier5-runtime-v1/`。MacOSX26.5.sdk全新源码编译、
+稳定ZIP全新解包与严格签名通过；190项行为、36项原生AppKit、125项Consumer工具、14项
+bridge、31项状态、Tier2/3/4/5各4项加载回退、表情3项、站姿5项及仓库门禁通过。隔离截图
+覆盖Tier2/3/4、count=5、count=9封顶Tier5、needs_input抢占及最新count=4恢复，5次Tier5
+捕获相同。160pt原生测量中Tier5约119.5×154.5pt，底部支撑余量2.5pt，无裁切；Tier2/3/4/5
+同尺度差异均保留展示。技术与Consumer接入已验证，用户视觉确认仍待完成；`--work-tier-5`
+强制preview。没有安装、Tier5 commit、push、tag或发布。详见
+`docs/decisions/2026-09-20-reimu-tier5-native-static-slice.md`。
+
 ## 2026-09-20 Tier 4 Consumer 源码已发布，未安装
 
 Consumer收口提交`aa820f07a1352f5e9291548f08187e408aada5bd`已推送至`origin/main`，
