@@ -309,7 +309,8 @@
         "REIMU-TIER2-RUNTIME-001",
         "REIMU-TIER3-RUNTIME-001",
         "REIMU-TIER4-RUNTIME-001",
-        "REIMU-TIER5-RUNTIME-001"
+        "REIMU-TIER5-RUNTIME-001",
+        "REIMU-TIER1-RUNTIME-001"
       ],
       "required_gates": [
         "specification",
@@ -599,6 +600,131 @@
           "evidence": [
             "docs/decisions/2026-09-20-reimu-tier5-publication.md",
             "https://github.com/lyw-ops/gensokyo-codex-pets/commit/d2b6bef76d9b5330f5e56a7ee61fbe86c6cdf9ac"
+          ],
+          "note": "The exact Consumer commit is verified on origin/main; no application installation, tag, or package release is implied."
+        }
+      }
+    },
+    "REIMU-TIER1-INTAKE-001": {
+      "title": "Prepare and review the existing Tier1 onigiri still",
+      "kind": "animation-delivery",
+      "depends_on": [],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier1-static-intake.md"
+          ],
+          "note": "Exact count one; immutable existing onigiri source; one-frame static hold."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier1-static-intake.md"
+          ],
+          "note": "Pinned source, plan, normal and reduced builds, previews, and intake report exist under build/reimu-tier1-intake-20260920."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier1-static-intake.md"
+          ],
+          "note": "Both public CLI pipelines pass with expected ZERO_MOTION; decoded pixels equal the source in normal and reduced motion; the original digest is unchanged."
+        },
+        "visual": {
+          "status": "approved",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier1-static-intake.md",
+            "docs/decisions/2026-09-20-reimu-tier1-native-static-slice.md",
+            "docs/decisions/2026-09-20-reimu-tier1-visual-approval.md"
+          ],
+          "note": "The user approved the reviewed Tier1 source and native presentation on 2026-09-20; the one-frame source remains a static hold, not a completed animation."
+        },
+        "consumer": {
+          "status": "not_required",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier1-static-intake.md"
+          ],
+          "note": "This task covers artwork intake only; native integration is tracked separately by REIMU-TIER1-RUNTIME-001."
+        },
+        "publication": {
+          "status": "not_required",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier1-static-intake.md"
+          ],
+          "note": "Local review candidate; no publication requested."
+        }
+      }
+    },
+    "REIMU-TIER1-RUNTIME-001": {
+      "title": "Connect observed count one to the existing native Tier1 still",
+      "kind": "consumer-vertical-slice",
+      "depends_on": [
+        "REIMU-TIER5-RUNTIME-001",
+        "REIMU-TIER1-INTAKE-001"
+      ],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual",
+        "consumer",
+        "publication"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier1-native-static-slice.md",
+            "docs/decisions/2026-09-20-reimu-tier1-visual-approval.md"
+          ],
+          "note": "Exact count one through the single tier policy, immutable one-frame source, safe-boundary switching, immediate preemption, latest-count recovery, reduced motion, isolated fallback, and visual approval boundary are explicit."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier1-native-static-slice.md",
+            "docs/decisions/2026-09-20-reimu-tier1-visual-approval.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/c2684cc3fecbdfbe0ae238a13f8e22fef333295d"
+          ],
+          "note": "The published Consumer commit contains the independent resource package, native identity, loader, selector, targeted tests, and the visually approved production-eligible build gate."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier1-native-static-slice.md",
+            "docs/decisions/2026-09-20-reimu-tier1-visual-approval.md"
+          ],
+          "note": "Fresh Swift compilation, behavior, AppKit, resource isolation, fallback, observer, tool, repository, signature, archive, and isolated runtime capture checks passed."
+        },
+        "visual": {
+          "status": "approved",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier1-native-static-slice.md",
+            "docs/decisions/2026-09-20-reimu-tier1-visual-approval.md"
+          ],
+          "note": "The user approved the reviewed native size, placement, support and crop, static hold, Tier1–5 switching, immediate preemption, and latest-count recovery on 2026-09-20."
+        },
+        "consumer": {
+          "status": "verified",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier1-native-static-slice.md",
+            "docs/decisions/2026-09-20-reimu-tier1-visual-approval.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/c2684cc3fecbdfbe0ae238a13f8e22fef333295d"
+          ],
+          "note": "The published Consumer source selects Tier1 only through the single mapping while working with exact count one, independently degrades a broken package, and accepts the approved manifest in preview or production identity."
+        },
+        "publication": {
+          "status": "published",
+          "evidence": [
+            "docs/decisions/2026-09-20-reimu-tier1-publication.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/c2684cc3fecbdfbe0ae238a13f8e22fef333295d"
           ],
           "note": "The exact Consumer commit is verified on origin/main; no application installation, tag, or package release is implied."
         }

@@ -1,5 +1,55 @@
 # Project handoff
 
+## 2026-09-20 Tier1 Consumer 源码已发布，未安装
+
+Consumer收口提交`c2684cc3fecbdfbe0ae238a13f8e22fef333295d`已推送至`origin/main`，
+`git ls-remote`独立核对一致。发布范围包含`work_eating_task_1`、单一档位策略中的exact-count
+one选择、安全循环边界、高优先级立即抢占、最新任务数恢复、独立摘要钉死静态包、隔离回退、
+批准后构建门与测试文档。
+
+源/base/frame仍为SHA-256
+`8dd9ff95bcfc2a891c997564496097328ec800d83b887ed08b54a608fe410e0e`，批准后manifest为
+`ad9e4b9887359df3d2567d434ab169993b33e5026578e50351a0722c0624b84f`。没有安装应用、创建
+tag或发布安装包；Tier1仍是一帧静态保持，不是多帧吃饭动画。详见
+`docs/decisions/2026-09-20-reimu-tier1-publication.md`。
+
+## 2026-09-20 Tier1 原生静态切片已获视觉批准，进入源码收口
+
+用户查看`build/reimu-tier1-runtime-v1/runtime-preview/runtime-review.gif`、
+`review-sheet.png`和`qa/native-size-review.png`后回复“收口”。批准绑定task_1原图
+SHA-256 `8dd9ff95bcfc2a891c997564496097328ec800d83b887ed08b54a608fe410e0e`
+及已展示的原生大小、摆放、支撑/裁切、单帧静态保持、Tier1–5切换、高优先级抢占与最新
+任务数恢复；不包含多帧吃饭动画、过渡、安装、tag或安装包发布。
+
+Consumer manifest只更新批准说明，批准后SHA-256为
+`ad9e4b9887359df3d2567d434ab169993b33e5026578e50351a0722c0624b84f`；图像与唯一帧摘要
+不变。`--work-tier-1`生产构建门已释放，仍严格钉死manifest、身份、画布、播放与图像摘要。
+批准后MacOSX26.5.sdk预览与`/private/tmp`临时正式身份双构建、严格签名、198项行为、37项
+原生AppKit、125项Consumer工具（无跳过）、14项bridge、31项状态、Tier1–5各4项隔离回退、
+表情3项、站姿5项、浏览器runtime、Consumer仓库门禁及Harness 674项聚合检查均通过。没有
+安装应用；源码提交与远端核对已由上方发布记录完成。详见
+`docs/decisions/2026-09-20-reimu-tier1-visual-approval.md`。
+
+## 2026-09-20 Tier1 原生静态垂直切片技术预览完成，等待视觉确认
+
+当前Tier2–5已发布，Consumer未提交工作区补入唯一缺失的exact-count Tier1：独立
+`work_eating_task_1`身份和静态资源包只通过现有`PetBehavior.foodTier(activeTaskCount:)`
+策略在真实`working + count=1`时选择。Tier2动态循环切入等待1.6秒安全边界，所有静态餐档
+离开无额外等待；高优先级事件立即抢占，恢复读取最新任务数。Tier1资源损坏只降级Tier1。
+
+596×596 RGBA源、运行时base、唯一125ms帧及普通/减少动态Harness输出逐字节相同，SHA-256为
+`8dd9ff95bcfc2a891c997564496097328ec800d83b887ed08b54a608fe410e0e`。没有重绘、分割、
+缩放或整场摇动；这仍是静态保持，不是吃饭动画完成。
+
+独立1.13/build15预览位于`build/reimu-tier1-runtime-v1/`。MacOSX26.5.sdk全新源码编译、稳定
+ZIP全新解包与严格签名通过；198项行为、37项原生AppKit、125项Consumer工具、14项bridge、
+31项状态、Tier1–5各4项加载回退、表情3项、站姿5项及仓库门禁通过。隔离截图覆盖Tier2动态
+切入Tier1、全部五档、count=9封顶Tier5、needs_input抢占及最新count=4恢复，5次Tier1捕获
+相同。160pt Tier1约118×137.5pt，支撑余量2.5pt且无裁切；较矮占地来自原稿伏桌姿态，未
+人为放大。技术与Consumer接入已验证，用户视觉确认仍待完成；`--work-tier-1`强制preview。
+没有安装、Tier1 commit、push、tag或发布。详见
+`docs/decisions/2026-09-20-reimu-tier1-native-static-slice.md`。
+
 ## 2026-09-20 Tier5 Consumer 源码已发布，未安装
 
 Consumer收口提交`d2b6bef76d9b5330f5e56a7ee61fbe86c6cdf9ac`已推送至`origin/main`，
