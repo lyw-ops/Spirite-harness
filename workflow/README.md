@@ -16,7 +16,7 @@ is supplementary and never the only status signal.
 ## Current summary
 
 <!-- BEGIN GENERATED SUMMARY -->
-**11 complete** · **2 implementation** · **1 visual review**
+**14 complete** · **2 implementation** · **1 visual review**
 <!-- END GENERATED SUMMARY -->
 
 ## Task register
@@ -27,8 +27,11 @@ is supplementary and never the only status signal.
 | [`HARNESS-KEYFRAMES-001`](STATUS.md#harness-keyframes-001) | **complete** | — |
 | [`HARNESS-WORKFLOW-001`](STATUS.md#harness-workflow-001) | **complete** | — |
 | [`REIMU-ACTIONS-001`](STATUS.md#reimu-actions-001) | **implementation** | implementation |
+| [`REIMU-SCENE-REACTIONS-001`](STATUS.md#reimu-scene-reactions-001) | **visual review** | visual review |
 | [`REIMU-TIER-EMOTE-LOOPS-INTAKE-001`](STATUS.md#reimu-tier-emote-loops-intake-001) | **complete** | — |
-| [`REIMU-TIER-EMOTE-LOOPS-RUNTIME-001`](STATUS.md#reimu-tier-emote-loops-runtime-001) | **visual review** | visual review |
+| [`REIMU-TIER-EMOTE-LOOPS-RUNTIME-001`](STATUS.md#reimu-tier-emote-loops-runtime-001) | **complete** | — |
+| [`REIMU-TIER-FACE-LOOPS-INTAKE-001`](STATUS.md#reimu-tier-face-loops-intake-001) | **complete** | — |
+| [`REIMU-TIER-FACE-LOOPS-RUNTIME-001`](STATUS.md#reimu-tier-face-loops-runtime-001) | **complete** | — |
 | [`REIMU-TIER1-INTAKE-001`](STATUS.md#reimu-tier1-intake-001) | **complete** | — |
 | [`REIMU-TIER1-RUNTIME-001`](STATUS.md#reimu-tier1-runtime-001) | **complete** | — |
 | [`REIMU-TIER2-RUNTIME-001`](STATUS.md#reimu-tier2-runtime-001) | **complete** | — |
@@ -51,8 +54,11 @@ flowchart LR
     N_HARNESS_KEYFRAMES_001["✓ HARNESS-KEYFRAMES-001<br/>Release keyframe tracks and the discrete pulse curve<br/>stage: complete"]
     N_HARNESS_WORKFLOW_001["✓ HARNESS-WORKFLOW-001<br/>Adopt the evidence-bound Sprite Harness workflow<br/>stage: complete"]
     N_REIMU_ACTIONS_001["◐ REIMU-ACTIONS-001<br/>Produce the six-tier work-eating, idle onigiri, and grabbed-drag action set<br/>stage: implementation"]
+    N_REIMU_SCENE_REACTIONS_001["◐ REIMU-SCENE-REACTIONS-001<br/>Scene-aware click reactions, Reimu-voiced lines, and plain standing idle<br/>stage: visual review"]
     N_REIMU_TIER_EMOTE_LOOPS_INTAKE_001["✓ REIMU-TIER-EMOTE-LOOPS-INTAKE-001<br/>Prepare emote-layer life loops for the static Tier1/3/4/5 stills<br/>stage: complete"]
-    N_REIMU_TIER_EMOTE_LOOPS_RUNTIME_001["◐ REIMU-TIER-EMOTE-LOOPS-RUNTIME-001<br/>Play the Tier1/3/4/5 emote loops in the native pet<br/>stage: visual review"]
+    N_REIMU_TIER_EMOTE_LOOPS_RUNTIME_001["✓ REIMU-TIER-EMOTE-LOOPS-RUNTIME-001<br/>Play the Tier1/3/4/5 emote loops in the native pet<br/>stage: complete"]
+    N_REIMU_TIER_FACE_LOOPS_INTAKE_001["✓ REIMU-TIER-FACE-LOOPS-INTAKE-001<br/>Prepare face-motion candidates for the Tier3/4/5 loops<br/>stage: complete"]
+    N_REIMU_TIER_FACE_LOOPS_RUNTIME_001["✓ REIMU-TIER-FACE-LOOPS-RUNTIME-001<br/>Play the Tier3/4/5 face loops in the native pet<br/>stage: complete"]
     N_REIMU_TIER1_INTAKE_001["✓ REIMU-TIER1-INTAKE-001<br/>Prepare and review the existing Tier1 onigiri still<br/>stage: complete"]
     N_REIMU_TIER1_RUNTIME_001["✓ REIMU-TIER1-RUNTIME-001<br/>Connect observed count one to the existing native Tier1 still<br/>stage: complete"]
     N_REIMU_TIER2_RUNTIME_001["✓ REIMU-TIER2-RUNTIME-001<br/>Connect observed count two to the approved native task_2 loop<br/>stage: complete"]
@@ -63,12 +69,16 @@ flowchart LR
     N_REIMU_TIER5_RUNTIME_001["✓ REIMU-TIER5-RUNTIME-001<br/>Connect five or more observed tasks to the existing native Tier5 still<br/>stage: complete"]
     N_REIMU_WORK_TRANSITIONS_001["◐ REIMU-WORK-TRANSITIONS-001<br/>Author transitions around native workload eating<br/>stage: implementation"]
     N_HARNESS_KEYFRAMES_001 --> N_REIMU_ACTIONS_001
+    N_REIMU_TIER_EMOTE_LOOPS_RUNTIME_001 --> N_REIMU_SCENE_REACTIONS_001
     N_REIMU_TIER1_INTAKE_001 --> N_REIMU_TIER_EMOTE_LOOPS_INTAKE_001
     N_REIMU_TIER4_INTAKE_001 --> N_REIMU_TIER_EMOTE_LOOPS_INTAKE_001
     N_REIMU_TIER5_INTAKE_001 --> N_REIMU_TIER_EMOTE_LOOPS_INTAKE_001
     N_REIMU_TIER3_RUNTIME_001 --> N_REIMU_TIER_EMOTE_LOOPS_INTAKE_001
     N_REIMU_TIER_EMOTE_LOOPS_INTAKE_001 --> N_REIMU_TIER_EMOTE_LOOPS_RUNTIME_001
     N_REIMU_TIER1_RUNTIME_001 --> N_REIMU_TIER_EMOTE_LOOPS_RUNTIME_001
+    N_REIMU_TIER_EMOTE_LOOPS_INTAKE_001 --> N_REIMU_TIER_FACE_LOOPS_INTAKE_001
+    N_REIMU_TIER_FACE_LOOPS_INTAKE_001 --> N_REIMU_TIER_FACE_LOOPS_RUNTIME_001
+    N_REIMU_TIER_EMOTE_LOOPS_RUNTIME_001 --> N_REIMU_TIER_FACE_LOOPS_RUNTIME_001
     N_REIMU_TIER5_RUNTIME_001 --> N_REIMU_TIER1_RUNTIME_001
     N_REIMU_TIER1_INTAKE_001 --> N_REIMU_TIER1_RUNTIME_001
     N_REIMU_ACTIONS_001 --> N_REIMU_TIER2_RUNTIME_001
@@ -85,7 +95,7 @@ flowchart LR
     classDef complete fill:#dbeafe,stroke:#1d4ed8,color:#172554;
     classDef active fill:#ffedd5,stroke:#c2410c,color:#431407;
     classDef blocked fill:#fee2e2,stroke:#b91c1c,color:#450a0a;
-    class N_HARNESS_KEYFRAMES_001,N_HARNESS_WORKFLOW_001,N_REIMU_TIER_EMOTE_LOOPS_INTAKE_001,N_REIMU_TIER1_INTAKE_001,N_REIMU_TIER1_RUNTIME_001,N_REIMU_TIER2_RUNTIME_001,N_REIMU_TIER3_RUNTIME_001,N_REIMU_TIER4_INTAKE_001,N_REIMU_TIER4_RUNTIME_001,N_REIMU_TIER5_INTAKE_001,N_REIMU_TIER5_RUNTIME_001 complete;
-    class N_REIMU_ACTIONS_001,N_REIMU_TIER_EMOTE_LOOPS_RUNTIME_001,N_REIMU_WORK_TRANSITIONS_001 active;
+    class N_HARNESS_KEYFRAMES_001,N_HARNESS_WORKFLOW_001,N_REIMU_TIER_EMOTE_LOOPS_INTAKE_001,N_REIMU_TIER_EMOTE_LOOPS_RUNTIME_001,N_REIMU_TIER_FACE_LOOPS_INTAKE_001,N_REIMU_TIER_FACE_LOOPS_RUNTIME_001,N_REIMU_TIER1_INTAKE_001,N_REIMU_TIER1_RUNTIME_001,N_REIMU_TIER2_RUNTIME_001,N_REIMU_TIER3_RUNTIME_001,N_REIMU_TIER4_INTAKE_001,N_REIMU_TIER4_RUNTIME_001,N_REIMU_TIER5_INTAKE_001,N_REIMU_TIER5_RUNTIME_001 complete;
+    class N_REIMU_ACTIONS_001,N_REIMU_SCENE_REACTIONS_001,N_REIMU_WORK_TRANSITIONS_001 active;
 ```
 <!-- END GENERATED TREE -->

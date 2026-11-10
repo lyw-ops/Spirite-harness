@@ -11,8 +11,11 @@ A gate records one claim only. In particular, `technical: passed` never supplies
 | `HARNESS-KEYFRAMES-001` · Release keyframe tracks and the discrete pulse curve | core-capability | **complete** | specification, implementation, technical, consumer, publication | — |
 | `HARNESS-WORKFLOW-001` · Adopt the evidence-bound Sprite Harness workflow | infrastructure | **complete** | specification, implementation, technical, publication | — |
 | `REIMU-ACTIONS-001` · Produce the six-tier work-eating, idle onigiri, and grabbed-drag action set | animation-delivery | **implementation** | specification, implementation, technical, visual, consumer, publication | `HARNESS-KEYFRAMES-001` |
+| `REIMU-SCENE-REACTIONS-001` · Scene-aware click reactions, Reimu-voiced lines, and plain standing idle | consumer-vertical-slice | **visual review** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER-EMOTE-LOOPS-RUNTIME-001` |
 | `REIMU-TIER-EMOTE-LOOPS-INTAKE-001` · Prepare emote-layer life loops for the static Tier1/3/4/5 stills | animation-delivery | **complete** | specification, implementation, technical, visual | `REIMU-TIER1-INTAKE-001`, `REIMU-TIER4-INTAKE-001`, `REIMU-TIER5-INTAKE-001`, `REIMU-TIER3-RUNTIME-001` |
-| `REIMU-TIER-EMOTE-LOOPS-RUNTIME-001` · Play the Tier1/3/4/5 emote loops in the native pet | consumer-vertical-slice | **visual review** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER-EMOTE-LOOPS-INTAKE-001`, `REIMU-TIER1-RUNTIME-001` |
+| `REIMU-TIER-EMOTE-LOOPS-RUNTIME-001` · Play the Tier1/3/4/5 emote loops in the native pet | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER-EMOTE-LOOPS-INTAKE-001`, `REIMU-TIER1-RUNTIME-001` |
+| `REIMU-TIER-FACE-LOOPS-INTAKE-001` · Prepare face-motion candidates for the Tier3/4/5 loops | animation-delivery | **complete** | specification, implementation, technical, visual | `REIMU-TIER-EMOTE-LOOPS-INTAKE-001` |
+| `REIMU-TIER-FACE-LOOPS-RUNTIME-001` · Play the Tier3/4/5 face loops in the native pet | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER-FACE-LOOPS-INTAKE-001`, `REIMU-TIER-EMOTE-LOOPS-RUNTIME-001` |
 | `REIMU-TIER1-INTAKE-001` · Prepare and review the existing Tier1 onigiri still | animation-delivery | **complete** | specification, implementation, technical, visual | — |
 | `REIMU-TIER1-RUNTIME-001` · Connect observed count one to the existing native Tier1 still | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER5-RUNTIME-001`, `REIMU-TIER1-INTAKE-001` |
 | `REIMU-TIER2-RUNTIME-001` · Connect observed count two to the approved native task_2 loop | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-ACTIONS-001` |
@@ -65,6 +68,20 @@ Derived stage: **implementation**.
 | consumer | yes | `pending` | — | Native runtime state selection, interruption, landing, and tier switching remain separately verifiable. |
 | publication | yes | `unpublished` | — | The design commit is published; the complete action delivery is not. |
 
+<a id="reimu-scene-reactions-001"></a>
+## `REIMU-SCENE-REACTIONS-001` · Scene-aware click reactions, Reimu-voiced lines, and plain standing idle
+
+Derived stage: **visual review**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md) | Reaction words follow the scene on screen; light clicks never cut away from a work meal; idle only stands unless the user opts back in. |
+| implementation | yes | `ready` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/2c62a77067d53746824946eeeb4c6c8ff2522175) | PetScene, PetLines, held work artwork during light reactions, idleAutonomy and its menu toggle exist in the published Consumer commit. |
+| technical | yes | `passed` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md) | 217 behavior, 37 native AppKit, 31 status, per-tier loader and fallback checks and strict signatures passed on the 1.16/build 18 bundle. |
+| visual | yes | `in_review` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md) | The lines and the idle change were installed on the user's request without a line-by-line review. |
+| consumer | yes | `verified` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/2c62a77067d53746824946eeeb4c6c8ff2522175) | Installed 1.16 runs with the new reactions; idle autonomy is off by default in the production identity. |
+| publication | yes | `published` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/2c62a77067d53746824946eeeb4c6c8ff2522175) | The maintainer asked to commit and push on 2026-11-10; the exact Consumer commit was verified on origin/main. No tag or package release is implied. |
+
 <a id="reimu-tier-emote-loops-intake-001"></a>
 ## `REIMU-TIER-EMOTE-LOOPS-INTAKE-001` · Prepare emote-layer life loops for the static Tier1/3/4/5 stills
 
@@ -82,16 +99,44 @@ Derived stage: **complete**.
 <a id="reimu-tier-emote-loops-runtime-001"></a>
 ## `REIMU-TIER-EMOTE-LOOPS-RUNTIME-001` · Play the Tier1/3/4/5 emote loops in the native pet
 
-Derived stage: **visual review**.
+Derived stage: **complete**.
 
 | Gate | Required | Status | Evidence | Boundary note |
 | --- | --- | --- | --- | --- |
 | specification | yes | `ready` | [2026-11-10-reimu-tier-emote-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-runtime.md) | 24-frame 10 fps loops whose first and last frames are the approved still; tier switching, preemption, reduced motion and isolated fallback are unchanged. |
 | implementation | yes | `ready` | [2026-11-10-reimu-tier-emote-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-runtime.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/0c814aa95ec464bbadef6a2c3344b9724b73b302) | The published Consumer commit contains the four exact-frame packages, builder pins, clip specs, frame selection, tests, and repository gate. |
 | technical | yes | `passed` | [2026-11-10-reimu-tier-emote-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-runtime.md) | Fresh 1.14/build 16 compilation, 198 behavior, 37 native AppKit, 31 status, per-tier loader and fallback checks, repository gate and strict signatures passed. |
-| visual | yes | `in_review` | [2026-11-10-reimu-tier-emote-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-runtime.md) | The approved v1 motion was re-timed (v2) so the last frame rests on the still; the v2 result and its native presentation were installed without a second review. |
+| visual | yes | `approved` | [2026-11-10-reimu-tier-emote-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-runtime.md), [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md) | The user replied "v2可以" on 2026-11-10 after the re-timed v2 loops were installed as 1.14/build 16 and the v2 review GIF was shown. Approval covers symbol motion only. |
 | consumer | yes | `verified` | [2026-11-10-reimu-tier-emote-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-runtime.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/0c814aa95ec464bbadef6a2c3344b9724b73b302) | The installed 1.14 loads all four loops, selects loop frames while working, holds frame 0 under reduced motion, and degrades a damaged package to standing on its own. |
 | publication | yes | `published` | [2026-11-10-reimu-tier-emote-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-runtime.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/0c814aa95ec464bbadef6a2c3344b9724b73b302) | The maintainer asked to commit and push on 2026-11-10; the exact Consumer commit was verified on origin/main. No tag or package release is implied. |
+
+<a id="reimu-tier-face-loops-intake-001"></a>
+## `REIMU-TIER-FACE-LOOPS-INTAKE-001` · Prepare face-motion candidates for the Tier3/4/5 loops
+
+Derived stage: **complete**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-11-10-reimu-tier-face-loops-intake.md](../docs/decisions/2026-11-10-reimu-tier-face-loops-intake.md) | Local continuous warps of approved pixels inside measured boxes; rest frames and reduced motion equal the approved still. |
+| implementation | yes | `ready` | [2026-11-10-reimu-tier-face-loops-intake.md](../docs/decisions/2026-11-10-reimu-tier-face-loops-intake.md) | Candidates exist for Tier3 chew, Tier4 noodle sway and Tier5 laugh under build/reimu-tier-face-loops-v1; the Tier1 blink was rejected and removed. |
+| technical | yes | `passed` | [2026-11-10-reimu-tier-face-loops-intake.md](../docs/decisions/2026-11-10-reimu-tier-face-loops-intake.md) | All eight public CLI builds validate and every change stays inside the emote and face regions. The motion is faint at 160 px and Tier5 has residual edge artifacts. |
+| visual | yes | `approved` | [2026-11-10-reimu-tier-face-loops-intake.md](../docs/decisions/2026-11-10-reimu-tier-face-loops-intake.md), [2026-11-10-reimu-tier-face-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-face-loops-runtime.md) | The user reviewed the GIFs and zoomed pose sheet and replied "接入这三个" on 2026-11-10 for Tier3, Tier4 and Tier5. The rejected Tier1 blink is not part of the approval. |
+| consumer | no | `not_required` | [2026-11-10-reimu-tier-face-loops-intake.md](../docs/decisions/2026-11-10-reimu-tier-face-loops-intake.md) | Intake only. |
+| publication | no | `not_required` | [2026-11-10-reimu-tier-face-loops-intake.md](../docs/decisions/2026-11-10-reimu-tier-face-loops-intake.md) | Local review candidate. |
+
+<a id="reimu-tier-face-loops-runtime-001"></a>
+## `REIMU-TIER-FACE-LOOPS-RUNTIME-001` · Play the Tier3/4/5 face loops in the native pet
+
+Derived stage: **complete**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-11-10-reimu-tier-face-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-face-loops-runtime.md) | Same 24-frame 10 fps contract as the emote loops; first and last frames are the approved still; Tier1 keeps its emote loop. |
+| implementation | yes | `ready` | [2026-11-10-reimu-tier-face-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-face-loops-runtime.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/2c62a77067d53746824946eeeb4c6c8ff2522175) | Three exact-frame packages, builder pins and the repository gate exist in the published Consumer commit. |
+| technical | yes | `passed` | [2026-11-10-reimu-tier-face-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-face-loops-runtime.md) | Fresh 1.17/build 19 compilation, 217 behavior, 37 native AppKit, 31 status, per-tier loader and fallback checks, repository gate and strict signatures passed. |
+| visual | yes | `approved` | [2026-11-10-reimu-tier-face-loops-intake.md](../docs/decisions/2026-11-10-reimu-tier-face-loops-intake.md), [2026-11-10-reimu-tier-face-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-face-loops-runtime.md) | The integrated frames are exactly the reviewed candidates; native placement of these tiers was approved on 2026-09-20. The user had reduced motion switched on at install time, so on-screen playback was not observed. |
+| consumer | yes | `verified` | [2026-11-10-reimu-tier-face-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-face-loops-runtime.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/2c62a77067d53746824946eeeb4c6c8ff2522175) | The installed 1.17 loads all three face loops and keeps the per-tier isolated fallback. |
+| publication | yes | `published` | [2026-11-10-reimu-tier-face-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-face-loops-runtime.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/2c62a77067d53746824946eeeb4c6c8ff2522175) | The maintainer asked to commit and push on 2026-11-10; the exact Consumer commit was verified on origin/main. No tag or package release is implied. |
 
 <a id="reimu-tier1-intake-001"></a>
 ## `REIMU-TIER1-INTAKE-001` · Prepare and review the existing Tier1 onigiri still
