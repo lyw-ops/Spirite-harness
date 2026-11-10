@@ -11,7 +11,11 @@ A gate records one claim only. In particular, `technical: passed` never supplies
 | `HARNESS-KEYFRAMES-001` · Release keyframe tracks and the discrete pulse curve | core-capability | **complete** | specification, implementation, technical, consumer, publication | — |
 | `HARNESS-WORKFLOW-001` · Adopt the evidence-bound Sprite Harness workflow | infrastructure | **complete** | specification, implementation, technical, publication | — |
 | `REIMU-ACTIONS-001` · Produce the six-tier work-eating, idle onigiri, and grabbed-drag action set | animation-delivery | **implementation** | specification, implementation, technical, visual, consumer, publication | `HARNESS-KEYFRAMES-001` |
-| `REIMU-SCENE-REACTIONS-001` · Scene-aware click reactions, Reimu-voiced lines, and plain standing idle | consumer-vertical-slice | **visual review** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER-EMOTE-LOOPS-RUNTIME-001` |
+| `REIMU-CUTER-STANDING-INTAKE-001` · Prepare a cuter, more chibi standing figure | animation-delivery | **blocked** | specification, implementation, technical, visual | — |
+| `REIMU-EATING-KEYFRAMES-INTAKE-001` · Author hand and mouth eating keyframes for the work tiers | animation-delivery | **complete** | specification, implementation, technical, visual | `REIMU-TIER-FACE-LOOPS-RUNTIME-001` |
+| `REIMU-EATING-KEYFRAMES-RUNTIME-001` · Play the eating keyframe loops in the native pet (all five work tiers) | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-EATING-KEYFRAMES-INTAKE-001`, `REIMU-TIER-FACE-LOOPS-RUNTIME-001` |
+| `REIMU-PROPS-OFFERING-BOX-INTAKE-001` · Prepare the offering box and coin props for standing scenes | animation-delivery | **blocked** | specification, implementation, technical, visual | `REIMU-SCENE-REACTIONS-001` |
+| `REIMU-SCENE-REACTIONS-001` · Scene-aware click reactions, Reimu-voiced lines, and plain standing idle | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER-EMOTE-LOOPS-RUNTIME-001` |
 | `REIMU-TIER-EMOTE-LOOPS-INTAKE-001` · Prepare emote-layer life loops for the static Tier1/3/4/5 stills | animation-delivery | **complete** | specification, implementation, technical, visual | `REIMU-TIER1-INTAKE-001`, `REIMU-TIER4-INTAKE-001`, `REIMU-TIER5-INTAKE-001`, `REIMU-TIER3-RUNTIME-001` |
 | `REIMU-TIER-EMOTE-LOOPS-RUNTIME-001` · Play the Tier1/3/4/5 emote loops in the native pet | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER-EMOTE-LOOPS-INTAKE-001`, `REIMU-TIER1-RUNTIME-001` |
 | `REIMU-TIER-FACE-LOOPS-INTAKE-001` · Prepare face-motion candidates for the Tier3/4/5 loops | animation-delivery | **complete** | specification, implementation, technical, visual | `REIMU-TIER-EMOTE-LOOPS-INTAKE-001` |
@@ -68,17 +72,73 @@ Derived stage: **implementation**.
 | consumer | yes | `pending` | — | Native runtime state selection, interruption, landing, and tier switching remain separately verifiable. |
 | publication | yes | `unpublished` | — | The design commit is published; the complete action delivery is not. |
 
+<a id="reimu-cuter-standing-intake-001"></a>
+## `REIMU-CUTER-STANDING-INTAKE-001` · Prepare a cuter, more chibi standing figure
+
+Derived stage: **blocked**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-11-10-reimu-cuter-standing-study.md](../docs/decisions/2026-11-10-reimu-cuter-standing-study.md) | Smooth, locally uniform rescale of the approved standing drawing: larger head, smaller body, fixed shoe line. The reading of the request as "the standing pose" is unconfirmed. |
+| implementation | yes | `blocked` | [2026-11-10-reimu-cuter-standing-study.md](../docs/decisions/2026-11-10-reimu-cuter-standing-study.md) | Stopped at the 596 px study after the visual rejection; no production poses were made. |
+| technical | yes | `pending` | [2026-11-10-reimu-cuter-standing-study.md](../docs/decisions/2026-11-10-reimu-cuter-standing-study.md) | Study only: bounds and shoe line were checked, and variant B matches the seated character scale. No package, digest or loader check exists. |
+| visual | yes | `rejected` | [2026-11-10-reimu-cuter-standing-study.md](../docs/decisions/2026-11-10-reimu-cuter-standing-study.md) | The user replied "不太行，保持原样吧" on 2026-11-10. The approved standing figure stays as it is; none of the study variants is to be integrated. |
+| consumer | no | `not_required` | [2026-11-10-reimu-cuter-standing-study.md](../docs/decisions/2026-11-10-reimu-cuter-standing-study.md) | Intake only. |
+| publication | no | `not_required` | [2026-11-10-reimu-cuter-standing-study.md](../docs/decisions/2026-11-10-reimu-cuter-standing-study.md) | Local review candidate. |
+
+<a id="reimu-eating-keyframes-intake-001"></a>
+## `REIMU-EATING-KEYFRAMES-INTAKE-001` · Author hand and mouth eating keyframes for the work tiers
+
+Derived stage: **complete**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-11-10-reimu-eating-keyframes-work-order.md](../docs/decisions/2026-11-10-reimu-eating-keyframes-work-order.md) | Two newly drawn keyframes per tier inside a measured edit box that lies inside the opaque silhouette; everything outside is locked to the approved still. Tier3 is the pilot. |
+| implementation | yes | `ready` | [2026-11-10-reimu-eating-keyframes-work-order.md](../docs/decisions/2026-11-10-reimu-eating-keyframes-work-order.md), [2026-11-10-reimu-eating-keyframes-tier3-pilot.md](../docs/decisions/2026-11-10-reimu-eating-keyframes-tier3-pilot.md), [2026-11-10-reimu-eating-keyframes-tiers-1-2-4-5-candidates.md](../docs/decisions/2026-11-10-reimu-eating-keyframes-tiers-1-2-4-5-candidates.md) | Keyframes for all five tiers were drawn by the local Codex image tool and taken in; Tier2 and Tier5 needed one redraw each. Intake gained an opt-in changed-blob mask for the tiers whose arms move. |
+| technical | yes | `passed` | [2026-11-10-reimu-eating-keyframes-tier3-pilot.md](../docs/decisions/2026-11-10-reimu-eating-keyframes-tier3-pilot.md), [2026-11-10-reimu-eating-keyframes-tiers-1-2-4-5-candidates.md](../docs/decisions/2026-11-10-reimu-eating-keyframes-tiers-1-2-4-5-candidates.md) | All five tiers: zero registration shift, rest and reduced frames equal the approved still, no change outside the measured rectangles and emote regions, Harness plan/render/validate pass. 160 px legibility 460-1440 px against the still. Tier1 K1-K2 differ by only 145 px, below the 250 floor; the guessed ring threshold of 10 was dropped in favour of zero shift plus a zoomed seam check. |
+| visual | yes | `approved` | [2026-11-10-reimu-eating-keyframes-tier3-pilot.md](../docs/decisions/2026-11-10-reimu-eating-keyframes-tier3-pilot.md), [2026-11-10-reimu-eating-keyframes-tiers-1-2-4-5-candidates.md](../docs/decisions/2026-11-10-reimu-eating-keyframes-tiers-1-2-4-5-candidates.md), [2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md](../docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md) | Tier3: "可以，继续" on 2026-11-10. Tier1, Tier2, Tier4 and Tier5: the user reviewed the comparison GIFs with the listed weak spots and replied "都可以，接入" on 2026-11-11. |
+| consumer | no | `not_required` | [2026-11-10-reimu-eating-keyframes-work-order.md](../docs/decisions/2026-11-10-reimu-eating-keyframes-work-order.md) | Intake only. |
+| publication | no | `not_required` | [2026-11-10-reimu-eating-keyframes-work-order.md](../docs/decisions/2026-11-10-reimu-eating-keyframes-work-order.md) | Local work order. |
+
+<a id="reimu-eating-keyframes-runtime-001"></a>
+## `REIMU-EATING-KEYFRAMES-RUNTIME-001` · Play the eating keyframe loops in the native pet (all five work tiers)
+
+Derived stage: **complete**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-11-10-reimu-eating-keyframes-tier3-runtime.md](../docs/decisions/2026-11-10-reimu-eating-keyframes-tier3-runtime.md), [2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md](../docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md) | Same exact-frame contract as the loops they replace: 24 frames at 10 fps, Tier2 16 frames; first and last frames are the approved still. |
+| implementation | yes | `ready` | [2026-11-10-reimu-eating-keyframes-tier3-runtime.md](../docs/decisions/2026-11-10-reimu-eating-keyframes-tier3-runtime.md), [2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md](../docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md) | Five task_N-eating-keyframes-v1 packages, all five builder pins and the repository gate are in Consumer commit 3b46b9c; no Swift change. |
+| technical | yes | `passed` | [2026-11-10-reimu-eating-keyframes-tier3-runtime.md](../docs/decisions/2026-11-10-reimu-eating-keyframes-tier3-runtime.md), [2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md](../docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md) | Fresh 1.19/build 21 compilation, 217 behavior, 37 native AppKit, status, per-tier loader and fallback checks, repository gate and strict signatures passed. |
+| visual | yes | `approved` | [2026-11-10-reimu-eating-keyframes-tier3-pilot.md](../docs/decisions/2026-11-10-reimu-eating-keyframes-tier3-pilot.md), [2026-11-10-reimu-eating-keyframes-tiers-1-2-4-5-candidates.md](../docs/decisions/2026-11-10-reimu-eating-keyframes-tiers-1-2-4-5-candidates.md), [2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md](../docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md) | The integrated frames are exactly the reviewed candidates (Tier3 approved 2026-11-10, the other four 2026-11-11). Reduced motion was on at install time, so on-screen playback was not observed. |
+| consumer | yes | `verified` | [2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md](../docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md) | The installed 1.19 loads all five keyframe loops (24/16/24/24/24 frames, reason none) and keeps the isolated per-tier fallback. |
+| publication | yes | `published` | [2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md](../docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md) | Consumer 3b46b9c85ff0c5dc3c6c94c40bac9fc578f2035d pushed to origin/main on 2026-11-11 at the user's request ("提交并推送"); installed locally as 1.19 / build 21 with a verified rollback. No tag or release. |
+
+<a id="reimu-props-offering-box-intake-001"></a>
+## `REIMU-PROPS-OFFERING-BOX-INTAKE-001` · Prepare the offering box and coin props for standing scenes
+
+Derived stage: **blocked**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-11-10-reimu-props-offering-box-intake.md](../docs/decisions/2026-11-10-reimu-props-offering-box-intake.md) | A script-drawn offering box beside the standing pose on the shoe line, plus a movable coin; shown only in standing scenes. |
+| implementation | yes | `ready` | [2026-11-10-reimu-props-offering-box-intake.md](../docs/decisions/2026-11-10-reimu-props-offering-box-intake.md) | Prop images and a composited mock-up exist under build/reimu-props-v1; no runtime code exists. |
+| technical | yes | `passed` | [2026-11-10-reimu-props-offering-box-intake.md](../docs/decisions/2026-11-10-reimu-props-offering-box-intake.md) | The box is on the 596 canvas, rests on the shoe line and overlaps no opaque pixel of the standing figure. No runtime or interaction test exists yet. |
+| visual | yes | `rejected` | [2026-11-10-reimu-props-offering-box-intake.md](../docs/decisions/2026-11-10-reimu-props-offering-box-intake.md), [2026-11-10-reimu-cuter-standing-study.md](../docs/decisions/2026-11-10-reimu-cuter-standing-study.md) | The user replied "有点怪异" on 2026-11-10. The script-drawn flat style does not sit with the character art; props should come from the same image source as the character. |
+| consumer | no | `not_required` | [2026-11-10-reimu-props-offering-box-intake.md](../docs/decisions/2026-11-10-reimu-props-offering-box-intake.md) | Intake only; the click-to-donate interaction needs a separate runtime task. |
+| publication | no | `not_required` | [2026-11-10-reimu-props-offering-box-intake.md](../docs/decisions/2026-11-10-reimu-props-offering-box-intake.md) | Local review candidate. |
+
 <a id="reimu-scene-reactions-001"></a>
 ## `REIMU-SCENE-REACTIONS-001` · Scene-aware click reactions, Reimu-voiced lines, and plain standing idle
 
-Derived stage: **visual review**.
+Derived stage: **complete**.
 
 | Gate | Required | Status | Evidence | Boundary note |
 | --- | --- | --- | --- | --- |
 | specification | yes | `ready` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md) | Reaction words follow the scene on screen; light clicks never cut away from a work meal; idle only stands unless the user opts back in. |
 | implementation | yes | `ready` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/2c62a77067d53746824946eeeb4c6c8ff2522175) | PetScene, PetLines, held work artwork during light reactions, idleAutonomy and its menu toggle exist in the published Consumer commit. |
 | technical | yes | `passed` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md) | 217 behavior, 37 native AppKit, 31 status, per-tier loader and fallback checks and strict signatures passed on the 1.16/build 18 bundle. |
-| visual | yes | `in_review` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md) | The lines and the idle change were installed on the user's request without a line-by-line review. |
+| visual | yes | `approved` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md), [2026-11-10-reimu-props-offering-box-intake.md](../docs/decisions/2026-11-10-reimu-props-offering-box-intake.md) | The user replied "差不多" on 2026-11-10 after using the installed lines; individual lines may still be revised on request. |
 | consumer | yes | `verified` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/2c62a77067d53746824946eeeb4c6c8ff2522175) | Installed 1.16 runs with the new reactions; idle autonomy is off by default in the production identity. |
 | publication | yes | `published` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/2c62a77067d53746824946eeeb4c6c8ff2522175) | The maintainer asked to commit and push on 2026-11-10; the exact Consumer commit was verified on origin/main. No tag or package release is implied. |
 

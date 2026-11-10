@@ -1,5 +1,63 @@
 # Project handoff
 
+## 2026-11-11 五档吃饭关键帧全部接入，已安装 1.19 / build 21，已发布
+
+用户看过 Tier1/2/4/5 候选后回复「都可以，接入」。Consumer 新增 `task_{1,2,4,5}-eating-keyframes-v1`（Tier2 为 16 帧），
+`build.py` 四档改钉并升到 1.19 / build 21，仓库门禁扩展，Swift 未变；217 行为 / 37 原生及各档位检查通过。
+回退包 `build/reimu-1.19-install-20261111/rollback-1.18-build20.zip`。详见 `docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md`。
+
+用户随后要求提交并推送：Consumer `3b46b9c` 已在 origin/main，Harness 记录随本提交发布。用户偏好「减弱动态」仍为开启，循环在屏幕上是静止的。
+可做的后续：每档再加一张关键帧让咀嚼有起伏；Tier2 重画区域线条偏柔；待机、戳一戳等非吃饭状态仍没有手嘴动作。
+
+## 2026-11-10 Tier3 吃饭关键帧已接入并安装 1.18 / build 20；Tier1/2/4/5 候选待确认（均未提交）
+
+用户看过 Tier3 试点后回复「可以，继续」。Consumer 新增 `task_3-eating-keyframes-v1`（筷子夹饭 → 张嘴 → 放回碗沿 → 鼓腮），
+`build.py` 改钉 Tier3 并升到 1.18 / build 20，仓库门禁扩展，Swift 未变；217 行为 / 37 原生及各档位检查通过。
+回退包 `build/reimu-1.18-install-20261110/rollback-1.17-build19.zip`。详见 `docs/decisions/2026-11-10-reimu-eating-keyframes-tier3-runtime.md`。
+
+其余四档的关键帧也已画出并合成候选循环（Tier2 为 16 帧，其余 24 帧），像素门全部通过，对照动图已发给用户，**尚无答复，未接入**。
+Tier2、Tier5 各重画一次（生成端把改动贴回矩形留下接缝 / 「咬」画成吐舌头）。`intake.py` 新增按档位启用的变化区域遮罩。
+详见 `docs/decisions/2026-11-10-reimu-eating-keyframes-tiers-1-2-4-5-candidates.md`。
+
+下一步：用户确认哪几档可以后，用 `build/reimu-eating-keyframes-v1/export_packages.py`（需为该档补 `MOTION` / `APPROVAL` 文案）导出资源包并改钉；
+Tier2 仍是 16 帧契约。安装链：1.9 → 1.13 → … → 1.17 → 1.18。用户偏好「减弱动态」仍为开启，循环在屏幕上是静止的。
+
+## 2026-11-10 吃饭关键帧试点成功（Tier3）：手和嘴真的在动，待用户确认
+
+用户回复「做」。用 ChatGPT 应用内置的 Codex 命令行（`/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex`，
+`exec -s workspace-write`，带 `image_generation`）画出 Tier3 的两张关键帧；`build/reimu-eating-keyframes-v1/intake.py` 只取实测范围内的像素、
+其余锁回批准原图，`verify.py` 通过全部像素门（首末帧与 reduced 等于批准静帧、范围外变化为 0、160 px 下变化 518–607 px）。
+计划的改图框偏小，按第一次交付的差异图给 Tier3 加了两个接收矩形。详见
+`docs/decisions/2026-11-10-reimu-eating-keyframes-tier3-pilot.md`。未接入、未提交。
+下一步：用户确认后把 Tier3 做成资源包接入，并用同一流程画 Tier1/2/4/5（每档交付后按实测复核范围）。
+
+## 2026-11-10 吃饭时手和嘴不动：已写关键帧作业单，等待画稿
+
+用户要求先解决吃饭时嘴和手没有动作。核查结论：五张吃饭图是扁平单图，Tier2 的「分层」只是切块（手层只有手指、身体有空洞），
+程序做不出真实的手部动作；用户此前已否决两种变通方案，所以本轮没有再做变通。写了给图像模型的作业单
+`build/reimu-eating-keyframes-v1/codex-eating-keyframes-task.md`（副本在 `~/Desktop/灵梦/`）：每档两张关键帧、量好的改图框
+（98%–100% 在不透明轮廓内，透明背景不再是问题）、可检查的验收门，Tier3 先做试点。交付目录 `~/Desktop/灵梦/eating-keyframes-delivery/`。
+下一步：收到 `task_3-k1.png` / `task_3-k2.png` 后写接收工具、锁定未改区域、合成循环、出对照动图。
+详见 `docs/decisions/2026-11-10-reimu-eating-keyframes-work-order.md`。
+
+## 2026-11-10 香火箱与更萌站姿试稿均被否决，站姿保持原样
+
+用户回复「有点怪异，我们可以做一个更萌一点的博丽灵梦形象」。香火箱候选记为 rejected（脚本画的扁平道具与角色画风不搭）。
+「更萌」理解为站姿（约 3.5 头身、全套里最不 Q 的一张），未向用户确认。`build/reimu-cuter-standing-v1/` 用平滑的局部等比
+重采样把已批准站姿做成大头比例：A/B/C 三档，B（头 1.42×、身体 0.74×）的角色比例与坐姿 Tier1 一致（头发最宽行都是 374 px）。
+只重采样已批准像素。正式接入要从 1254 原图对三张眼姿同参数处理并重钉站姿资源包。详见
+`docs/decisions/2026-11-10-reimu-cuter-standing-study.md`。
+
+**结果**：用户回复「不太行，保持原样吧」，三档试稿全部否决（账本 visual rejected），已安装的 1.17 与站姿素材均未改动。
+这两轮说明：脚本画的道具和对已批准画面做比例重采样都不被接受；形象或道具要变，需要真正的新画稿。
+
+## 2026-11-10 场景道具候选：香火箱与铜钱（待视觉确认，未接入）
+
+用户确认人设台词「差不多」，并提出按场景做道具，例如香火箱。`build/reimu-props-v1/` 里有脚本绘制的香火箱
+（站姿右侧、落在鞋线上、与角色零重叠）和方孔铜钱，以及投币互动的示意动图。设想：香火箱只在站姿场景出现，
+点击它投一枚香火钱并按人设回应。原生代码未动。详见 `docs/decisions/2026-11-10-reimu-props-offering-box-intake.md`；
+账本 `REIMU-PROPS-OFFERING-BOX-INTAKE-001` 的 visual 为 in_review。`REIMU-SCENE-REACTIONS-001` 的台词用户回复「差不多」。
+
 ## 2026-11-10 Tier3/4/5 脸部动作已接入并安装 1.17 / build 19；Consumer `2c62a77` 已发布
 
 用户看过候选后回复「接入这三个」。Consumer 新增 `task_{3,4,5}-face-loop-v1`（符号循环 + 咀嚼 / 面条晃动 / 张合嘴），

@@ -904,11 +904,12 @@
           "note": "217 behavior, 37 native AppKit, 31 status, per-tier loader and fallback checks and strict signatures passed on the 1.16/build 18 bundle."
         },
         "visual": {
-          "status": "in_review",
+          "status": "approved",
           "evidence": [
-            "docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md"
+            "docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md",
+            "docs/decisions/2026-11-10-reimu-props-offering-box-intake.md"
           ],
-          "note": "The lines and the idle change were installed on the user's request without a line-by-line review."
+          "note": "The user replied \"\u5dee\u4e0d\u591a\" on 2026-11-10 after using the installed lines; individual lines may still be revised on request."
         },
         "consumer": {
           "status": "verified",
@@ -1047,6 +1048,246 @@
             "https://github.com/lyw-ops/gensokyo-codex-pets/commit/2c62a77067d53746824946eeeb4c6c8ff2522175"
           ],
           "note": "The maintainer asked to commit and push on 2026-11-10; the exact Consumer commit was verified on origin/main. No tag or package release is implied."
+        }
+      }
+    },
+    "REIMU-PROPS-OFFERING-BOX-INTAKE-001": {
+      "title": "Prepare the offering box and coin props for standing scenes",
+      "kind": "animation-delivery",
+      "depends_on": [
+        "REIMU-SCENE-REACTIONS-001"
+      ],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-props-offering-box-intake.md"
+          ],
+          "note": "A script-drawn offering box beside the standing pose on the shoe line, plus a movable coin; shown only in standing scenes."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-props-offering-box-intake.md"
+          ],
+          "note": "Prop images and a composited mock-up exist under build/reimu-props-v1; no runtime code exists."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-props-offering-box-intake.md"
+          ],
+          "note": "The box is on the 596 canvas, rests on the shoe line and overlaps no opaque pixel of the standing figure. No runtime or interaction test exists yet."
+        },
+        "visual": {
+          "status": "rejected",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-props-offering-box-intake.md",
+            "docs/decisions/2026-11-10-reimu-cuter-standing-study.md"
+          ],
+          "note": "The user replied \"\u6709\u70b9\u602a\u5f02\" on 2026-11-10. The script-drawn flat style does not sit with the character art; props should come from the same image source as the character."
+        },
+        "consumer": {
+          "status": "not_required",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-props-offering-box-intake.md"
+          ],
+          "note": "Intake only; the click-to-donate interaction needs a separate runtime task."
+        },
+        "publication": {
+          "status": "not_required",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-props-offering-box-intake.md"
+          ],
+          "note": "Local review candidate."
+        }
+      }
+    },
+    "REIMU-CUTER-STANDING-INTAKE-001": {
+      "title": "Prepare a cuter, more chibi standing figure",
+      "kind": "animation-delivery",
+      "depends_on": [],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-cuter-standing-study.md"
+          ],
+          "note": "Smooth, locally uniform rescale of the approved standing drawing: larger head, smaller body, fixed shoe line. The reading of the request as \"the standing pose\" is unconfirmed."
+        },
+        "implementation": {
+          "status": "blocked",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-cuter-standing-study.md"
+          ],
+          "note": "Stopped at the 596 px study after the visual rejection; no production poses were made."
+        },
+        "technical": {
+          "status": "pending",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-cuter-standing-study.md"
+          ],
+          "note": "Study only: bounds and shoe line were checked, and variant B matches the seated character scale. No package, digest or loader check exists."
+        },
+        "visual": {
+          "status": "rejected",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-cuter-standing-study.md"
+          ],
+          "note": "The user replied \"\u4e0d\u592a\u884c\uff0c\u4fdd\u6301\u539f\u6837\u5427\" on 2026-11-10. The approved standing figure stays as it is; none of the study variants is to be integrated."
+        },
+        "consumer": {
+          "status": "not_required",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-cuter-standing-study.md"
+          ],
+          "note": "Intake only."
+        },
+        "publication": {
+          "status": "not_required",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-cuter-standing-study.md"
+          ],
+          "note": "Local review candidate."
+        }
+      }
+    },
+    "REIMU-EATING-KEYFRAMES-INTAKE-001": {
+      "title": "Author hand and mouth eating keyframes for the work tiers",
+      "kind": "animation-delivery",
+      "depends_on": [
+        "REIMU-TIER-FACE-LOOPS-RUNTIME-001"
+      ],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-eating-keyframes-work-order.md"
+          ],
+          "note": "Two newly drawn keyframes per tier inside a measured edit box that lies inside the opaque silhouette; everything outside is locked to the approved still. Tier3 is the pilot."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-eating-keyframes-work-order.md",
+            "docs/decisions/2026-11-10-reimu-eating-keyframes-tier3-pilot.md",
+            "docs/decisions/2026-11-10-reimu-eating-keyframes-tiers-1-2-4-5-candidates.md"
+          ],
+          "note": "Keyframes for all five tiers were drawn by the local Codex image tool and taken in; Tier2 and Tier5 needed one redraw each. Intake gained an opt-in changed-blob mask for the tiers whose arms move."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-eating-keyframes-tier3-pilot.md",
+            "docs/decisions/2026-11-10-reimu-eating-keyframes-tiers-1-2-4-5-candidates.md"
+          ],
+          "note": "All five tiers: zero registration shift, rest and reduced frames equal the approved still, no change outside the measured rectangles and emote regions, Harness plan/render/validate pass. 160 px legibility 460-1440 px against the still. Tier1 K1-K2 differ by only 145 px, below the 250 floor; the guessed ring threshold of 10 was dropped in favour of zero shift plus a zoomed seam check."
+        },
+        "visual": {
+          "status": "approved",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-eating-keyframes-tier3-pilot.md",
+            "docs/decisions/2026-11-10-reimu-eating-keyframes-tiers-1-2-4-5-candidates.md",
+            "docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md"
+          ],
+          "note": "Tier3: \"\u53ef\u4ee5\uff0c\u7ee7\u7eed\" on 2026-11-10. Tier1, Tier2, Tier4 and Tier5: the user reviewed the comparison GIFs with the listed weak spots and replied \"\u90fd\u53ef\u4ee5\uff0c\u63a5\u5165\" on 2026-11-11."
+        },
+        "consumer": {
+          "status": "not_required",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-eating-keyframes-work-order.md"
+          ],
+          "note": "Intake only."
+        },
+        "publication": {
+          "status": "not_required",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-eating-keyframes-work-order.md"
+          ],
+          "note": "Local work order."
+        }
+      }
+    },
+    "REIMU-EATING-KEYFRAMES-RUNTIME-001": {
+      "title": "Play the eating keyframe loops in the native pet (all five work tiers)",
+      "kind": "consumer-vertical-slice",
+      "depends_on": [
+        "REIMU-EATING-KEYFRAMES-INTAKE-001",
+        "REIMU-TIER-FACE-LOOPS-RUNTIME-001"
+      ],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual",
+        "consumer",
+        "publication"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-eating-keyframes-tier3-runtime.md",
+            "docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md"
+          ],
+          "note": "Same exact-frame contract as the loops they replace: 24 frames at 10 fps, Tier2 16 frames; first and last frames are the approved still."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-eating-keyframes-tier3-runtime.md",
+            "docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md"
+          ],
+          "note": "Five task_N-eating-keyframes-v1 packages, all five builder pins and the repository gate are in Consumer commit 3b46b9c; no Swift change."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-eating-keyframes-tier3-runtime.md",
+            "docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md"
+          ],
+          "note": "Fresh 1.19/build 21 compilation, 217 behavior, 37 native AppKit, status, per-tier loader and fallback checks, repository gate and strict signatures passed."
+        },
+        "visual": {
+          "status": "approved",
+          "evidence": [
+            "docs/decisions/2026-11-10-reimu-eating-keyframes-tier3-pilot.md",
+            "docs/decisions/2026-11-10-reimu-eating-keyframes-tiers-1-2-4-5-candidates.md",
+            "docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md"
+          ],
+          "note": "The integrated frames are exactly the reviewed candidates (Tier3 approved 2026-11-10, the other four 2026-11-11). Reduced motion was on at install time, so on-screen playback was not observed."
+        },
+        "consumer": {
+          "status": "verified",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md"
+          ],
+          "note": "The installed 1.19 loads all five keyframe loops (24/16/24/24/24 frames, reason none) and keeps the isolated per-tier fallback."
+        },
+        "publication": {
+          "status": "published",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md"
+          ],
+          "note": "Consumer 3b46b9c85ff0c5dc3c6c94c40bac9fc578f2035d pushed to origin/main on 2026-11-11 at the user's request (\"\u63d0\u4ea4\u5e76\u63a8\u9001\"); installed locally as 1.19 / build 21 with a verified rollback. No tag or release."
         }
       }
     }
