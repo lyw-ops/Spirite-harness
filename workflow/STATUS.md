@@ -2,7 +2,7 @@
 
 > Generated from `workflow/tasks.json`; do not edit by hand.
 
-Ledger date: **2026-09-20**.
+Ledger date: **2026-11-10**.
 
 A gate records one claim only. In particular, `technical: passed` never supplies visual, consumer, installation, or publication evidence.
 
@@ -11,6 +11,8 @@ A gate records one claim only. In particular, `technical: passed` never supplies
 | `HARNESS-KEYFRAMES-001` · Release keyframe tracks and the discrete pulse curve | core-capability | **complete** | specification, implementation, technical, consumer, publication | — |
 | `HARNESS-WORKFLOW-001` · Adopt the evidence-bound Sprite Harness workflow | infrastructure | **complete** | specification, implementation, technical, publication | — |
 | `REIMU-ACTIONS-001` · Produce the six-tier work-eating, idle onigiri, and grabbed-drag action set | animation-delivery | **implementation** | specification, implementation, technical, visual, consumer, publication | `HARNESS-KEYFRAMES-001` |
+| `REIMU-TIER-EMOTE-LOOPS-INTAKE-001` · Prepare emote-layer life loops for the static Tier1/3/4/5 stills | animation-delivery | **complete** | specification, implementation, technical, visual | `REIMU-TIER1-INTAKE-001`, `REIMU-TIER4-INTAKE-001`, `REIMU-TIER5-INTAKE-001`, `REIMU-TIER3-RUNTIME-001` |
+| `REIMU-TIER-EMOTE-LOOPS-RUNTIME-001` · Play the Tier1/3/4/5 emote loops in the native pet | consumer-vertical-slice | **visual review** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER-EMOTE-LOOPS-INTAKE-001`, `REIMU-TIER1-RUNTIME-001` |
 | `REIMU-TIER1-INTAKE-001` · Prepare and review the existing Tier1 onigiri still | animation-delivery | **complete** | specification, implementation, technical, visual | — |
 | `REIMU-TIER1-RUNTIME-001` · Connect observed count one to the existing native Tier1 still | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER5-RUNTIME-001`, `REIMU-TIER1-INTAKE-001` |
 | `REIMU-TIER2-RUNTIME-001` · Connect observed count two to the approved native task_2 loop | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-ACTIONS-001` |
@@ -19,7 +21,7 @@ A gate records one claim only. In particular, `technical: passed` never supplies
 | `REIMU-TIER4-RUNTIME-001` · Connect observed count four to the existing native Tier4 still | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER3-RUNTIME-001`, `REIMU-TIER4-INTAKE-001` |
 | `REIMU-TIER5-INTAKE-001` · Prepare and review the existing Tier5 meal still | animation-delivery | **complete** | specification, implementation, technical, visual | — |
 | `REIMU-TIER5-RUNTIME-001` · Connect five or more observed tasks to the existing native Tier5 still | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER4-RUNTIME-001`, `REIMU-TIER5-INTAKE-001` |
-| `REIMU-WORK-TRANSITIONS-001` · Author transitions around native workload eating | animation-delivery | **specification** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER2-RUNTIME-001`, `REIMU-TIER3-RUNTIME-001`, `REIMU-TIER4-RUNTIME-001`, `REIMU-TIER5-RUNTIME-001`, `REIMU-TIER1-RUNTIME-001` |
+| `REIMU-WORK-TRANSITIONS-001` · Author transitions around native workload eating | animation-delivery | **implementation** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER2-RUNTIME-001`, `REIMU-TIER3-RUNTIME-001`, `REIMU-TIER4-RUNTIME-001`, `REIMU-TIER5-RUNTIME-001`, `REIMU-TIER1-RUNTIME-001` |
 
 <a id="harness-keyframes-001"></a>
 ## `HARNESS-KEYFRAMES-001` · Release keyframe tracks and the discrete pulse curve
@@ -62,6 +64,34 @@ Derived stage: **implementation**.
 | visual | yes | `pending` | — | Technical QA cannot approve expression, silhouette, scale, timing, or transition quality. |
 | consumer | yes | `pending` | — | Native runtime state selection, interruption, landing, and tier switching remain separately verifiable. |
 | publication | yes | `unpublished` | — | The design commit is published; the complete action delivery is not. |
+
+<a id="reimu-tier-emote-loops-intake-001"></a>
+## `REIMU-TIER-EMOTE-LOOPS-INTAKE-001` · Prepare emote-layer life loops for the static Tier1/3/4/5 stills
+
+Derived stage: **complete**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-11-10-reimu-tier-emote-loops-intake.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-intake.md) | Lossless split of each approved still into detached alpha components; only emote symbols move; frame 0 and reduced motion must equal the approved still. |
+| implementation | yes | `ready` | [2026-11-10-reimu-tier-emote-loops-intake.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-intake.md) | Layer sources, plans, full and reduced builds, pixel gates, and review exports exist under build/reimu-tier-emote-loops-v1. |
+| technical | yes | `passed` | [2026-11-10-reimu-tier-emote-loops-intake.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-intake.md) | All eight public CLI builds validate; frame 0 and every reduced frame equal the approved still; no changed pixel lies outside the emote regions. Tier1 motion is weak at 160 px. |
+| visual | yes | `approved` | [2026-11-10-reimu-tier-emote-loops-intake.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-intake.md), [2026-11-10-reimu-tier-emote-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-runtime.md) | The user reviewed the v1 GIFs and replied "可以，接入" on 2026-11-10. Approval covers the symbol motion shown; it is not an eating animation. |
+| consumer | no | `not_required` | [2026-11-10-reimu-tier-emote-loops-intake.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-intake.md) | Intake only; native integration needs a separate runtime task after visual approval. |
+| publication | no | `not_required` | [2026-11-10-reimu-tier-emote-loops-intake.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-intake.md) | Local review candidate; no publication requested. |
+
+<a id="reimu-tier-emote-loops-runtime-001"></a>
+## `REIMU-TIER-EMOTE-LOOPS-RUNTIME-001` · Play the Tier1/3/4/5 emote loops in the native pet
+
+Derived stage: **visual review**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-11-10-reimu-tier-emote-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-runtime.md) | 24-frame 10 fps loops whose first and last frames are the approved still; tier switching, preemption, reduced motion and isolated fallback are unchanged. |
+| implementation | yes | `ready` | [2026-11-10-reimu-tier-emote-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-runtime.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/0c814aa95ec464bbadef6a2c3344b9724b73b302) | The published Consumer commit contains the four exact-frame packages, builder pins, clip specs, frame selection, tests, and repository gate. |
+| technical | yes | `passed` | [2026-11-10-reimu-tier-emote-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-runtime.md) | Fresh 1.14/build 16 compilation, 198 behavior, 37 native AppKit, 31 status, per-tier loader and fallback checks, repository gate and strict signatures passed. |
+| visual | yes | `in_review` | [2026-11-10-reimu-tier-emote-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-runtime.md) | The approved v1 motion was re-timed (v2) so the last frame rests on the still; the v2 result and its native presentation were installed without a second review. |
+| consumer | yes | `verified` | [2026-11-10-reimu-tier-emote-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-runtime.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/0c814aa95ec464bbadef6a2c3344b9724b73b302) | The installed 1.14 loads all four loops, selects loop frames while working, holds frame 0 under reduced motion, and degrades a damaged package to standing on its own. |
+| publication | yes | `published` | [2026-11-10-reimu-tier-emote-loops-runtime.md](../docs/decisions/2026-11-10-reimu-tier-emote-loops-runtime.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/0c814aa95ec464bbadef6a2c3344b9724b73b302) | The maintainer asked to commit and push on 2026-11-10; the exact Consumer commit was verified on origin/main. No tag or package release is implied. |
 
 <a id="reimu-tier1-intake-001"></a>
 ## `REIMU-TIER1-INTAKE-001` · Prepare and review the existing Tier1 onigiri still
@@ -178,13 +208,13 @@ Derived stage: **complete**.
 <a id="reimu-work-transitions-001"></a>
 ## `REIMU-WORK-TRANSITIONS-001` · Author transitions around native workload eating
 
-Derived stage: **specification**.
+Derived stage: **implementation**.
 
 | Gate | Required | Status | Evidence | Boundary note |
 | --- | --- | --- | --- | --- |
-| specification | yes | `pending` | [2026-09-19-reimu-tier2-native-vertical-slice.md](../docs/decisions/2026-09-19-reimu-tier2-native-vertical-slice.md), [2026-09-19-reimu-tier3-native-static-slice.md](../docs/decisions/2026-09-19-reimu-tier3-native-static-slice.md) | Candidate scope is entry, exit, future cross-tier changes, and post-transient recovery; exact clips, timing, and art direction are not yet frozen. |
-| implementation | yes | `pending` | — | No transition artwork, manifest, or runtime transition node has been implemented. |
-| technical | yes | `pending` | — | Transition continuity, interruption, reduced-motion, source-integrity, and fallback tests remain future work. |
-| visual | yes | `pending` | — | Future transition timing and pose continuity require a separate native visual review. |
-| consumer | yes | `pending` | — | Future transitions must preserve immediate high-priority preemption and restore only the latest observed tier. |
-| publication | yes | `unpublished` | — | The transition task is only a recorded backlog item; nothing has been authored, installed, committed, or published for it. |
+| specification | yes | `ready` | [2026-09-20-reimu-work-transitions-spec.md](../docs/decisions/2026-09-20-reimu-work-transitions-spec.md) | The directed entry, exit, and cross-tier identity matrix, sharing rule, safe-boundary and preemption semantics, immutable endpoint and manifest contract, reduced-motion and isolated-fallback behavior, first vertical slice, future tests, and native preview evidence are frozen without claiming any artwork or runtime implementation. |
+| implementation | yes | `pending` | [2026-09-20-reimu-standing-tier2-entry-generation-blocked.md](../docs/decisions/2026-09-20-reimu-standing-tier2-entry-generation-blocked.md), [2026-09-20-reimu-standing-tier2-serial-generation-blocked.md](../docs/decisions/2026-09-20-reimu-standing-tier2-serial-generation-blocked.md), [2026-09-20-reimu-standing-tier2-seam-feasibility-failed.md](../docs/decisions/2026-09-20-reimu-standing-tier2-seam-feasibility-failed.md) | The first standing-to-Tier2 generation attempt was stopped after complete-scene and explicit-layer strategies both failed the transparent-background and fixed-scene gates. The subsequent AI-only single-frame serial attempt also stopped before import. A bounded endpoint-seam experiment then used five of six allowed image calls: no character layer passed the strict detached-low-alpha gate, the tatami was clipped, and the table geometry drifted, so no composite candidate or transition package exists. |
+| technical | yes | `pending` | [2026-09-20-reimu-standing-tier2-entry-generation-blocked.md](../docs/decisions/2026-09-20-reimu-standing-tier2-entry-generation-blocked.md), [2026-09-20-reimu-standing-tier2-serial-generation-blocked.md](../docs/decisions/2026-09-20-reimu-standing-tier2-serial-generation-blocked.md), [2026-09-20-reimu-standing-tier2-seam-feasibility-failed.md](../docs/decisions/2026-09-20-reimu-standing-tier2-seam-feasibility-failed.md) | The four immutable endpoint digests and deterministic 596px standing receipt were reverified, but the endpoint-seam experiment failed its layer material gates before composition. No candidate, endpoint overlay/diff, full/reduced validation, interruption, route-isolation, or fallback test exists. |
+| visual | yes | `pending` | [2026-09-20-reimu-standing-tier2-entry-generation-blocked.md](../docs/decisions/2026-09-20-reimu-standing-tier2-entry-generation-blocked.md), [2026-09-20-reimu-standing-tier2-serial-generation-blocked.md](../docs/decisions/2026-09-20-reimu-standing-tier2-serial-generation-blocked.md), [2026-09-20-reimu-standing-tier2-seam-feasibility-failed.md](../docs/decisions/2026-09-20-reimu-standing-tier2-seam-feasibility-failed.md) | Rejected generation attempts and the endpoint-seam experiment are diagnostic evidence only. The closest character study remains unaccepted, no three-layer candidate or seam preview exists, and the route is neither in review nor approved. |
+| consumer | yes | `pending` | — | The Consumer still uses the approved direct switch; a future integration must preserve the single tier policy, immediate high-priority preemption, isolated route fallback, and latest-observation recovery. |
+| publication | yes | `unpublished` | — | The specification and blocked-attempt records were committed with the 2026-11-10 Harness records commit; no transition has been authored, installed, tagged, or released. |

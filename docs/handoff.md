@@ -1,5 +1,144 @@
 # Project handoff
 
+## 2026-11-10 表情符号循环已接入、安装 1.14 / build 16 并发布 Consumer `0c814aa`
+
+用户看过 v1 动图后回复「可以，接入」。Tier1/3/4/5 现在在原生里播放 24 帧 / 10 fps 的符号循环，
+已安装并运行（启动日志：1.14/build 16，真实 working、1 项任务、Tier1）。完整记录见
+`docs/decisions/2026-11-10-reimu-tier-emote-loops-runtime.md`。
+
+- 为满足加载器「首尾帧等于 base」的合同，动效从 v1 重排为 v2（`build/reimu-tier-emote-loops-v2/`）：
+  末帧回到静止，爱心改为从原位浮起再落回。v2 未在安装前再给用户看，账本 runtime 的 visual 记为 in_review。
+- Consumer 工作区新增四个 `task_N-emote-loop-v1` 包，改了 `build.py`、`main.swift`、`PetBehavior.swift`、
+  行为测试、四个档位包测试和仓库门禁；档位切换时序与抢占规则未改（这四档离开仍不等待）。
+- 198 行为 / 37 原生 / 31 状态 / 各档位加载回退 / 仓库门禁通过，验签三次通过。
+- 回退：`build/reimu-1.14-install-20261110/rollback-1.13-build15.zip`；再往前是
+  `build/reimu-1.13-install-20261110/rollback-1.9-build11.zip`。
+
+用户随后要求提交并推送：Consumer `0c814aa95ec464bbadef6a2c3344b9724b73b302` 已在 origin/main 核对；
+Harness 的记录随本条一起提交。账本 runtime 任务只剩 visual（v2 待用户看）。真正的吃饭动作仍需首尾帧视频路线
+（`build/reimu-video-loop-kit-v1/`，要用户自己跑视频模型）。
+
+## 2026-11-10 已安装 1.13 / build 15；Tier1/3/4/5 表情符号循环动效待视觉确认
+
+用户回复「由你来全权决定做什么」。据此做了两件事，均有决定记录：
+
+- **安装**：从已发布 Consumer `c2684cc` 全新编译正式身份 1.13/build 15 并替换 1.9/build 11，只含用户已批准的
+  Tier1–5 画面。198 行为 / 37 原生 / 31 状态及各加载回退检查通过，安装前后与启动后严格验签通过；启动日志为
+  真实 `working`、3 项任务、Tier3。回退包 `build/reimu-1.13-install-20261110/rollback-1.9-build11.zip`。
+  见 `docs/decisions/2026-11-10-reimu-1.13-installation.md`。
+- **候选动效**：把 Tier1/3/4/5 批准静帧按 alpha 连通域无损拆出独立符号层（汗滴、热气、爱心、星星），
+  用公共 CLI 做成 24 帧 / 10 fps 循环；第 0 帧与 reduced 全帧等于批准静帧，符号区域外变化为 0。
+  账本新增 `REIMU-TIER-EMOTE-LOOPS-INTAKE-001`：technical passed，**visual in_review**，未接入 Consumer。
+  见 `docs/decisions/2026-11-10-reimu-tier-emote-loops-intake.md`。
+
+没有做的：上一条里的「下压回弹」衔接自查后判定改善有限，没有接入；首尾帧视频路线需要用户自己跑视频模型，
+素材包保留。没有 commit、push、tag。下一步：用户看过动图后，把循环接进 Consumer（新资源包、摘要钉、
+帧计划、各档位测试），再按既有流程出原生预览。
+
+## 2026-11-10 参照 DeepSeek 桌宠的对照研究：两份视觉研究素材，未接入
+
+用户要求参照近期的 DeepSeek Harness 社区桌宠改善灵梦。调研对象：dsh-pet（大肥鱼，28 段透明动画）、
+deepseek-pet（大蓝鲸）、dsh-whale-musume（鲸鱼娘）、dsh-deepseek-girl-pet（16 方向追视）、dafeiyu-pet。
+它们的共同做法：动作用首尾帧约束的 AI 视频在纯色底上生成再抠像；所有动作从同一标准站姿起止、角色大小
+和地面线固定；睡觉拆成入睡/循环/醒来三段接力；换立绘用「下压→切换→弹起」而不是交叉淡化；气泡台词带
+时间感与任务感。
+
+本轮只做了两份可看的研究，均在忽略目录下，没有改 Consumer、没有构建或安装 App、没有 commit/push，
+账本未新增任务：
+
+- `build/reimu-pose-swap-polish-v1/`：站姿 ↔ Tier2 的「直接切换」对「下压→换图→回弹」对照。只用已批准
+  像素，经公共 CLI plan/render/validate，两套 112 帧均通过；回弹版只在两次切换各 6 帧上不同，其余 100 帧
+  逐像素相同，缩放 0.93–1.0 不会被原生窗口裁切。它是显示层衔接，不是角色动作。自查：改善有限，主要跳变
+  来自站姿与坐姿角色比例不同（头发最宽行 245 px 对 374–454 px，约 1.5–1.85 倍）。**待用户看图决定**。
+- `build/reimu-video-loop-kit-v1/`：站姿与 Tier1/3/4/5 静帧的首尾帧视频输入图和提示词。底色按实测选品红
+  `#FF00FF`（六张批准图不透明像素到品红的最小 RGB 距离 ≥ 156；绿在 Tier4/5、蓝在 Tier1/5 有上百像素落在
+  160 以内）。提示词未经实测，溢色与静止区域漂移要等第一段真实视频再量。
+
+两个需要用户决定的规格冲突：抠像是 `2026-09-20-reimu-work-transitions-spec.md` 目前禁止的；整图缩放
+只能标作显示层衔接。另外已安装的仍是 1.9/build 11，不含已发布源码里的 Tier1–5 工作吃饭档位。
+
+## 2026-09-20 standing → Tier2 终点接缝可行性实验未通过
+
+本轮只验证“新固定榻榻米层 + 新坐姿角色层 + 新固定桌餐层”是否值得继续制作中间动作。
+两仓fetch后HEAD仍分别等于`origin/main`的Harness `37d9384`与Consumer `c2684cc`；四个冻结
+端点摘要及standing 596回执`02a087e…`再次匹配，旧未提交规格、账本、交接和失败记录均保留。
+
+通过内置imagegen共消耗5/6次调用：坐姿角色初稿、一次alpha定向修复、一次改变策略的干净重生、
+榻榻米初稿、桌餐初稿。角色三次都存在主轮廓外低alpha脱离组件；榻榻米主组件触底并裁切；桌餐
+内容正确但桌体更深、桌腿更长且仍有低alpha组件。最接近的角色身份可识别，但严格素材门未过，
+因此没有挑选三层参数，也没有生成candidate、review-sheet、seam GIF、overlay或diff占位证据。
+
+实验判定为`failed before composition`，不值得现在制作pose 1–5；应先取得三张exact-zero背景、
+安全边距且端点几何更近的独立原稿，再重做同一终点实验。完整提示词、原稿、摘要、alpha证据和
+596/320px明暗审阅见`build/reimu-standing-tier2-seam-feasibility-v1/`，决定记录见
+`docs/decisions/2026-09-20-reimu-standing-tier2-seam-feasibility-failed.md`。账本仍只有
+specification ready，其余implementation/technical/visual/consumer pending，publication
+unpublished。没有生产接入、安装、commit或push。
+
+## 2026-09-20 standing → Tier2 单帧串行 AI-only 路线仍未通过素材门
+
+本轮两仓 fetch 后 HEAD/origin/main 仍为 Harness `37d9384`、Consumer `c2684cc`。
+四个端点摘要前后不变；standing 596 回执由原始1254图重新确定性派生，使用 LANCZOS、
+`596/1254`、`(0,0)`、PNG compress_level=9，完整摘要仍为
+`02a087e34141aed4f65cb07a006f7275fadaf4aacb034f69c7aea598202a25b0`。
+
+独立桌餐层、榻榻米层和 pose1 共生成七张新候选（含修复/策略改变）；没有生成多格场景。
+背景修复仍出现非均匀绿幕，pose1 从干净 standing 重新编辑后仍失败，且屈膝不够明确。
+因此停止，未执行 chroma key、自动抠图或合成，未继续 pose2–6，未创建正式素材包或预览。
+原始未提交内容保留；生产 Swift、provider、安装、提交、推送均未触及。
+账本仍 specification ready，其余 implementation/technical/visual/consumer pending，
+publication unpublished。七张候选、提示词、完整摘要与像素门报告见
+`build/reimu-work-transition-standing-to-tier2-serial-v1/failure-report.json`；决定记录见
+`docs/decisions/2026-09-20-reimu-standing-tier2-serial-generation-blocked.md`。
+
+## 2026-09-20 standing → Tier2 entry 素材生成失败，按硬门停止
+
+本轮只尝试`standing_to_tier_2`首个垂直切片。两仓fetch后仍分别为Harness
+`37d9384cc91ef3b3f0c349405d15f174f7c66c2f`与Consumer
+`c2684cc3fecbdfbe0ae238a13f8e22fef333295d`，均等于`origin/main`；上一轮未提交规格/账本/文档
+修改完整保留。standing图与manifest、Tier2 frame 0与source manifest的四个冻结摘要在前后审计
+中完全不变。
+
+standing的596端点回执已用统一`596/1254`、Pillow LANCZOS、`(0,0)`确定性派生，SHA-256为
+`02a087e34141aed4f65cb07a006f7275fadaf4aacb034f69c7aea598202a25b0`，鞋线映射到
+`y=584.5933014354067`。imagegen两轮完整场景原稿虽有六个真实角色姿态，但背景不是纯键色/透明，
+桌子、榻榻米和餐点也逐格重绘漂移；改为显式分层后，固定桌餐层可用，但六姿态角色层及最后一次
+背景提取仍带可见渐变，不能成为透明角色层。
+
+因此按冻结规格和hatch-pet收敛规则停止。没有用本地抠图、整图变换、fade、光流、morph、历史cut
+像素或静态占位掩盖失败；没有生成八帧资源包、manifest、Harness full/reduced收据、原生预览或
+Consumer导入。失败证据与摘要保存在
+`build/reimu-work-transition-standing-to-tier2-v1/failure-report.json`，决定记录见
+`docs/decisions/2026-09-20-reimu-standing-tier2-entry-generation-blocked.md`。账本保持specification
+`ready`，implementation/technical/visual/consumer均`pending`，publication仍`unpublished`。
+没有生产接入、安装、commit或push。
+
+## 2026-09-20 工作档位过渡规格已冻结，只有 specification ready
+
+`REIMU-WORK-TRANSITIONS-001`现已有可实施合同，见
+`docs/decisions/2026-09-20-reimu-work-transitions-spec.md`。本轮重新fetch并核对Harness
+`37d9384cc91ef3b3f0c349405d15f174f7c66c2f`与Consumer
+`c2684cc3fecbdfbe0ae238a13f8e22fef333295d`均和`origin/main`一致；实际manifest继续证明
+Tier2为16帧、10 fps、1.6秒循环，Tier1/3/4/5各为一帧125 ms静态保持。唯一档位边界仍是
+`min(max(activeTaskCount, 0), 5)`。
+
+规格冻结5个standing/fallback进入、5个退出和20个有向跨档逻辑身份；只有端点像素、摆放、
+缩放、支撑线、方向、时序和取消点全部兼容并分别获原生视觉批准时才允许共享资源，当前没有
+预授权共享。Tier2普通离开在有效过渡存在时等1.6秒安全边界，静态档离开不等待；高优先级
+事件立即抢占，过渡中变化只读取最新观察状态，reduced motion直接选择目标代表帧。任何单路
+资源缺失、摘要不符或加载失败只关闭该路并回到现有直接切换。
+
+未来素材包固定使用596×596 RGBA、显式统一缩放和原生支撑线、`loop: false`、独立端点与帧
+摘要、来源和reduced-motion声明；整图摇动、旋转、缩放、平移或交叉溶解不算角色动作，普通
+cut/fade只能标作显示层衔接。历史`build/reimu-idle-meal-transition-20260907-v1/cut/`只可参考
+摆放经验，不是本任务素材，像素不得复用冒充新过渡。
+
+首个建议切片是`standing_to_tier_2`：新创作6–9帧、12 fps、500–750 ms的原始姿态或分层
+序列，以批准站姿的确定性596端点回执起步，以Tier2 frame 0结束，再进入现有10 fps循环。
+下一切片才是`tier_2_to_standing`，用于专门验证离开安全边界。本轮没有生成图片、manifest、
+预览、Swift节点或App；implementation、technical、visual、consumer仍pending，publication
+仍unpublished，也没有安装、commit或push。
+
 ## 2026-09-20 Tier1 Consumer 源码已发布，未安装
 
 Consumer收口提交`c2684cc3fecbdfbe0ae238a13f8e22fef333295d`已推送至`origin/main`，
