@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-11-10",
+  "updated": "2026-11-11",
   "policy": {
     "gate_order": [
       "specification",
@@ -1288,6 +1288,194 @@
             "docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md"
           ],
           "note": "Consumer 3b46b9c85ff0c5dc3c6c94c40bac9fc578f2035d pushed to origin/main on 2026-11-11 at the user's request (\"\u63d0\u4ea4\u5e76\u63a8\u9001\"); installed locally as 1.19 / build 21 with a verified rollback. No tag or release."
+        }
+      }
+    },
+    "REIMU-DIALOGUE-ACTIONS-001": {
+      "title": "Event remarks, a deeper click ladder and eyelid beats from Reimu's persona",
+      "kind": "consumer-vertical-slice",
+      "depends_on": [
+        "REIMU-SCENE-REACTIONS-001"
+      ],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual",
+        "consumer",
+        "publication"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md"
+          ],
+          "note": "Persona rules, the event table with its pacing limits, per-scene line tables, the four-step click ladder, three eyelid beats and the ordered list of actions that still need new artwork are written down."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/36834509b3780dc0a3ca13342928ef03b8ddd9bb"
+          ],
+          "note": "PetClock, PetEvent, the extended PetLines, react_stare, event remarks, the launch greeting and the menu toggle are in the published Consumer commit. No image asset was added or changed."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md"
+          ],
+          "note": "254 behavior, 38 native AppKit, reaction, standing, per-tier loader, status contract and repository gate checks and strict signatures passed on the 1.20/build 22 bundle."
+        },
+        "visual": {
+          "status": "in_review",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md"
+          ],
+          "note": "The lines and the three eyelid beats were installed without a line-by-line review; reduced motion was on at install, so the beats have not been seen moving on screen."
+        },
+        "consumer": {
+          "status": "verified",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/36834509b3780dc0a3ca13342928ef03b8ddd9bb"
+          ],
+          "note": "Installed as 1.20/build 22 (since superseded by 1.21 and 1.22, which keep it); remarks are on by default and the launch greeting and a real work-eased remark were recorded in the behavior log. Idle still only stands."
+        },
+        "publication": {
+          "status": "published",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/36834509b3780dc0a3ca13342928ef03b8ddd9bb"
+          ],
+          "note": "The maintainer delegated all further steps including commit and push on 2026-11-11; the exact Consumer commit is on origin/main. No tag or release."
+        }
+      }
+    },
+    "REIMU-MANGA-BALLOONS-001": {
+      "title": "Draw Reimu's lines as manga speech balloons",
+      "kind": "consumer-vertical-slice",
+      "depends_on": [
+        "REIMU-DIALOGUE-ACTIONS-001"
+      ],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual",
+        "consumer",
+        "publication"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-manga-balloons.md"
+          ],
+          "note": "Four balloon shapes from the maintainer's reference image, the rule that picks one from how a line is said, punctuation-only wrapping, and placement above the head that avoids the status card are written down."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-manga-balloons.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/36834509b3780dc0a3ca13342928ef03b8ddd9bb"
+          ],
+          "note": "SpeechBalloon.swift (click-through window, four shapes, layout), BalloonStyle in PetBehavior.swift and the --render-balloons review sheet are in the published Consumer commit."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-manga-balloons.md"
+          ],
+          "note": "262 behavior and 40 native checks, including every line fitting inside all four outlines at the smallest and largest pet size and the placement cases, passed on the 1.21/build 23 bundle with strict signatures."
+        },
+        "visual": {
+          "status": "in_review",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-manga-balloons.md"
+          ],
+          "note": "The maintainer supplied the reference image but has not seen the result. Only the app's own review sheets were inspected; no real screenshot was available."
+        },
+        "consumer": {
+          "status": "verified",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-manga-balloons.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/36834509b3780dc0a3ca13342928ef03b8ddd9bb"
+          ],
+          "note": "Installed as 1.21/build 23; the window list showed the balloon window appear with the launch greeting and disappear about three seconds later."
+        },
+        "publication": {
+          "status": "published",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-manga-balloons.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/36834509b3780dc0a3ca13342928ef03b8ddd9bb"
+          ],
+          "note": "Published with the dialogue work in the same Consumer commit on origin/main. No tag or release."
+        }
+      }
+    },
+    "REIMU-TEA-BREAK-001": {
+      "title": "Tea break at the low table after a round of work",
+      "kind": "consumer-vertical-slice",
+      "depends_on": [
+        "REIMU-DIALOGUE-ACTIONS-001",
+        "REIMU-EATING-KEYFRAMES-RUNTIME-001"
+      ],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual",
+        "consumer",
+        "publication"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md",
+            "docs/decisions/2026-11-11-reimu-tea-break.md"
+          ],
+          "note": "The action, its trigger (working to round-ended only), its end, click behaviour, reduced motion and isolated fallback are written down; the maintainer asked for it with \"\u753b\u6536\u5de5\u8336\"."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-tea-break.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/4dc36a9950a8a9a50f009e30a498cf4d046f7c16"
+          ],
+          "note": "The tea_break-v1 package (48 frames), PetScene.tea, PetArtwork.teaBreak, the optional --tea-break build input, its package test and the repository gate are in the published Consumer commit."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-tea-break.md"
+          ],
+          "note": "Harness 0.8.0 validation of the full and reduced builds, the pixel gates (zero changed pixels outside the take rectangle against the approved task_3 still, unchanged opaque bounds, 1179-1458 px changed at 160 px), 274 behavior, 41 native and 5 package checks and strict signatures passed on the 1.22/build 24 bundle."
+        },
+        "visual": {
+          "status": "in_review",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-tea-break.md"
+          ],
+          "note": "Not reviewed by the maintainer. Installed on the designer's decision after the maintainer delegated all further steps on 2026-11-11; the review GIFs are waiting for the maintainer."
+        },
+        "consumer": {
+          "status": "verified",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-tea-break.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/4dc36a9950a8a9a50f009e30a498cf4d046f7c16"
+          ],
+          "note": "Installed as 1.22/build 24; the installed loader reports tea_break_reason none and all five tiers none."
+        },
+        "publication": {
+          "status": "published",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-tea-break.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/4dc36a9950a8a9a50f009e30a498cf4d046f7c16"
+          ],
+          "note": "The exact Consumer commit is on origin/main under the maintainer's delegation. No tag or release."
         }
       }
     }

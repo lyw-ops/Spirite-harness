@@ -2,7 +2,7 @@
 
 > Generated from `workflow/tasks.json`; do not edit by hand.
 
-Ledger date: **2026-11-10**.
+Ledger date: **2026-11-11**.
 
 A gate records one claim only. In particular, `technical: passed` never supplies visual, consumer, installation, or publication evidence.
 
@@ -12,10 +12,13 @@ A gate records one claim only. In particular, `technical: passed` never supplies
 | `HARNESS-WORKFLOW-001` · Adopt the evidence-bound Sprite Harness workflow | infrastructure | **complete** | specification, implementation, technical, publication | — |
 | `REIMU-ACTIONS-001` · Produce the six-tier work-eating, idle onigiri, and grabbed-drag action set | animation-delivery | **implementation** | specification, implementation, technical, visual, consumer, publication | `HARNESS-KEYFRAMES-001` |
 | `REIMU-CUTER-STANDING-INTAKE-001` · Prepare a cuter, more chibi standing figure | animation-delivery | **blocked** | specification, implementation, technical, visual | — |
+| `REIMU-DIALOGUE-ACTIONS-001` · Event remarks, a deeper click ladder and eyelid beats from Reimu's persona | consumer-vertical-slice | **visual review** | specification, implementation, technical, visual, consumer, publication | `REIMU-SCENE-REACTIONS-001` |
 | `REIMU-EATING-KEYFRAMES-INTAKE-001` · Author hand and mouth eating keyframes for the work tiers | animation-delivery | **complete** | specification, implementation, technical, visual | `REIMU-TIER-FACE-LOOPS-RUNTIME-001` |
 | `REIMU-EATING-KEYFRAMES-RUNTIME-001` · Play the eating keyframe loops in the native pet (all five work tiers) | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-EATING-KEYFRAMES-INTAKE-001`, `REIMU-TIER-FACE-LOOPS-RUNTIME-001` |
+| `REIMU-MANGA-BALLOONS-001` · Draw Reimu's lines as manga speech balloons | consumer-vertical-slice | **visual review** | specification, implementation, technical, visual, consumer, publication | `REIMU-DIALOGUE-ACTIONS-001` |
 | `REIMU-PROPS-OFFERING-BOX-INTAKE-001` · Prepare the offering box and coin props for standing scenes | animation-delivery | **blocked** | specification, implementation, technical, visual | `REIMU-SCENE-REACTIONS-001` |
 | `REIMU-SCENE-REACTIONS-001` · Scene-aware click reactions, Reimu-voiced lines, and plain standing idle | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER-EMOTE-LOOPS-RUNTIME-001` |
+| `REIMU-TEA-BREAK-001` · Tea break at the low table after a round of work | consumer-vertical-slice | **visual review** | specification, implementation, technical, visual, consumer, publication | `REIMU-DIALOGUE-ACTIONS-001`, `REIMU-EATING-KEYFRAMES-RUNTIME-001` |
 | `REIMU-TIER-EMOTE-LOOPS-INTAKE-001` · Prepare emote-layer life loops for the static Tier1/3/4/5 stills | animation-delivery | **complete** | specification, implementation, technical, visual | `REIMU-TIER1-INTAKE-001`, `REIMU-TIER4-INTAKE-001`, `REIMU-TIER5-INTAKE-001`, `REIMU-TIER3-RUNTIME-001` |
 | `REIMU-TIER-EMOTE-LOOPS-RUNTIME-001` · Play the Tier1/3/4/5 emote loops in the native pet | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER-EMOTE-LOOPS-INTAKE-001`, `REIMU-TIER1-RUNTIME-001` |
 | `REIMU-TIER-FACE-LOOPS-INTAKE-001` · Prepare face-motion candidates for the Tier3/4/5 loops | animation-delivery | **complete** | specification, implementation, technical, visual | `REIMU-TIER-EMOTE-LOOPS-INTAKE-001` |
@@ -86,6 +89,20 @@ Derived stage: **blocked**.
 | consumer | no | `not_required` | [2026-11-10-reimu-cuter-standing-study.md](../docs/decisions/2026-11-10-reimu-cuter-standing-study.md) | Intake only. |
 | publication | no | `not_required` | [2026-11-10-reimu-cuter-standing-study.md](../docs/decisions/2026-11-10-reimu-cuter-standing-study.md) | Local review candidate. |
 
+<a id="reimu-dialogue-actions-001"></a>
+## `REIMU-DIALOGUE-ACTIONS-001` · Event remarks, a deeper click ladder and eyelid beats from Reimu's persona
+
+Derived stage: **visual review**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-11-11-reimu-dialogue-and-action-design.md](../docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md) | Persona rules, the event table with its pacing limits, per-scene line tables, the four-step click ladder, three eyelid beats and the ordered list of actions that still need new artwork are written down. |
+| implementation | yes | `ready` | [2026-11-11-reimu-dialogue-and-action-design.md](../docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/36834509b3780dc0a3ca13342928ef03b8ddd9bb) | PetClock, PetEvent, the extended PetLines, react_stare, event remarks, the launch greeting and the menu toggle are in the published Consumer commit. No image asset was added or changed. |
+| technical | yes | `passed` | [2026-11-11-reimu-dialogue-and-action-design.md](../docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md) | 254 behavior, 38 native AppKit, reaction, standing, per-tier loader, status contract and repository gate checks and strict signatures passed on the 1.20/build 22 bundle. |
+| visual | yes | `in_review` | [2026-11-11-reimu-dialogue-and-action-design.md](../docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md) | The lines and the three eyelid beats were installed without a line-by-line review; reduced motion was on at install, so the beats have not been seen moving on screen. |
+| consumer | yes | `verified` | [2026-11-11-reimu-dialogue-and-action-design.md](../docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/36834509b3780dc0a3ca13342928ef03b8ddd9bb) | Installed as 1.20/build 22 (since superseded by 1.21 and 1.22, which keep it); remarks are on by default and the launch greeting and a real work-eased remark were recorded in the behavior log. Idle still only stands. |
+| publication | yes | `published` | [2026-11-11-reimu-dialogue-and-action-design.md](../docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/36834509b3780dc0a3ca13342928ef03b8ddd9bb) | The maintainer delegated all further steps including commit and push on 2026-11-11; the exact Consumer commit is on origin/main. No tag or release. |
+
 <a id="reimu-eating-keyframes-intake-001"></a>
 ## `REIMU-EATING-KEYFRAMES-INTAKE-001` · Author hand and mouth eating keyframes for the work tiers
 
@@ -114,6 +131,20 @@ Derived stage: **complete**.
 | consumer | yes | `verified` | [2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md](../docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md) | The installed 1.19 loads all five keyframe loops (24/16/24/24/24 frames, reason none) and keeps the isolated per-tier fallback. |
 | publication | yes | `published` | [2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md](../docs/decisions/2026-11-11-reimu-eating-keyframes-all-tiers-runtime.md) | Consumer 3b46b9c85ff0c5dc3c6c94c40bac9fc578f2035d pushed to origin/main on 2026-11-11 at the user's request ("提交并推送"); installed locally as 1.19 / build 21 with a verified rollback. No tag or release. |
 
+<a id="reimu-manga-balloons-001"></a>
+## `REIMU-MANGA-BALLOONS-001` · Draw Reimu's lines as manga speech balloons
+
+Derived stage: **visual review**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-11-11-reimu-manga-balloons.md](../docs/decisions/2026-11-11-reimu-manga-balloons.md) | Four balloon shapes from the maintainer's reference image, the rule that picks one from how a line is said, punctuation-only wrapping, and placement above the head that avoids the status card are written down. |
+| implementation | yes | `ready` | [2026-11-11-reimu-manga-balloons.md](../docs/decisions/2026-11-11-reimu-manga-balloons.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/36834509b3780dc0a3ca13342928ef03b8ddd9bb) | SpeechBalloon.swift (click-through window, four shapes, layout), BalloonStyle in PetBehavior.swift and the --render-balloons review sheet are in the published Consumer commit. |
+| technical | yes | `passed` | [2026-11-11-reimu-manga-balloons.md](../docs/decisions/2026-11-11-reimu-manga-balloons.md) | 262 behavior and 40 native checks, including every line fitting inside all four outlines at the smallest and largest pet size and the placement cases, passed on the 1.21/build 23 bundle with strict signatures. |
+| visual | yes | `in_review` | [2026-11-11-reimu-manga-balloons.md](../docs/decisions/2026-11-11-reimu-manga-balloons.md) | The maintainer supplied the reference image but has not seen the result. Only the app's own review sheets were inspected; no real screenshot was available. |
+| consumer | yes | `verified` | [2026-11-11-reimu-manga-balloons.md](../docs/decisions/2026-11-11-reimu-manga-balloons.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/36834509b3780dc0a3ca13342928ef03b8ddd9bb) | Installed as 1.21/build 23; the window list showed the balloon window appear with the launch greeting and disappear about three seconds later. |
+| publication | yes | `published` | [2026-11-11-reimu-manga-balloons.md](../docs/decisions/2026-11-11-reimu-manga-balloons.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/36834509b3780dc0a3ca13342928ef03b8ddd9bb) | Published with the dialogue work in the same Consumer commit on origin/main. No tag or release. |
+
 <a id="reimu-props-offering-box-intake-001"></a>
 ## `REIMU-PROPS-OFFERING-BOX-INTAKE-001` · Prepare the offering box and coin props for standing scenes
 
@@ -141,6 +172,20 @@ Derived stage: **complete**.
 | visual | yes | `approved` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md), [2026-11-10-reimu-props-offering-box-intake.md](../docs/decisions/2026-11-10-reimu-props-offering-box-intake.md) | The user replied "差不多" on 2026-11-10 after using the installed lines; individual lines may still be revised on request. |
 | consumer | yes | `verified` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/2c62a77067d53746824946eeeb4c6c8ff2522175) | Installed 1.16 runs with the new reactions; idle autonomy is off by default in the production identity. |
 | publication | yes | `published` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/2c62a77067d53746824946eeeb4c6c8ff2522175) | The maintainer asked to commit and push on 2026-11-10; the exact Consumer commit was verified on origin/main. No tag or package release is implied. |
+
+<a id="reimu-tea-break-001"></a>
+## `REIMU-TEA-BREAK-001` · Tea break at the low table after a round of work
+
+Derived stage: **visual review**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-11-11-reimu-dialogue-and-action-design.md](../docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md), [2026-11-11-reimu-tea-break.md](../docs/decisions/2026-11-11-reimu-tea-break.md) | The action, its trigger (working to round-ended only), its end, click behaviour, reduced motion and isolated fallback are written down; the maintainer asked for it with "画收工茶". |
+| implementation | yes | `ready` | [2026-11-11-reimu-tea-break.md](../docs/decisions/2026-11-11-reimu-tea-break.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/4dc36a9950a8a9a50f009e30a498cf4d046f7c16) | The tea_break-v1 package (48 frames), PetScene.tea, PetArtwork.teaBreak, the optional --tea-break build input, its package test and the repository gate are in the published Consumer commit. |
+| technical | yes | `passed` | [2026-11-11-reimu-tea-break.md](../docs/decisions/2026-11-11-reimu-tea-break.md) | Harness 0.8.0 validation of the full and reduced builds, the pixel gates (zero changed pixels outside the take rectangle against the approved task_3 still, unchanged opaque bounds, 1179-1458 px changed at 160 px), 274 behavior, 41 native and 5 package checks and strict signatures passed on the 1.22/build 24 bundle. |
+| visual | yes | `in_review` | [2026-11-11-reimu-tea-break.md](../docs/decisions/2026-11-11-reimu-tea-break.md) | Not reviewed by the maintainer. Installed on the designer's decision after the maintainer delegated all further steps on 2026-11-11; the review GIFs are waiting for the maintainer. |
+| consumer | yes | `verified` | [2026-11-11-reimu-tea-break.md](../docs/decisions/2026-11-11-reimu-tea-break.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/4dc36a9950a8a9a50f009e30a498cf4d046f7c16) | Installed as 1.22/build 24; the installed loader reports tea_break_reason none and all five tiers none. |
+| publication | yes | `published` | [2026-11-11-reimu-tea-break.md](../docs/decisions/2026-11-11-reimu-tea-break.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/4dc36a9950a8a9a50f009e30a498cf4d046f7c16) | The exact Consumer commit is on origin/main under the maintainer's delegation. No tag or release. |
 
 <a id="reimu-tier-emote-loops-intake-001"></a>
 ## `REIMU-TIER-EMOTE-LOOPS-INTAKE-001` · Prepare emote-layer life loops for the static Tier1/3/4/5 stills
