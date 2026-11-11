@@ -1666,6 +1666,69 @@
           "note": "The exact Consumer commit is on origin/main; the maintainer answered \"\u63d0\u4ea4\u5e76\u63a8\u9001\" on 2026-11-11. No tag or release."
         }
       }
+    },
+    "REIMU-FAILURE-DROOP-001": {
+      "title": "Hanging her head and sighing once when the observed work fails",
+      "kind": "consumer-vertical-slice",
+      "depends_on": [
+        "REIMU-STANDING-YAWN-001"
+      ],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual",
+        "consumer",
+        "publication"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md",
+            "docs/decisions/2026-11-11-reimu-failure-droop.md"
+          ],
+          "note": "Row 4 of the action roadmap; the pose pair, the once-per-failure trigger, reduced motion and the fallback to the eyelid wince are written down. The maintainer answered \"\u753b\" on 2026-11-11."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-failure-droop.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/46e5799c161334dc116111b55b22dfb858cdd44c"
+          ],
+          "note": "The droop-v1 pose table (with the approval record), presentation(droopAllowed:), the optional --droop build input, its package test and the gate rule are in the published Consumer commit."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-failure-droop.md"
+          ],
+          "note": "Harness 0.8.0 validation, pixel gates (zero changed pixels outside the take rectangle, unchanged shoe line, 3248-3648 px changed at 160 px), 311 behavior, 44 native and 4 package checks and strict signatures passed on the installed 1.25/build 27 bundle."
+        },
+        "visual": {
+          "status": "approved",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-failure-droop.md"
+          ],
+          "note": "With the side-by-side review GIF delivered and the three weak spots listed, the maintainer replied \"\u53ef\u4ee5\uff0c\u5b89\u88c5\" on 2026-11-11. Approval was given from an offline composite before installation; reduced motion was on at install, so the droop may not have been seen on screen."
+        },
+        "consumer": {
+          "status": "verified",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-failure-droop.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/46e5799c161334dc116111b55b22dfb858cdd44c"
+          ],
+          "note": "Installed as 1.25/build 27, built from the sources later published unchanged; the installed loader reports droop_reason none and droop_frames 4."
+        },
+        "publication": {
+          "status": "published",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-failure-droop.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/46e5799c161334dc116111b55b22dfb858cdd44c"
+          ],
+          "note": "The exact Consumer commit is on origin/main; the maintainer answered \"\u63d0\u4ea4\u5e76\u63a8\u9001\" on 2026-11-11. No tag or release."
+        }
+      }
     }
   }
 }

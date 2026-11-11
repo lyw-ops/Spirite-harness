@@ -1,5 +1,13 @@
 # Project handoff
 
+## 2026-11-11 1.25 / build 27 已安装并发布：出错时垂头叹气
+
+用户对我建议的下一个动作回复「画」，看过对照动图后回复「可以，安装」。`docs/decisions/2026-11-11-reimu-failure-droop.md`，`REIMU-FAILURE-DROOP-001`，
+工作目录 `build/reimu-standing-droop-v1/`。`droop-v1` 带确认记录重新导出，`build.py` 改钉摘要，1.25 / build 27 通过全部测试
+（行为 311、原生 44、垂头 4 及其余、仓库门禁）后安装；回退包 `build/reimu-1.25-install-20261111/rollback-1.24-build26.zip`。
+安装后用户回复「提交并推送」，Consumer `46e5799` 已推送。构建多了一个输入 `--droop`（Consumer 仓库里的包，或已安装应用的 `Resources/Droop`）。
+减弱动态开着时出错只出台词；用户确认时还没在应用里看到它。
+
 ## 2026-11-11 1.24 / build 26 已安装并发布：等你确认时托腮；清理同步冲突副本
 
 用户对「接着做什么」里的两项回复「做，可以处理一下冲突副本」。
