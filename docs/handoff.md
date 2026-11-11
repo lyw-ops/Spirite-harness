@@ -1,5 +1,15 @@
 # Project handoff
 
+## 2026-11-11 1.26 / build 28 已安装并发布：夜里伏桌睡
+
+用户对我建议的下一个动作回复「做」，看过对照动图后回复「可以，安装」。`docs/decisions/2026-11-11-reimu-night-sleep.md`，`REIMU-NIGHT-SLEEP-001`，
+工作目录 `build/reimu-night-sleep-v1/`。不画新图：9 月的睡姿和三张过渡姿态原样打包成 `night_sleep-v1`；新做的是规则
+（深夜 23–7 点、空闲且没人理满 20 分钟入睡；点击和天亮播醒来姿态；开工、等确认、出错、拖动、喂食、暂停立刻离开）。
+包带确认记录重新导出，`build.py` 改钉摘要，1.26 / build 28 通过全部测试（行为 334、原生 46、夜间睡眠 4 及其余、仓库门禁）后安装；
+回退包 `build/reimu-1.26-install-20261111/rollback-1.25-build27.zip`。安装后用户回复「提交并推送」，Consumer `eb978dc` 已推送。
+菜单「深夜没人理就趴桌睡」默认开；减弱动态下照样入睡、不播中间姿态（这两处是我定的，已告诉用户）。用户还没在应用里看到它。
+构建多了一个输入 `--night-sleep`（Consumer 仓库里的包，或已安装应用的 `Resources/Sleep`）。
+
 ## 2026-11-11 1.25 / build 27 已安装并发布：出错时垂头叹气
 
 用户对我建议的下一个动作回复「画」，看过对照动图后回复「可以，安装」。`docs/decisions/2026-11-11-reimu-failure-droop.md`，`REIMU-FAILURE-DROOP-001`，
