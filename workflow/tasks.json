@@ -1921,6 +1921,68 @@
           "note": "The exact Consumer commit is on origin/main; the maintainer answered \"\u63d0\u4ea4\u5e76\u63a8\u9001\" on 2026-11-11. No tag or release."
         }
       }
+    },
+    "REIMU-SHORT-MENU-001": {
+      "title": "Shorter context menu: status line, three actions, three submenus and Quit",
+      "kind": "consumer-vertical-slice",
+      "depends_on": [
+        "REIMU-SIT-BRIDGE-001"
+      ],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual",
+        "consumer",
+        "publication"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-short-context-menu.md"
+          ],
+          "note": "The maintainer sent a screenshot of the 20-row menu and asked whether it could be simpler; the new top level and what each submenu holds are written down. No function or preference key changes."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-short-context-menu.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/b846bd7787e8c0ad3ddbbe484574d65ca47e13a0"
+          ],
+          "note": "makeMenu() and one native self-test changed; both are in the published Consumer commit."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-short-context-menu.md"
+          ],
+          "note": "362 behavior checks, 51 native checks (1 new, on the menu shape), 17 package and status tests, the repository gate and strict signatures passed on the installed 1.29/build 31 bundle."
+        },
+        "visual": {
+          "status": "approved",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-short-context-menu.md"
+          ],
+          "note": "With 1.29 installed and the new layout described, the maintainer was asked whether to commit and push if the menu was fine, with a \"change it\" alternative, and answered \"\u63d0\u4ea4\u5e76\u63a8\u9001\" on 2026-11-11. No separate comment on the layout was given."
+        },
+        "consumer": {
+          "status": "verified",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-short-context-menu.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/b846bd7787e8c0ad3ddbbe484574d65ca47e13a0"
+          ],
+          "note": "Installed as 1.29/build 31, built from the sources later published unchanged; every asset reason is none."
+        },
+        "publication": {
+          "status": "published",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-short-context-menu.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/b846bd7787e8c0ad3ddbbe484574d65ca47e13a0"
+          ],
+          "note": "The exact Consumer commit is on origin/main; the maintainer answered \"\u63d0\u4ea4\u5e76\u63a8\u9001\" on 2026-11-11. No tag or release."
+        }
+      }
     }
   }
 }

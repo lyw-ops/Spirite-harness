@@ -1,5 +1,12 @@
 # Project handoff
 
+## 2026-11-11 1.29 / build 31 已安装并发布：右键菜单精简
+
+用户发来右键菜单截图问「这个栏可以做的简洁一点？」。`docs/decisions/2026-11-11-reimu-short-context-menu.md`，`REIMU-SHORT-MENU-001`。
+顶层从 20 行减到 8 行（状态一行、喂饭团、暂停、任务状态框、「行为 ▸」「大小和位置 ▸」「更多 ▸」、退出），功能和偏好键都没变；只改了 `makeMenu()` 和一项自检。
+行为 362、原生 51、17 个资源包与状态测试、仓库门禁通过后安装；回退包 `build/reimu-1.29-install-20261111/rollback-1.28-build30.zip`。
+安装后用户回复「提交并推送」，Consumer `b846bd7` 已推送。安装时读到 `reduced = 0`、`idleActivities = 1`：用户已经自己关了减弱动态、开了待机活动。
+
 ## 2026-11-11 1.28 / build 30 已安装并发布：画出来的坐下和站起
 
 用户对「画出来的坐下和站起仍然没有」回复「做」，看过对照动图后回复「可以，安装」。`docs/decisions/2026-11-11-reimu-sit-down-and-stand-up.md`，

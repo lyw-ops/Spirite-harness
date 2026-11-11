@@ -22,6 +22,7 @@ A gate records one claim only. In particular, `technical: passed` never supplies
 | `REIMU-POOF-BRIDGE-001` · Smoke display bridge between pose families | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TEA-BREAK-001` |
 | `REIMU-PROPS-OFFERING-BOX-INTAKE-001` · Prepare the offering box and coin props for standing scenes | animation-delivery | **blocked** | specification, implementation, technical, visual | `REIMU-SCENE-REACTIONS-001` |
 | `REIMU-SCENE-REACTIONS-001` · Scene-aware click reactions, Reimu-voiced lines, and plain standing idle | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER-EMOTE-LOOPS-RUNTIME-001` |
+| `REIMU-SHORT-MENU-001` · Shorter context menu: status line, three actions, three submenus and Quit | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-SIT-BRIDGE-001` |
 | `REIMU-SIT-BRIDGE-001` · Drawn sit-down and stand-up poses inside the display bridge | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-POOF-BRIDGE-001`, `REIMU-GOHEI-FLOAT-SWEEP-001` |
 | `REIMU-STANDING-YAWN-001` · Standing yawn for sleepy clicks and late greetings | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-DIALOGUE-ACTIONS-001` |
 | `REIMU-TEA-BREAK-001` · Tea break at the low table after a round of work | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-DIALOGUE-ACTIONS-001`, `REIMU-EATING-KEYFRAMES-RUNTIME-001` |
@@ -235,6 +236,20 @@ Derived stage: **complete**.
 | visual | yes | `approved` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md), [2026-11-10-reimu-props-offering-box-intake.md](../docs/decisions/2026-11-10-reimu-props-offering-box-intake.md) | The user replied "差不多" on 2026-11-10 after using the installed lines; individual lines may still be revised on request. |
 | consumer | yes | `verified` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/2c62a77067d53746824946eeeb4c6c8ff2522175) | Installed 1.16 runs with the new reactions; idle autonomy is off by default in the production identity. |
 | publication | yes | `published` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/2c62a77067d53746824946eeeb4c6c8ff2522175) | The maintainer asked to commit and push on 2026-11-10; the exact Consumer commit was verified on origin/main. No tag or package release is implied. |
+
+<a id="reimu-short-menu-001"></a>
+## `REIMU-SHORT-MENU-001` · Shorter context menu: status line, three actions, three submenus and Quit
+
+Derived stage: **complete**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-11-11-reimu-short-context-menu.md](../docs/decisions/2026-11-11-reimu-short-context-menu.md) | The maintainer sent a screenshot of the 20-row menu and asked whether it could be simpler; the new top level and what each submenu holds are written down. No function or preference key changes. |
+| implementation | yes | `ready` | [2026-11-11-reimu-short-context-menu.md](../docs/decisions/2026-11-11-reimu-short-context-menu.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/b846bd7787e8c0ad3ddbbe484574d65ca47e13a0) | makeMenu() and one native self-test changed; both are in the published Consumer commit. |
+| technical | yes | `passed` | [2026-11-11-reimu-short-context-menu.md](../docs/decisions/2026-11-11-reimu-short-context-menu.md) | 362 behavior checks, 51 native checks (1 new, on the menu shape), 17 package and status tests, the repository gate and strict signatures passed on the installed 1.29/build 31 bundle. |
+| visual | yes | `approved` | [2026-11-11-reimu-short-context-menu.md](../docs/decisions/2026-11-11-reimu-short-context-menu.md) | With 1.29 installed and the new layout described, the maintainer was asked whether to commit and push if the menu was fine, with a "change it" alternative, and answered "提交并推送" on 2026-11-11. No separate comment on the layout was given. |
+| consumer | yes | `verified` | [2026-11-11-reimu-short-context-menu.md](../docs/decisions/2026-11-11-reimu-short-context-menu.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/b846bd7787e8c0ad3ddbbe484574d65ca47e13a0) | Installed as 1.29/build 31, built from the sources later published unchanged; every asset reason is none. |
+| publication | yes | `published` | [2026-11-11-reimu-short-context-menu.md](../docs/decisions/2026-11-11-reimu-short-context-menu.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/b846bd7787e8c0ad3ddbbe484574d65ca47e13a0) | The exact Consumer commit is on origin/main; the maintainer answered "提交并推送" on 2026-11-11. No tag or release. |
 
 <a id="reimu-sit-bridge-001"></a>
 ## `REIMU-SIT-BRIDGE-001` · Drawn sit-down and stand-up poses inside the display bridge
