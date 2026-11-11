@@ -1858,6 +1858,69 @@
           "note": "The exact Consumer commit is on origin/main; the maintainer answered \"\u63d0\u4ea4\u5e76\u63a8\u9001\" on 2026-11-11. No tag or release."
         }
       }
+    },
+    "REIMU-SIT-BRIDGE-001": {
+      "title": "Drawn sit-down and stand-up poses inside the display bridge",
+      "kind": "consumer-vertical-slice",
+      "depends_on": [
+        "REIMU-POOF-BRIDGE-001",
+        "REIMU-GOHEI-FLOAT-SWEEP-001"
+      ],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual",
+        "consumer",
+        "publication"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-sit-down-and-stand-up.md"
+          ],
+          "note": "Two authored poses at the standing scale shown before the smoke when she leaves the standing family and after it when she returns; step tables, interruption, reduced motion and fallback are written down. It is explicitly not the authored route of the frozen work-transition specification and closes no gate of REIMU-WORK-TRANSITIONS-001. The maintainer answered \"\u505a\" on 2026-11-11."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-sit-down-and-stand-up.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/8b83fd78163e56acc474365f14dcfc99a665b916"
+          ],
+          "note": "The sit-v1 pose table (with the approval record), DisplayBridge.plan and interrupts, the host drawing, the optional --sit build input, its package test and the gate rule are in the published Consumer commit."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-sit-down-and-stand-up.md"
+          ],
+          "note": "Harness 0.8.0 validation, 362 behavior checks (9 new), 50 native checks (1 new), 4 package checks, every other package test and strict signatures passed on the installed 1.28/build 30 bundle."
+        },
+        "visual": {
+          "status": "approved",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-sit-down-and-stand-up.md"
+          ],
+          "note": "With the review GIF delivered and told that this is not the frozen specification's route, that the scale jump stays under the smoke and that the seated art appears 0.32 s later, the maintainer replied \"\u53ef\u4ee5\uff0c\u5b89\u88c5\" on 2026-11-11. The GIF was an offline composite; reduced motion was on at install, so it has not been seen on screen."
+        },
+        "consumer": {
+          "status": "verified",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-sit-down-and-stand-up.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/8b83fd78163e56acc474365f14dcfc99a665b916"
+          ],
+          "note": "Installed as 1.28/build 30, built from the sources later published unchanged; the installed loader reports every reason none and sit_frames 4."
+        },
+        "publication": {
+          "status": "published",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-sit-down-and-stand-up.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/8b83fd78163e56acc474365f14dcfc99a665b916"
+          ],
+          "note": "The exact Consumer commit is on origin/main; the maintainer answered \"\u63d0\u4ea4\u5e76\u63a8\u9001\" on 2026-11-11. No tag or release."
+        }
+      }
     }
   }
 }
