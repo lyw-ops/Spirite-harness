@@ -1391,11 +1391,11 @@
           "note": "262 behavior and 40 native checks, including every line fitting inside all four outlines at the smallest and largest pet size and the placement cases, passed on the 1.21/build 23 bundle with strict signatures."
         },
         "visual": {
-          "status": "in_review",
+          "status": "approved",
           "evidence": [
             "docs/decisions/2026-11-11-reimu-manga-balloons.md"
           ],
-          "note": "The maintainer supplied the reference image but has not seen the result. Only the app's own review sheets were inspected; no real screenshot was available."
+          "note": "With 1.21 and then 1.22 installed and the app-rendered review sheet delivered, the maintainer was asked whether the balloons and the tea break look right and replied \"\u90fd\u53ef\u4ee5\" on 2026-11-11. Approval covers the four shapes and their placement as shipped."
         },
         "consumer": {
           "status": "verified",
@@ -1455,11 +1455,11 @@
           "note": "Harness 0.8.0 validation of the full and reduced builds, the pixel gates (zero changed pixels outside the take rectangle against the approved task_3 still, unchanged opaque bounds, 1179-1458 px changed at 160 px), 274 behavior, 41 native and 5 package checks and strict signatures passed on the 1.22/build 24 bundle."
         },
         "visual": {
-          "status": "in_review",
+          "status": "approved",
           "evidence": [
             "docs/decisions/2026-11-11-reimu-tea-break.md"
           ],
-          "note": "Not reviewed by the maintainer. Installed on the designer's decision after the maintainer delegated all further steps on 2026-11-11; the review GIFs are waiting for the maintainer."
+          "note": "With 1.22 installed and the side-by-side review GIF delivered, the maintainer replied \"\u90fd\u53ef\u4ee5\" on 2026-11-11. Approval covers the three poses and the loop as shipped, with the weak spots listed in the record; reduced motion was on at the time, so on-screen playback may not have been seen."
         },
         "consumer": {
           "status": "verified",
