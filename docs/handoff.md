@@ -1,5 +1,15 @@
 # Project handoff
 
+## 2026-11-11 1.27 / build 29 已安装并发布：举御币、飘起来、扫地 + Codex 审过的台词
+
+用户说「做完，台词你可以让codex去根据博丽灵梦的人物性格和习惯去review」，看过三张对照动图后回复「可以，安装」。
+`docs/decisions/2026-11-11-reimu-gohei-float-sweep-and-line-review.md`，`REIMU-GOHEI-FLOAT-SWEEP-001`，工作目录 `build/reimu-standing-{gohei,float,sweep}-v1/` 和 `build/reimu-line-review-v1/`。
+三个动作各两张 Codex 关键帧：站姿第四下点击举御币、拖动时飘起来（整张取用）、扫地（早晨问候 + 待机自发）。Codex 审了全部 135 句台词，建议改的 16 句都已采纳。
+三个包带确认记录重新导出，`build.py` 改钉摘要，1.27 / build 29 通过全部测试（行为 353、原生 49、16 个资源包与状态测试、仓库门禁）后安装；
+回退包 `build/reimu-1.27-install-20261111/rollback-1.26-build28.zip`。安装后用户回复「提交并推送」，Consumer `a81b57b` 已推送。
+构建输入现在是 `--gohei`、`--float`、`--sweep`、`--night-sleep`、`--yawn`、`--droop`、`--poof`、`--tea-break`，都可以用已安装应用的 `Resources` 下对应目录。
+至此设计路线里的七个新图动作都做完并装上了；没做的只有画出来的站 ↔ 坐过渡（`REIMU-WORK-TRANSITIONS-001`）。
+
 ## 2026-11-11 1.26 / build 28 已安装并发布：夜里伏桌睡
 
 用户对我建议的下一个动作回复「做」，看过对照动图后回复「可以，安装」。`docs/decisions/2026-11-11-reimu-night-sleep.md`，`REIMU-NIGHT-SLEEP-001`，

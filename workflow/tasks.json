@@ -1329,11 +1329,12 @@
           "note": "254 behavior, 38 native AppKit, reaction, standing, per-tier loader, status contract and repository gate checks and strict signatures passed on the 1.20/build 22 bundle."
         },
         "visual": {
-          "status": "in_review",
+          "status": "approved",
           "evidence": [
-            "docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md"
+            "docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md",
+            "docs/decisions/2026-11-11-reimu-gohei-float-sweep-and-line-review.md"
           ],
-          "note": "The lines and the three eyelid beats were installed without a line-by-line review; reduced motion was on at install, so the beats have not been seen moving on screen."
+          "note": "The maintainer did not review the lines one by one and on 2026-11-11 delegated that review to Codex; it kept 119 of 135 lines and revised 16, all adopted and installed with 1.27/build 29. The maintainer then approved the installation with the three kinds of change summarised. The eyelid beats were never singled out for review."
         },
         "consumer": {
           "status": "verified",
@@ -1789,6 +1790,70 @@
           "evidence": [
             "docs/decisions/2026-11-11-reimu-night-sleep.md",
             "https://github.com/lyw-ops/gensokyo-codex-pets/commit/eb978dc6685371b4a3894e5326c0b2fca8c57125"
+          ],
+          "note": "The exact Consumer commit is on origin/main; the maintainer answered \"\u63d0\u4ea4\u5e76\u63a8\u9001\" on 2026-11-11. No tag or release."
+        }
+      }
+    },
+    "REIMU-GOHEI-FLOAT-SWEEP-001": {
+      "title": "Gohei on the fourth standing click, floating while dragged, sweeping; and the Codex review of every line",
+      "kind": "consumer-vertical-slice",
+      "depends_on": [
+        "REIMU-FAILURE-DROOP-001",
+        "REIMU-NIGHT-SLEEP-001"
+      ],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual",
+        "consumer",
+        "publication"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md",
+            "docs/decisions/2026-11-11-reimu-gohei-float-sweep-and-line-review.md"
+          ],
+          "note": "Rows 3, 5 and 6 of the action roadmap, with each trigger, reduced motion and fallback written down, and the brief given to Codex for the line review. The maintainer answered \"\u505a\u5b8c\uff0c\u53f0\u8bcd\u4f60\u53ef\u4ee5\u8ba9codex\u53bb\u6839\u636e\u535a\u4e3d\u7075\u68a6\u7684\u4eba\u7269\u6027\u683c\u548c\u4e60\u60ef\u53bbreview\" on 2026-11-11."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-gohei-float-sweep-and-line-review.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/a81b57b21d7bfd29fcb22a1d371c2ffe784136f6"
+          ],
+          "note": "The gohei-v1, float-v1 and sweep-v1 pose tables (with the approval record), their actions and triggers, three optional build inputs, three package tests, the gate rules and the sixteen revised lines are in the published Consumer commit."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-gohei-float-sweep-and-line-review.md"
+          ],
+          "note": "Harness 0.8.0 validation and pixel gates for all three (zero changed pixels outside the take rectangles for gohei and sweep; float is taken whole), 353 behavior checks, 49 native checks, 4 checks per new package and every other package test and strict signatures passed on the installed 1.27/build 29 bundle."
+        },
+        "visual": {
+          "status": "approved",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-gohei-float-sweep-and-line-review.md"
+          ],
+          "note": "With three review GIFs delivered and the triggers, the line changes and the weak spots listed, the maintainer replied \"\u53ef\u4ee5\uff0c\u5b89\u88c5\" on 2026-11-11. The GIFs were offline composites; reduced motion was on at install; the sixteen revised lines were reviewed by Codex at the maintainer's request and not read one by one by the maintainer."
+        },
+        "consumer": {
+          "status": "verified",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-gohei-float-sweep-and-line-review.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/a81b57b21d7bfd29fcb22a1d371c2ffe784136f6"
+          ],
+          "note": "Installed as 1.27/build 29, built from the sources later published unchanged; the installed loader reports every reason none and 4 frames for each new package."
+        },
+        "publication": {
+          "status": "published",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-gohei-float-sweep-and-line-review.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/a81b57b21d7bfd29fcb22a1d371c2ffe784136f6"
           ],
           "note": "The exact Consumer commit is on origin/main; the maintainer answered \"\u63d0\u4ea4\u5e76\u63a8\u9001\" on 2026-11-11. No tag or release."
         }
