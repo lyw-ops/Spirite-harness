@@ -39,13 +39,14 @@ def test_first_unsatisfied_required_gate_drives_stage():
 
 
 def test_blocking_gate_dominates_later_progress():
-    task = deepcopy(load_tasks()["tasks"]["REIMU-ACTIONS-001"])
+    task = deepcopy(load_tasks()["tasks"]["HARNESS-KEYFRAMES-001"])
+    task["required_gates"] = list(update.GATES)  # the sample task itself does not require a visual gate
     task["gates"]["visual"]["status"] = "rejected"
     assert update.overall(task) == "blocked"
 
 
 def test_dependency_cycle_is_rejected():
     data = load_tasks()
-    data["tasks"]["HARNESS-WORKFLOW-001"]["depends_on"] = ["REIMU-ACTIONS-001"]
-    data["tasks"]["REIMU-ACTIONS-001"]["depends_on"] = ["HARNESS-WORKFLOW-001"]
+    data["tasks"]["HARNESS-WORKFLOW-001"]["depends_on"] = ["HARNESS-KEYFRAMES-001"]
+    data["tasks"]["HARNESS-KEYFRAMES-001"]["depends_on"] = ["HARNESS-WORKFLOW-001"]
     assert any("dependency cycle" in error for error in update.validate(data))

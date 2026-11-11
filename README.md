@@ -123,6 +123,12 @@ or a build directory produced by `plan`.
 - [`examples/reimu-eating-task2/`](examples/reimu-eating-task2/) — a
   frame-manifest example with clearly marked programmatic placeholder frames.
 
+This repository holds the tool only. The decision records, task ledger and
+handoff journal of the Reimu desktop pet built with it live in
+[gensokyo-codex-pets](https://github.com/lyw-ops/gensokyo-codex-pets)
+(`docs/decisions/`, `workflow/`, `HANDOFF.md`); they were kept here until
+2026-11-11.
+
 ## Documentation
 
 - [`HARNESS.md`](HARNESS.md) — canonical protocol: workflow, artifact
