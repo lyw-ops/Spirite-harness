@@ -33,6 +33,7 @@ A gate records one claim only. In particular, `technical: passed` never supplies
 | `REIMU-TIER4-RUNTIME-001` · Connect observed count four to the existing native Tier4 still | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER3-RUNTIME-001`, `REIMU-TIER4-INTAKE-001` |
 | `REIMU-TIER5-INTAKE-001` · Prepare and review the existing Tier5 meal still | animation-delivery | **complete** | specification, implementation, technical, visual | — |
 | `REIMU-TIER5-RUNTIME-001` · Connect five or more observed tasks to the existing native Tier5 still | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER4-RUNTIME-001`, `REIMU-TIER5-INTAKE-001` |
+| `REIMU-WAITING-SLOUCH-001` · Slouch at the low table while the observed work waits for input | consumer-vertical-slice | **visual review** | specification, implementation, technical, visual, consumer, publication | `REIMU-DIALOGUE-ACTIONS-001`, `REIMU-POOF-BRIDGE-001` |
 | `REIMU-WORK-TRANSITIONS-001` · Author transitions around native workload eating | animation-delivery | **implementation** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER2-RUNTIME-001`, `REIMU-TIER3-RUNTIME-001`, `REIMU-TIER4-RUNTIME-001`, `REIMU-TIER5-RUNTIME-001`, `REIMU-TIER1-RUNTIME-001` |
 
 <a id="harness-keyframes-001"></a>
@@ -384,6 +385,20 @@ Derived stage: **complete**.
 | visual | yes | `approved` | [2026-09-20-reimu-tier5-native-static-slice.md](../docs/decisions/2026-09-20-reimu-tier5-native-static-slice.md), [2026-09-20-reimu-tier5-visual-approval.md](../docs/decisions/2026-09-20-reimu-tier5-visual-approval.md) | The user approved the reviewed native size, placement, support and crop, static hold, Tier2/3/4/5 switching, capped selection, immediate preemption, and latest-count recovery on 2026-09-20. |
 | consumer | yes | `verified` | [2026-09-20-reimu-tier5-native-static-slice.md](../docs/decisions/2026-09-20-reimu-tier5-native-static-slice.md), [2026-09-20-reimu-tier5-visual-approval.md](../docs/decisions/2026-09-20-reimu-tier5-visual-approval.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/d2b6bef76d9b5330f5e56a7ee61fbe86c6cdf9ac) | The published Consumer source selects Tier5 only through the single capped mapping while working, independently degrades a broken package, and accepts the approved manifest in preview or production identity. |
 | publication | yes | `published` | [2026-09-20-reimu-tier5-publication.md](../docs/decisions/2026-09-20-reimu-tier5-publication.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/d2b6bef76d9b5330f5e56a7ee61fbe86c6cdf9ac) | The exact Consumer commit is verified on origin/main; no application installation, tag, or package release is implied. |
+
+<a id="reimu-waiting-slouch-001"></a>
+## `REIMU-WAITING-SLOUCH-001` · Slouch at the low table while the observed work waits for input
+
+Derived stage: **visual review**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-11-11-reimu-dialogue-and-action-design.md](../docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md), [2026-11-11-reimu-waiting-slouch.md](../docs/decisions/2026-11-11-reimu-waiting-slouch.md) | Listed in the action design as the one change that needs no new art; when it shows, clicks, reduced motion, the fallback without the clip and the bridge rule are written down. The maintainer answered "做" on 2026-11-11. |
+| implementation | yes | `ready` | [2026-11-11-reimu-waiting-slouch.md](../docs/decisions/2026-11-11-reimu-waiting-slouch.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/05cde7d29f6dca97b7e1c600546227c66e09f5d6) | presentation(waitSlouchAllowed:), the host flag and the tests are in the published Consumer commit; no asset was added or changed. |
+| technical | yes | `passed` | [2026-11-11-reimu-waiting-slouch.md](../docs/decisions/2026-11-11-reimu-waiting-slouch.md) | 301 behavior checks (9 new), 43 native checks (1 new), every package test, the repository gate and strict signatures passed on the installed 1.24/build 26 bundle. |
+| visual | yes | `in_review` | [2026-11-11-reimu-waiting-slouch.md](../docs/decisions/2026-11-11-reimu-waiting-slouch.md) | The slouch loop itself is approved art; its use for the waiting state has not been seen by the maintainer, and no screen capture was possible. |
+| consumer | yes | `verified` | [2026-11-11-reimu-waiting-slouch.md](../docs/decisions/2026-11-11-reimu-waiting-slouch.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/05cde7d29f6dca97b7e1c600546227c66e09f5d6) | Installed as 1.24/build 26, built from the sources later published unchanged; the installed loader reports slouch_reason none. |
+| publication | yes | `published` | [2026-11-11-reimu-waiting-slouch.md](../docs/decisions/2026-11-11-reimu-waiting-slouch.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/05cde7d29f6dca97b7e1c600546227c66e09f5d6) | The exact Consumer commit is on origin/main; the maintainer answered "提交并推送" on 2026-11-11. No tag or release. |
 
 <a id="reimu-work-transitions-001"></a>
 ## `REIMU-WORK-TRANSITIONS-001` · Author transitions around native workload eating

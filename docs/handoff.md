@@ -1,5 +1,16 @@
 # Project handoff
 
+## 2026-11-11 1.24 / build 26 已安装并发布：等你确认时托腮；清理同步冲突副本
+
+用户对「接着做什么」里的两项回复「做，可以处理一下冲突副本」。
+
+- 等确认时托腮：`docs/decisions/2026-11-11-reimu-waiting-slouch.md`，`REIMU-WAITING-SLOUCH-001`。不加新图，`needs_input` 时显示已批准的托腮循环；
+  行为 301、原生 43 及其余检查通过，1.24 / build 26 已安装，回退包 `build/reimu-1.24-install-20261111/rollback-1.23-build25.zip`。
+  安装后用户回复「提交并推送」，Consumer `05cde7d` 已推送。视觉门仍是 `in_review`：用户还没看到效果。
+- 冲突副本：`docs/decisions/2026-11-11-reimu-conflict-copies-cleanup.md`，清单 `build/reimu-conflict-copies-cleanup-20261111/moved.tsv`。
+  585 个有原件的副本和 8 个空目录移到了废纸篓 `~/.Trash/reimu-conflict-copies-20261111/`（没有永久删除）；4 个没有原件的没动。
+  原因（仓库在被同步的 `~/Documents` 里）没有消除，副本还会再出现，提交时继续只按文件名添加。
+
 ## 2026-11-11 1.23 / build 25 已安装并发布：站姿打哈欠、烟雾过渡
 
 用户说「画打哈欠」，随后说「然后我也建议我们做一些过度动画」；看过两张对照动图后回复「都可以，安装」。

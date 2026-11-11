@@ -1602,6 +1602,70 @@
           "note": "The exact Consumer commit is on origin/main; the maintainer agreed to install, commit and push in the same reply. No tag or release."
         }
       }
+    },
+    "REIMU-WAITING-SLOUCH-001": {
+      "title": "Slouch at the low table while the observed work waits for input",
+      "kind": "consumer-vertical-slice",
+      "depends_on": [
+        "REIMU-DIALOGUE-ACTIONS-001",
+        "REIMU-POOF-BRIDGE-001"
+      ],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual",
+        "consumer",
+        "publication"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-dialogue-and-action-design.md",
+            "docs/decisions/2026-11-11-reimu-waiting-slouch.md"
+          ],
+          "note": "Listed in the action design as the one change that needs no new art; when it shows, clicks, reduced motion, the fallback without the clip and the bridge rule are written down. The maintainer answered \"\u505a\" on 2026-11-11."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-waiting-slouch.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/05cde7d29f6dca97b7e1c600546227c66e09f5d6"
+          ],
+          "note": "presentation(waitSlouchAllowed:), the host flag and the tests are in the published Consumer commit; no asset was added or changed."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-waiting-slouch.md"
+          ],
+          "note": "301 behavior checks (9 new), 43 native checks (1 new), every package test, the repository gate and strict signatures passed on the installed 1.24/build 26 bundle."
+        },
+        "visual": {
+          "status": "in_review",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-waiting-slouch.md"
+          ],
+          "note": "The slouch loop itself is approved art; its use for the waiting state has not been seen by the maintainer, and no screen capture was possible."
+        },
+        "consumer": {
+          "status": "verified",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-waiting-slouch.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/05cde7d29f6dca97b7e1c600546227c66e09f5d6"
+          ],
+          "note": "Installed as 1.24/build 26, built from the sources later published unchanged; the installed loader reports slouch_reason none."
+        },
+        "publication": {
+          "status": "published",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-waiting-slouch.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/05cde7d29f6dca97b7e1c600546227c66e09f5d6"
+          ],
+          "note": "The exact Consumer commit is on origin/main; the maintainer answered \"\u63d0\u4ea4\u5e76\u63a8\u9001\" on 2026-11-11. No tag or release."
+        }
+      }
     }
   }
 }

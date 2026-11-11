@@ -16,7 +16,7 @@ is supplementary and never the only status signal.
 ## Current summary
 
 <!-- BEGIN GENERATED SUMMARY -->
-**2 blocked** · **21 complete** · **2 implementation** · **1 visual review**
+**2 blocked** · **21 complete** · **2 implementation** · **2 visual review**
 <!-- END GENERATED SUMMARY -->
 
 ## Task register
@@ -49,6 +49,7 @@ is supplementary and never the only status signal.
 | [`REIMU-TIER4-RUNTIME-001`](STATUS.md#reimu-tier4-runtime-001) | **complete** | — |
 | [`REIMU-TIER5-INTAKE-001`](STATUS.md#reimu-tier5-intake-001) | **complete** | — |
 | [`REIMU-TIER5-RUNTIME-001`](STATUS.md#reimu-tier5-runtime-001) | **complete** | — |
+| [`REIMU-WAITING-SLOUCH-001`](STATUS.md#reimu-waiting-slouch-001) | **visual review** | visual review |
 | [`REIMU-WORK-TRANSITIONS-001`](STATUS.md#reimu-work-transitions-001) | **implementation** | implementation |
 <!-- END GENERATED TASKS -->
 
@@ -85,6 +86,7 @@ flowchart LR
     N_REIMU_TIER4_RUNTIME_001["✓ REIMU-TIER4-RUNTIME-001<br/>Connect observed count four to the existing native Tier4 still<br/>stage: complete"]
     N_REIMU_TIER5_INTAKE_001["✓ REIMU-TIER5-INTAKE-001<br/>Prepare and review the existing Tier5 meal still<br/>stage: complete"]
     N_REIMU_TIER5_RUNTIME_001["✓ REIMU-TIER5-RUNTIME-001<br/>Connect five or more observed tasks to the existing native Tier5 still<br/>stage: complete"]
+    N_REIMU_WAITING_SLOUCH_001["◐ REIMU-WAITING-SLOUCH-001<br/>Slouch at the low table while the observed work waits for input<br/>stage: visual review"]
     N_REIMU_WORK_TRANSITIONS_001["◐ REIMU-WORK-TRANSITIONS-001<br/>Author transitions around native workload eating<br/>stage: implementation"]
     N_HARNESS_KEYFRAMES_001 --> N_REIMU_ACTIONS_001
     N_REIMU_SCENE_REACTIONS_001 --> N_REIMU_DIALOGUE_ACTIONS_001
@@ -115,6 +117,8 @@ flowchart LR
     N_REIMU_TIER4_INTAKE_001 --> N_REIMU_TIER4_RUNTIME_001
     N_REIMU_TIER4_RUNTIME_001 --> N_REIMU_TIER5_RUNTIME_001
     N_REIMU_TIER5_INTAKE_001 --> N_REIMU_TIER5_RUNTIME_001
+    N_REIMU_DIALOGUE_ACTIONS_001 --> N_REIMU_WAITING_SLOUCH_001
+    N_REIMU_POOF_BRIDGE_001 --> N_REIMU_WAITING_SLOUCH_001
     N_REIMU_TIER2_RUNTIME_001 --> N_REIMU_WORK_TRANSITIONS_001
     N_REIMU_TIER3_RUNTIME_001 --> N_REIMU_WORK_TRANSITIONS_001
     N_REIMU_TIER4_RUNTIME_001 --> N_REIMU_WORK_TRANSITIONS_001
@@ -124,7 +128,7 @@ flowchart LR
     classDef active fill:#ffedd5,stroke:#c2410c,color:#431407;
     classDef blocked fill:#fee2e2,stroke:#b91c1c,color:#450a0a;
     class N_HARNESS_KEYFRAMES_001,N_HARNESS_WORKFLOW_001,N_REIMU_EATING_KEYFRAMES_INTAKE_001,N_REIMU_EATING_KEYFRAMES_RUNTIME_001,N_REIMU_MANGA_BALLOONS_001,N_REIMU_POOF_BRIDGE_001,N_REIMU_SCENE_REACTIONS_001,N_REIMU_STANDING_YAWN_001,N_REIMU_TEA_BREAK_001,N_REIMU_TIER_EMOTE_LOOPS_INTAKE_001,N_REIMU_TIER_EMOTE_LOOPS_RUNTIME_001,N_REIMU_TIER_FACE_LOOPS_INTAKE_001,N_REIMU_TIER_FACE_LOOPS_RUNTIME_001,N_REIMU_TIER1_INTAKE_001,N_REIMU_TIER1_RUNTIME_001,N_REIMU_TIER2_RUNTIME_001,N_REIMU_TIER3_RUNTIME_001,N_REIMU_TIER4_INTAKE_001,N_REIMU_TIER4_RUNTIME_001,N_REIMU_TIER5_INTAKE_001,N_REIMU_TIER5_RUNTIME_001 complete;
-    class N_REIMU_ACTIONS_001,N_REIMU_DIALOGUE_ACTIONS_001,N_REIMU_WORK_TRANSITIONS_001 active;
+    class N_REIMU_ACTIONS_001,N_REIMU_DIALOGUE_ACTIONS_001,N_REIMU_WAITING_SLOUCH_001,N_REIMU_WORK_TRANSITIONS_001 active;
     class N_REIMU_CUTER_STANDING_INTAKE_001,N_REIMU_PROPS_OFFERING_BOX_INTAKE_001 blocked;
 ```
 <!-- END GENERATED TREE -->
