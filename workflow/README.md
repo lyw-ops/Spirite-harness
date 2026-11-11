@@ -16,7 +16,7 @@ is supplementary and never the only status signal.
 ## Current summary
 
 <!-- BEGIN GENERATED SUMMARY -->
-**2 blocked** · **19 complete** · **2 implementation** · **1 visual review**
+**2 blocked** · **21 complete** · **2 implementation** · **1 visual review**
 <!-- END GENERATED SUMMARY -->
 
 ## Task register
@@ -32,8 +32,10 @@ is supplementary and never the only status signal.
 | [`REIMU-EATING-KEYFRAMES-INTAKE-001`](STATUS.md#reimu-eating-keyframes-intake-001) | **complete** | — |
 | [`REIMU-EATING-KEYFRAMES-RUNTIME-001`](STATUS.md#reimu-eating-keyframes-runtime-001) | **complete** | — |
 | [`REIMU-MANGA-BALLOONS-001`](STATUS.md#reimu-manga-balloons-001) | **complete** | — |
+| [`REIMU-POOF-BRIDGE-001`](STATUS.md#reimu-poof-bridge-001) | **complete** | — |
 | [`REIMU-PROPS-OFFERING-BOX-INTAKE-001`](STATUS.md#reimu-props-offering-box-intake-001) | **blocked** | blocked |
 | [`REIMU-SCENE-REACTIONS-001`](STATUS.md#reimu-scene-reactions-001) | **complete** | — |
+| [`REIMU-STANDING-YAWN-001`](STATUS.md#reimu-standing-yawn-001) | **complete** | — |
 | [`REIMU-TEA-BREAK-001`](STATUS.md#reimu-tea-break-001) | **complete** | — |
 | [`REIMU-TIER-EMOTE-LOOPS-INTAKE-001`](STATUS.md#reimu-tier-emote-loops-intake-001) | **complete** | — |
 | [`REIMU-TIER-EMOTE-LOOPS-RUNTIME-001`](STATUS.md#reimu-tier-emote-loops-runtime-001) | **complete** | — |
@@ -66,8 +68,10 @@ flowchart LR
     N_REIMU_EATING_KEYFRAMES_INTAKE_001["✓ REIMU-EATING-KEYFRAMES-INTAKE-001<br/>Author hand and mouth eating keyframes for the work tiers<br/>stage: complete"]
     N_REIMU_EATING_KEYFRAMES_RUNTIME_001["✓ REIMU-EATING-KEYFRAMES-RUNTIME-001<br/>Play the eating keyframe loops in the native pet (all five work tiers)<br/>stage: complete"]
     N_REIMU_MANGA_BALLOONS_001["✓ REIMU-MANGA-BALLOONS-001<br/>Draw Reimu's lines as manga speech balloons<br/>stage: complete"]
+    N_REIMU_POOF_BRIDGE_001["✓ REIMU-POOF-BRIDGE-001<br/>Smoke display bridge between pose families<br/>stage: complete"]
     N_REIMU_PROPS_OFFERING_BOX_INTAKE_001["! REIMU-PROPS-OFFERING-BOX-INTAKE-001<br/>Prepare the offering box and coin props for standing scenes<br/>stage: blocked"]
     N_REIMU_SCENE_REACTIONS_001["✓ REIMU-SCENE-REACTIONS-001<br/>Scene-aware click reactions, Reimu-voiced lines, and plain standing idle<br/>stage: complete"]
+    N_REIMU_STANDING_YAWN_001["✓ REIMU-STANDING-YAWN-001<br/>Standing yawn for sleepy clicks and late greetings<br/>stage: complete"]
     N_REIMU_TEA_BREAK_001["✓ REIMU-TEA-BREAK-001<br/>Tea break at the low table after a round of work<br/>stage: complete"]
     N_REIMU_TIER_EMOTE_LOOPS_INTAKE_001["✓ REIMU-TIER-EMOTE-LOOPS-INTAKE-001<br/>Prepare emote-layer life loops for the static Tier1/3/4/5 stills<br/>stage: complete"]
     N_REIMU_TIER_EMOTE_LOOPS_RUNTIME_001["✓ REIMU-TIER-EMOTE-LOOPS-RUNTIME-001<br/>Play the Tier1/3/4/5 emote loops in the native pet<br/>stage: complete"]
@@ -88,8 +92,10 @@ flowchart LR
     N_REIMU_EATING_KEYFRAMES_INTAKE_001 --> N_REIMU_EATING_KEYFRAMES_RUNTIME_001
     N_REIMU_TIER_FACE_LOOPS_RUNTIME_001 --> N_REIMU_EATING_KEYFRAMES_RUNTIME_001
     N_REIMU_DIALOGUE_ACTIONS_001 --> N_REIMU_MANGA_BALLOONS_001
+    N_REIMU_TEA_BREAK_001 --> N_REIMU_POOF_BRIDGE_001
     N_REIMU_SCENE_REACTIONS_001 --> N_REIMU_PROPS_OFFERING_BOX_INTAKE_001
     N_REIMU_TIER_EMOTE_LOOPS_RUNTIME_001 --> N_REIMU_SCENE_REACTIONS_001
+    N_REIMU_DIALOGUE_ACTIONS_001 --> N_REIMU_STANDING_YAWN_001
     N_REIMU_DIALOGUE_ACTIONS_001 --> N_REIMU_TEA_BREAK_001
     N_REIMU_EATING_KEYFRAMES_RUNTIME_001 --> N_REIMU_TEA_BREAK_001
     N_REIMU_TIER1_INTAKE_001 --> N_REIMU_TIER_EMOTE_LOOPS_INTAKE_001
@@ -117,7 +123,7 @@ flowchart LR
     classDef complete fill:#dbeafe,stroke:#1d4ed8,color:#172554;
     classDef active fill:#ffedd5,stroke:#c2410c,color:#431407;
     classDef blocked fill:#fee2e2,stroke:#b91c1c,color:#450a0a;
-    class N_HARNESS_KEYFRAMES_001,N_HARNESS_WORKFLOW_001,N_REIMU_EATING_KEYFRAMES_INTAKE_001,N_REIMU_EATING_KEYFRAMES_RUNTIME_001,N_REIMU_MANGA_BALLOONS_001,N_REIMU_SCENE_REACTIONS_001,N_REIMU_TEA_BREAK_001,N_REIMU_TIER_EMOTE_LOOPS_INTAKE_001,N_REIMU_TIER_EMOTE_LOOPS_RUNTIME_001,N_REIMU_TIER_FACE_LOOPS_INTAKE_001,N_REIMU_TIER_FACE_LOOPS_RUNTIME_001,N_REIMU_TIER1_INTAKE_001,N_REIMU_TIER1_RUNTIME_001,N_REIMU_TIER2_RUNTIME_001,N_REIMU_TIER3_RUNTIME_001,N_REIMU_TIER4_INTAKE_001,N_REIMU_TIER4_RUNTIME_001,N_REIMU_TIER5_INTAKE_001,N_REIMU_TIER5_RUNTIME_001 complete;
+    class N_HARNESS_KEYFRAMES_001,N_HARNESS_WORKFLOW_001,N_REIMU_EATING_KEYFRAMES_INTAKE_001,N_REIMU_EATING_KEYFRAMES_RUNTIME_001,N_REIMU_MANGA_BALLOONS_001,N_REIMU_POOF_BRIDGE_001,N_REIMU_SCENE_REACTIONS_001,N_REIMU_STANDING_YAWN_001,N_REIMU_TEA_BREAK_001,N_REIMU_TIER_EMOTE_LOOPS_INTAKE_001,N_REIMU_TIER_EMOTE_LOOPS_RUNTIME_001,N_REIMU_TIER_FACE_LOOPS_INTAKE_001,N_REIMU_TIER_FACE_LOOPS_RUNTIME_001,N_REIMU_TIER1_INTAKE_001,N_REIMU_TIER1_RUNTIME_001,N_REIMU_TIER2_RUNTIME_001,N_REIMU_TIER3_RUNTIME_001,N_REIMU_TIER4_INTAKE_001,N_REIMU_TIER4_RUNTIME_001,N_REIMU_TIER5_INTAKE_001,N_REIMU_TIER5_RUNTIME_001 complete;
     class N_REIMU_ACTIONS_001,N_REIMU_DIALOGUE_ACTIONS_001,N_REIMU_WORK_TRANSITIONS_001 active;
     class N_REIMU_CUTER_STANDING_INTAKE_001,N_REIMU_PROPS_OFFERING_BOX_INTAKE_001 blocked;
 ```

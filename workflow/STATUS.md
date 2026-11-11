@@ -16,8 +16,10 @@ A gate records one claim only. In particular, `technical: passed` never supplies
 | `REIMU-EATING-KEYFRAMES-INTAKE-001` · Author hand and mouth eating keyframes for the work tiers | animation-delivery | **complete** | specification, implementation, technical, visual | `REIMU-TIER-FACE-LOOPS-RUNTIME-001` |
 | `REIMU-EATING-KEYFRAMES-RUNTIME-001` · Play the eating keyframe loops in the native pet (all five work tiers) | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-EATING-KEYFRAMES-INTAKE-001`, `REIMU-TIER-FACE-LOOPS-RUNTIME-001` |
 | `REIMU-MANGA-BALLOONS-001` · Draw Reimu's lines as manga speech balloons | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-DIALOGUE-ACTIONS-001` |
+| `REIMU-POOF-BRIDGE-001` · Smoke display bridge between pose families | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TEA-BREAK-001` |
 | `REIMU-PROPS-OFFERING-BOX-INTAKE-001` · Prepare the offering box and coin props for standing scenes | animation-delivery | **blocked** | specification, implementation, technical, visual | `REIMU-SCENE-REACTIONS-001` |
 | `REIMU-SCENE-REACTIONS-001` · Scene-aware click reactions, Reimu-voiced lines, and plain standing idle | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER-EMOTE-LOOPS-RUNTIME-001` |
+| `REIMU-STANDING-YAWN-001` · Standing yawn for sleepy clicks and late greetings | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-DIALOGUE-ACTIONS-001` |
 | `REIMU-TEA-BREAK-001` · Tea break at the low table after a round of work | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-DIALOGUE-ACTIONS-001`, `REIMU-EATING-KEYFRAMES-RUNTIME-001` |
 | `REIMU-TIER-EMOTE-LOOPS-INTAKE-001` · Prepare emote-layer life loops for the static Tier1/3/4/5 stills | animation-delivery | **complete** | specification, implementation, technical, visual | `REIMU-TIER1-INTAKE-001`, `REIMU-TIER4-INTAKE-001`, `REIMU-TIER5-INTAKE-001`, `REIMU-TIER3-RUNTIME-001` |
 | `REIMU-TIER-EMOTE-LOOPS-RUNTIME-001` · Play the Tier1/3/4/5 emote loops in the native pet | consumer-vertical-slice | **complete** | specification, implementation, technical, visual, consumer, publication | `REIMU-TIER-EMOTE-LOOPS-INTAKE-001`, `REIMU-TIER1-RUNTIME-001` |
@@ -145,6 +147,20 @@ Derived stage: **complete**.
 | consumer | yes | `verified` | [2026-11-11-reimu-manga-balloons.md](../docs/decisions/2026-11-11-reimu-manga-balloons.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/36834509b3780dc0a3ca13342928ef03b8ddd9bb) | Installed as 1.21/build 23; the window list showed the balloon window appear with the launch greeting and disappear about three seconds later. |
 | publication | yes | `published` | [2026-11-11-reimu-manga-balloons.md](../docs/decisions/2026-11-11-reimu-manga-balloons.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/36834509b3780dc0a3ca13342928ef03b8ddd9bb) | Published with the dialogue work in the same Consumer commit on origin/main. No tag or release. |
 
+<a id="reimu-poof-bridge-001"></a>
+## `REIMU-POOF-BRIDGE-001` · Smoke display bridge between pose families
+
+Derived stage: **complete**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-11-11-reimu-poof-display-bridge.md](../docs/decisions/2026-11-11-reimu-poof-display-bridge.md) | A display bridge under the frozen transition specification's own definition: when it appears, when it never does, its five 80 ms steps and that the behavior model is not delayed. It closes no gate of REIMU-WORK-TRANSITIONS-001. |
+| implementation | yes | `ready` | [2026-11-11-reimu-poof-display-bridge.md](../docs/decisions/2026-11-11-reimu-poof-display-bridge.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/cb160884b5d8d43a9511f66938018345552aef9c) | The poof-v1 effect package (re-exported with the approval record), DisplayBridge and PoseFamily, the overlay drawing, the menu toggle, the optional --poof build input, its package test and the gate rule are in the published Consumer commit. |
+| technical | yes | `passed` | [2026-11-11-reimu-poof-display-bridge.md](../docs/decisions/2026-11-11-reimu-poof-display-bridge.md) | 292 behavior checks including the five bridge rules, 42 native and 4 package checks and strict signatures passed on the installed 1.23/build 25 bundle; the full cloud hides 89.6-97.7% of each family's silhouette. |
+| visual | yes | `approved` | [2026-11-11-reimu-poof-display-bridge.md](../docs/decisions/2026-11-11-reimu-poof-display-bridge.md) | The maintainer replied "都可以，安装" on 2026-11-11 after the review GIF, which is a Python composite on the runtime timing and not a recording of the app. Reduced motion was on at install, so the bridge may not have been seen on screen. It closes no gate of REIMU-WORK-TRANSITIONS-001. |
+| consumer | yes | `verified` | [2026-11-11-reimu-poof-display-bridge.md](../docs/decisions/2026-11-11-reimu-poof-display-bridge.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/cb160884b5d8d43a9511f66938018345552aef9c) | Installed as 1.23/build 25; the installed loader reports poof_reason none and poof_frames 4. |
+| publication | yes | `published` | [2026-11-11-reimu-poof-display-bridge.md](../docs/decisions/2026-11-11-reimu-poof-display-bridge.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/cb160884b5d8d43a9511f66938018345552aef9c) | The exact Consumer commit is on origin/main; the maintainer agreed to install, commit and push in the same reply. No tag or release. |
+
 <a id="reimu-props-offering-box-intake-001"></a>
 ## `REIMU-PROPS-OFFERING-BOX-INTAKE-001` · Prepare the offering box and coin props for standing scenes
 
@@ -172,6 +188,20 @@ Derived stage: **complete**.
 | visual | yes | `approved` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md), [2026-11-10-reimu-props-offering-box-intake.md](../docs/decisions/2026-11-10-reimu-props-offering-box-intake.md) | The user replied "差不多" on 2026-11-10 after using the installed lines; individual lines may still be revised on request. |
 | consumer | yes | `verified` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/2c62a77067d53746824946eeeb4c6c8ff2522175) | Installed 1.16 runs with the new reactions; idle autonomy is off by default in the production identity. |
 | publication | yes | `published` | [2026-11-10-reimu-scene-reactions-and-idle.md](../docs/decisions/2026-11-10-reimu-scene-reactions-and-idle.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/2c62a77067d53746824946eeeb4c6c8ff2522175) | The maintainer asked to commit and push on 2026-11-10; the exact Consumer commit was verified on origin/main. No tag or package release is implied. |
+
+<a id="reimu-standing-yawn-001"></a>
+## `REIMU-STANDING-YAWN-001` · Standing yawn for sleepy clicks and late greetings
+
+Derived stage: **complete**.
+
+| Gate | Required | Status | Evidence | Boundary note |
+| --- | --- | --- | --- | --- |
+| specification | yes | `ready` | [2026-11-11-reimu-standing-yawn.md](../docs/decisions/2026-11-11-reimu-standing-yawn.md) | The pose pair, the three event-tied triggers, interruption by any click, reduced motion and isolated fallback are written down; the maintainer asked for it with "画打哈欠". |
+| implementation | yes | `ready` | [2026-11-11-reimu-standing-yawn.md](../docs/decisions/2026-11-11-reimu-standing-yawn.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/cb160884b5d8d43a9511f66938018345552aef9c) | The yawn-v1 pose table (re-exported with the approval record), PetAction.yawn, greet(yawn:), the optional --yawn build input, its package test and the gate rule are in the published Consumer commit. |
+| technical | yes | `passed` | [2026-11-11-reimu-standing-yawn.md](../docs/decisions/2026-11-11-reimu-standing-yawn.md) | Harness 0.8.0 validation, pixel gates (zero changed pixels outside the two take rectangles, unchanged opaque bounds and shoe line, 913-1477 px changed at 160 px), 292 behavior, 42 native and 4 package checks and strict signatures passed on the installed 1.23/build 25 bundle. |
+| visual | yes | `approved` | [2026-11-11-reimu-standing-yawn.md](../docs/decisions/2026-11-11-reimu-standing-yawn.md) | With the side-by-side review GIF delivered, the maintainer replied "都可以，安装" on 2026-11-11. Approval was given from the GIF before installation; reduced motion was on at install, so on-screen playback may not have been seen. |
+| consumer | yes | `verified` | [2026-11-11-reimu-standing-yawn.md](../docs/decisions/2026-11-11-reimu-standing-yawn.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/cb160884b5d8d43a9511f66938018345552aef9c) | Installed as 1.23/build 25; the installed loader reports yawn_reason none and yawn_frames 4. |
+| publication | yes | `published` | [2026-11-11-reimu-standing-yawn.md](../docs/decisions/2026-11-11-reimu-standing-yawn.md), [remote](https://github.com/lyw-ops/gensokyo-codex-pets/commit/cb160884b5d8d43a9511f66938018345552aef9c) | The exact Consumer commit is on origin/main; the maintainer agreed to install, commit and push in the same reply. No tag or release. |
 
 <a id="reimu-tea-break-001"></a>
 ## `REIMU-TEA-BREAK-001` · Tea break at the low table after a round of work

@@ -1478,6 +1478,130 @@
           "note": "The exact Consumer commit is on origin/main under the maintainer's delegation. No tag or release."
         }
       }
+    },
+    "REIMU-STANDING-YAWN-001": {
+      "title": "Standing yawn for sleepy clicks and late greetings",
+      "kind": "consumer-vertical-slice",
+      "depends_on": [
+        "REIMU-DIALOGUE-ACTIONS-001"
+      ],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual",
+        "consumer",
+        "publication"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-standing-yawn.md"
+          ],
+          "note": "The pose pair, the three event-tied triggers, interruption by any click, reduced motion and isolated fallback are written down; the maintainer asked for it with \"\u753b\u6253\u54c8\u6b20\"."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-standing-yawn.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/cb160884b5d8d43a9511f66938018345552aef9c"
+          ],
+          "note": "The yawn-v1 pose table (re-exported with the approval record), PetAction.yawn, greet(yawn:), the optional --yawn build input, its package test and the gate rule are in the published Consumer commit."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-standing-yawn.md"
+          ],
+          "note": "Harness 0.8.0 validation, pixel gates (zero changed pixels outside the two take rectangles, unchanged opaque bounds and shoe line, 913-1477 px changed at 160 px), 292 behavior, 42 native and 4 package checks and strict signatures passed on the installed 1.23/build 25 bundle."
+        },
+        "visual": {
+          "status": "approved",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-standing-yawn.md"
+          ],
+          "note": "With the side-by-side review GIF delivered, the maintainer replied \"\u90fd\u53ef\u4ee5\uff0c\u5b89\u88c5\" on 2026-11-11. Approval was given from the GIF before installation; reduced motion was on at install, so on-screen playback may not have been seen."
+        },
+        "consumer": {
+          "status": "verified",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-standing-yawn.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/cb160884b5d8d43a9511f66938018345552aef9c"
+          ],
+          "note": "Installed as 1.23/build 25; the installed loader reports yawn_reason none and yawn_frames 4."
+        },
+        "publication": {
+          "status": "published",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-standing-yawn.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/cb160884b5d8d43a9511f66938018345552aef9c"
+          ],
+          "note": "The exact Consumer commit is on origin/main; the maintainer agreed to install, commit and push in the same reply. No tag or release."
+        }
+      }
+    },
+    "REIMU-POOF-BRIDGE-001": {
+      "title": "Smoke display bridge between pose families",
+      "kind": "consumer-vertical-slice",
+      "depends_on": [
+        "REIMU-TEA-BREAK-001"
+      ],
+      "required_gates": [
+        "specification",
+        "implementation",
+        "technical",
+        "visual",
+        "consumer",
+        "publication"
+      ],
+      "gates": {
+        "specification": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-poof-display-bridge.md"
+          ],
+          "note": "A display bridge under the frozen transition specification's own definition: when it appears, when it never does, its five 80 ms steps and that the behavior model is not delayed. It closes no gate of REIMU-WORK-TRANSITIONS-001."
+        },
+        "implementation": {
+          "status": "ready",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-poof-display-bridge.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/cb160884b5d8d43a9511f66938018345552aef9c"
+          ],
+          "note": "The poof-v1 effect package (re-exported with the approval record), DisplayBridge and PoseFamily, the overlay drawing, the menu toggle, the optional --poof build input, its package test and the gate rule are in the published Consumer commit."
+        },
+        "technical": {
+          "status": "passed",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-poof-display-bridge.md"
+          ],
+          "note": "292 behavior checks including the five bridge rules, 42 native and 4 package checks and strict signatures passed on the installed 1.23/build 25 bundle; the full cloud hides 89.6-97.7% of each family's silhouette."
+        },
+        "visual": {
+          "status": "approved",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-poof-display-bridge.md"
+          ],
+          "note": "The maintainer replied \"\u90fd\u53ef\u4ee5\uff0c\u5b89\u88c5\" on 2026-11-11 after the review GIF, which is a Python composite on the runtime timing and not a recording of the app. Reduced motion was on at install, so the bridge may not have been seen on screen. It closes no gate of REIMU-WORK-TRANSITIONS-001."
+        },
+        "consumer": {
+          "status": "verified",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-poof-display-bridge.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/cb160884b5d8d43a9511f66938018345552aef9c"
+          ],
+          "note": "Installed as 1.23/build 25; the installed loader reports poof_reason none and poof_frames 4."
+        },
+        "publication": {
+          "status": "published",
+          "evidence": [
+            "docs/decisions/2026-11-11-reimu-poof-display-bridge.md",
+            "https://github.com/lyw-ops/gensokyo-codex-pets/commit/cb160884b5d8d43a9511f66938018345552aef9c"
+          ],
+          "note": "The exact Consumer commit is on origin/main; the maintainer agreed to install, commit and push in the same reply. No tag or release."
+        }
+      }
     }
   }
 }

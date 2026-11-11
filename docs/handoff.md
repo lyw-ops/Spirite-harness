@@ -1,5 +1,19 @@
 # Project handoff
 
+## 2026-11-11 1.23 / build 25 已安装并发布：站姿打哈欠、烟雾过渡
+
+用户说「画打哈欠」，随后说「然后我也建议我们做一些过度动画」；看过两张对照动图后回复「都可以，安装」。
+两个包带确认记录重新导出，`build.py` 改钉摘要，1.23 / build 25 通过全部测试（行为 292、原生 42、哈欠 4、烟雾 4、收工茶 5 及其余、仓库门禁）后安装。
+Consumer `cb16088` 已推送。回退包 `build/reimu-1.23-install-20261111/rollback-1.22-build24.zip`。
+
+- 哈欠：`docs/decisions/2026-11-11-reimu-standing-yawn.md`，`REIMU-STANDING-YAWN-001` 完成，工作目录 `build/reimu-standing-yawn-v1/`。
+- 烟雾过渡：`docs/decisions/2026-11-11-reimu-poof-display-bridge.md`，`REIMU-POOF-BRIDGE-001` 完成，工作目录 `build/reimu-poof-bridge-v1/`。
+  它是如实标注的显示桥，不是画出来的起身 / 坐下；`REIMU-WORK-TRANSITIONS-001` 的门没有动。
+
+要留意：确认依据是动图（烟雾那张是离线合成，不是录屏），用户确认时还没在应用里看到；安装时偏好 `reduced = 1`，
+减弱动态开着时哈欠只出台词、烟雾不出现。下次构建的输入：`--tea-break`、`--yawn`、`--poof` 都可以用已安装应用的 `Resources/TeaBreak`、`Yawn`、`Poof`。
+设计里还没做的：御币、垂头、漂浮、扫地、夜间睡觉，「等确认时用托腮图」，1.20 台词逐句确认。
+
 ## 2026-11-11 用户确认漫画对话框和收工茶：「都可以」
 
 用户醒来后对「对话框和收工茶的样子可以吗？」回复「都可以」。`REIMU-MANGA-BALLOONS-001`、`REIMU-TEA-BREAK-001` 的视觉门改为 `approved`，两个任务完成。
